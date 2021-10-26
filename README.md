@@ -3,6 +3,21 @@
 This repo contains the labs for the LFD420 training. It uses
 the `Raspberry Pi 3 B+` and `Raspbian` to perform the exercises.
 
+## Structure of the repo
+
+The structure of the repo contains these 2 main directories
+
+```
+.
+├── labs
+├── linux
+└── README.md
+```
+
+- labs: contains the solution to the labs.
+- linux: contains the Linux source code the Raspberry Pi.
+
+
 ## Steps to install Raspbian
 
 For detailed instructions see:
@@ -77,7 +92,10 @@ sudo apt install git bc bison flex libssl-dev make libc6-dev libncurses5-dev
 sudo apt install crossbuild-essential-arm64
 ```
 
-Get the linux kernel and compile it:
+Get the linux kernel:
+
+> Note: This step might be skipped because the linux kernel is already
+> under the `linux` directory.
 
 ```shell
 $ git clone --depth=1 https://github.com/raspberrypi/linux
@@ -86,7 +104,11 @@ $ git branch
 * rpi-5.10.y
 $ git log --oneline
 6cfe1a8 staging/bcm2835-camera: Add support for MPEG_VIDEO_FORCE_KEY_FRAME
+```
 
+Compile the Linux kernel, modules and device trees:
+
+```
 $ KERNEL=kernel8
 $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- bcmrpi3_defconfig
 $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image -j 8 modules dtbs

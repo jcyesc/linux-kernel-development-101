@@ -1,8 +1,8 @@
 obj-m += my_basic_module.o
 
 
-# Assumes that the kernel is in:
-KERNEL_DIR ?= $(HOME)/Development/lsf-kernel-dev/linux
+# Assumes that the Linux Kernel source code is in:
+KERNEL_DIR ?= $(HOME)/Development/lsf-kernel-dev/linux-kernel-internals-LFD420/linux
 
 # Compile the module.
 all:
