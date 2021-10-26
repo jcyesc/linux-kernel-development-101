@@ -90,6 +90,7 @@ Instal the tooling necessary to get and compile the kernel.
 ```shell
 sudo apt install git bc bison flex libssl-dev make libc6-dev libncurses5-dev
 sudo apt install crossbuild-essential-arm64
+sudo apt install libncurses5-dev
 ```
 
 Get the linux kernel:
@@ -110,7 +111,12 @@ Compile the Linux kernel, modules and device trees:
 
 ```
 $ KERNEL=kernel8
+# Always install the default configuration
 $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- bcmrpi3_defconfig
+
+# In case you want to configure a particular feature, use menuconfig.
+# https://www.raspberrypi.com/documentation/computers/linux_kernel.html#preparing-to-configure
+$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig
 $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image -j 8 modules dtbs
 ```
 

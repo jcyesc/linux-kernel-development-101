@@ -73,3 +73,13 @@ CONFIG_PREEMPT_VOLUNTARY=y
 # CONFIG_PREEMPT is not set
 # CONFIG_PREEMPTIRQ_EVENTS is not set
 ```
+
+## How to find the processor information
+
+There are several ways to find process information
+
+```shell
+$ nproc
+4
+$ cat /proc/cpuinfo
+```
