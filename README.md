@@ -125,8 +125,8 @@ Install the image in the SD card:
 ```shell
 $ lsblk
 sdb
-   sdb1
-   sdb2
+   sdc1
+   sdc2
 
 $ mkdir mnt
 $ mkdir mnt/fat32

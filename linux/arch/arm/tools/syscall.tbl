@@ -454,3 +454,5 @@
 438	common	pidfd_getfd			sys_pidfd_getfd
 439	common	faccessat2			sys_faccessat2
 440	common	process_madvise			sys_process_madvise
+441	common	custom				sys_custom
+442	common	custom_print		sys_custom_print

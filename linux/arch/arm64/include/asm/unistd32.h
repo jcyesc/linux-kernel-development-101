@@ -889,6 +889,10 @@ __SYSCALL(__NR_pidfd_getfd, sys_pidfd_getfd)
 __SYSCALL(__NR_faccessat2, sys_faccessat2)
 #define __NR_process_madvise 440
 __SYSCALL(__NR_process_madvise, sys_process_madvise)
+#define __NR_sys_custom 441
+__SYSCALL(__NR_sys_custom, sys_custom)
+#define __NR_sys_custom_print 442
+__SYSCALL(__NR_sys_custom_print, sys_custom_print)
 
 /*
  * Please add new compat syscalls above this comment and update
