@@ -62,6 +62,10 @@ scp my_file pi@192.168.2.2:~
 
 ## Cross-compile and install the Linux kernel
 
+After you have installed Raspbian in the SD card using `Raspberry Pi OS`, you might
+want to compile and install newer versions of the Kernel. This section explains
+how to do it.
+
 For detailed instructions see:
 
 https://www.raspberrypi.com/documentation/computers/linux_kernel.html
