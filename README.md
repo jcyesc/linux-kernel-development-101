@@ -75,7 +75,7 @@ To transfer a file from the host to the target, execute:
 scp my_file pi@192.168.2.2:~
 ```
 
-## Cross-compile and install the Linux kernel
+## Cross-compile and install the `64-bit` Linux kernel
 
 After you have installed Raspbian in the SD card using `Raspberry Pi OS`, you might
 want to compile and install newer versions of the Kernel. This section explains
@@ -107,7 +107,7 @@ $ git log --oneline
 6cfe1a8 staging/bcm2835-camera: Add support for MPEG_VIDEO_FORCE_KEY_FRAME
 ```
 
-Compile the Linux kernel, modules and device trees:
+Compile the `64-bit` Linux kernel, modules and device trees:
 
 ```
 $ KERNEL=kernel8
@@ -146,6 +146,17 @@ $ sudo umount mnt/ext4
 ```
 
 ## Find out if the OS is 32-bit or 64-bit
+
+```shell
+# Go to the linux kernel directory.
+$ cd linux
+$ file vmlinux
+vmlinux: ELF 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), statically linked, BuildID[sha1]=d5a8bf0bbb5a55d98492b8b9e3eda9f320d1a2f1, not stripped
+$ file kernel/sys.o
+kernel/sys.o: ELF 64-bit LSB relocatable, ARM aarch64, version 1 (SYSV), not stripped
+```
+
+## Find out if the user space is 32-bit or 64-bit
 
 ```shell
 pi@raspberrypi:~ $ getconf LONG_BIT
