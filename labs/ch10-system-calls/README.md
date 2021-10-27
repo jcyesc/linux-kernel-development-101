@@ -2,6 +2,13 @@
 # System calls
 
 
+## How to add a system call
+
+The steps to add a system call are in:
+
+https://github.com/jcyesc/linux-kernel-internals-LFD420/commit/a94b4819ee08fa1b97e5ae00a8d2e2bb62c54aa1
+
+
 ## How execute a system call in user space
 
 Once that Linux has booted, compile the following code.
