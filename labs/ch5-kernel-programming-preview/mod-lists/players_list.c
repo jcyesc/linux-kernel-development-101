@@ -55,9 +55,23 @@ static void __exit players_list_exit(void)
 
 	list_for_each_safe(list_pos, list_tmp, &players_list) {
 		p = list_entry(list_pos, struct player, node);
-		pr_info("freeing id: %d, name: %s\n", p->id, p->name);
 
+		pr_info("Removing node from the list\n");
+		list_del(list_pos);
+
+		pr_info("Freeing id: %d, name: %s\n", p->id, p->name);
 		kfree(p);
+	}
+
+	if (list_empty(&players_list)) {
+		pr_info("players_list is empty!");
+	}
+
+	pr_info("Checking if there are elements:");
+	list_for_each(list_pos, &players_list) {
+		p = list_entry(list_pos, struct player, node);
+
+		pr_info("id: %d, name: %s\n", p->id, p->name);
 	}
 }
 
