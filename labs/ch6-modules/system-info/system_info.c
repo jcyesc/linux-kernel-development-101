@@ -10,7 +10,7 @@
  *
  * Compare your results with the results of uname -a.
  */
-
+J
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/utsname.h>
