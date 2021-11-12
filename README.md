@@ -15,7 +15,7 @@ The structure of the repo contains these 2 main directories
 ```
 
 - labs: contains the solution to the labs.
-- linux: contains the Linux source code the Raspberry Pi.
+- linux: contains the Linux source code for the Raspberry Pi.
 
 
 ## Steps to install Raspbian
@@ -124,9 +124,11 @@ Install the image in the SD card:
 
 ```shell
 $ lsblk
-sdb
-   sdc1
-   sdc2
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sr0     11:0    1 1024M  0 rom
+sdc      8:32   1 14.9G  0 disk
+├─sdc2   8:34   1 14.6G  0 part /media/parallels/rootfs
+└─sdc1   8:33   1  256M  0 part /media/parallels/boot
 
 $ mkdir mnt
 $ mkdir mnt/fat32

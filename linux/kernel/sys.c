@@ -2691,7 +2691,7 @@ COMPAT_SYSCALL_DEFINE1(sysinfo, struct compat_sysinfo __user *, info)
 
 SYSCALL_DEFINE0(custom_print)
 {
-	printk("sys_custom_print() system call in kernel/sys.c\n");
+	printk("sys_custom_print() defined in kernel/sys.c\n");
 
 	return 5555;
 }

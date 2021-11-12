@@ -8,6 +8,9 @@ The steps to add a system call are in:
 
 https://github.com/jcyesc/linux-kernel-internals-LFD420/commit/a94b4819ee08fa1b97e5ae00a8d2e2bb62c54aa1
 
+> For aarch64 is not necessaary to modify this file:
+> `linux/arch/arm/tools/syscall.tbl`
+
 
 ## How execute a system call in user space
 

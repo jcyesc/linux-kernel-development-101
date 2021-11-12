@@ -7,7 +7,7 @@
  */
 SYSCALL_DEFINE0(custom)
 {
-	printk("sys_custom() system call in custom-syscalls/sys_custom.c\n");
+	printk("sys_custom() defined in custom-syscalls/sys_custom.c\n");
 
 	return 3;
 }
