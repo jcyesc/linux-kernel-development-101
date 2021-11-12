@@ -26,3 +26,27 @@ pi@raspberrypi:~ $ zcat /proc/config.gz | grep IKCONFIG
 CONFIG_IKCONFIG=y
 CONFIG_IKCONFIG_PROC=y
 ```
+
+## Kernel browsers
+
+
+There are a lot of kernel browsers, two popular ones are:
+
+- Bootlin: https://elixir.bootlin.com/linux/latest/source
+- cscope
+
+Bootlin allows to navigate and search through the kernel source code using a
+web browser. On the other hand `cscope` offers a command line alternative.
+
+To install and use `cscope`, follow the steps below:
+
+```shell
+$ sudo apt install cscope
+
+# Go where the kernel source code is:
+$ cd kernel_src/
+$ make cscope
+
+# Start searching using cscope.
+$ cscope
+```

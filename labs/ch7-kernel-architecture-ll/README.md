@@ -1,6 +1,26 @@
 # Kernel Architecture II
 
 
+## Processes, Threads and Tasks
+
+
+A `process` is an executing program and associated resources such as memory
+mappings, open files, signal handlers, etc.
+
+A `thread` is a light way process in the sense that it shares the resources
+of other processes (memory, open files, etc).
+
+
+The kernel can be in different contexts:
+
+- Process context: executing code on behalf of the process.
+- Interrupt context: dispatching a hardware interrupt.
+
+
+To find out in which context the kernel is, use the functions in
+`include/linux/preempt.h`.
+
+
 ## How to find the kernel configuration
 
 
