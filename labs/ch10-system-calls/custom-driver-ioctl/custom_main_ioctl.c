@@ -22,11 +22,12 @@ int main(int argc, char *argv[])
 	printf("open() returns %d\n", fd);
 	if (fd < 0) {
 		printf("There was a problem opening %s, error %d\n", dev_name, fd);
+		printf("Try: sudo chmod 755 %s\n", dev_name);
 		return fd;
 	}
 
 	for (i = 100; i <= 110; i++) {
-		printf("ioctl(%d) = %d\n", i, ioctl(fd, i, 90));
+		printf("ioctl(%d) = %d\n", i, ioctl(fd, i, 90 + i));
 	}
 
 	close(fd);

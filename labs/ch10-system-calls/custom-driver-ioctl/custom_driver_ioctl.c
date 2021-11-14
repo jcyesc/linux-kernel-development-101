@@ -9,6 +9,10 @@
  *
  * sudo insmod custom_driver_ioctl.ko
  * chmod 755 /dev/customdev
+ *
+ * Note:
+ * - unlocked_ioctl() - Use it for ARM32
+ * - compat_ioctl() - Use it for ARM64
  */
 #include <linux/device.h>  // Use to create and destroy nodes.
 #include <linux/fs.h>      // Defines the file operations prototypes for driver.
@@ -17,7 +21,6 @@
 #include <linux/module.h>
 
 #define CUSTOM_DEV_IOCTL "customdev"
-
 
 static int custom_driver_open(struct inode *inode, struct file *file) {
 	pr_info("custom_driver_open() is called.\n");
@@ -39,11 +42,24 @@ static long  custom_driver_unlocked_ioctl(
 	return 0;
 }
 
+/**
+ * When the Raspberry Pi kernel is compiled for ARM64, the compact_ioctl()
+ * function has to be used instead of unlocked_ioctl().
+ */
+static long  custom_driver_compat_ioctl(
+		struct file *fp, unsigned int cmd, unsigned long arg)
+{
+	pr_info("custom_driver_compat_ioctl() cmd=%d, arg=%lu\n", cmd, arg);
+
+	return 0;
+}
+
 static const struct file_operations custom_driver_fops = {
 		.owner = THIS_MODULE,
 		.open = custom_driver_open,
 		.release = custom_driver_close,
 		.unlocked_ioctl = custom_driver_unlocked_ioctl,
+		.compat_ioctl = custom_driver_compat_ioctl,
 };
 
 static struct miscdevice misc_custom_device = {
