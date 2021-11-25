@@ -54,7 +54,7 @@ static int __init spin_lock_module_init(void)
 	pr_info("Trying to load module %s\n", KBUILD_MODNAME);
 	spin_lock_init(&print_lock);
 
-	// Create and star a kthread.
+	// Create and start a kthread.
 	task = kthread_run(kthread_handler, "THREAD_1 HANDLER", "THREAD_1");
 	if (task == ERR_PTR(-ENOMEM)) {
 		ret = -ENOMEM;
@@ -71,7 +71,7 @@ static int __init spin_lock_module_init(void)
 	return 0;
 
 	out:
-		pr_err("There was an error");
+		pr_err("There was an error in %s\n", KBUILD_MODNAME);
 		return ret;
 }
 
