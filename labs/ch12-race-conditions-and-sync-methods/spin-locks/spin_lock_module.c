@@ -1,13 +1,17 @@
 /**
  * spin-lock module
  *
+ * An spinlock is a kernel construction that is used to protect critical
+ * regions. It will spin while waiting for a resource to be available and it
+ * doesn't sleep while waiting.
+ *
  * This module shows how to use spin-locks. In order to do that, it creates
  * and starts 2 kthreads that get the spinlock before printing the kthread
  * name.
  *
- * An spinlock is a kernel construction that is used to protect critical
- * regions. It will spin while waiting for a resource to be available and it
- * doesn't sleep while waiting.
+ * To see the output, execute:
+ *
+ * $ tail -f /var/log/messages
  */
 
 #include <linux/atomic.h>
@@ -33,8 +37,9 @@ static int kthread_handler(void *data)
 	for (i = 1; i <= 20; i++) {
 		spin_lock(&print_lock);
 		pr_info("Thread %s has the spinlock for %d time\n", thread_name, i);
-		msleep_interruptible(msecs);
 		spin_unlock(&print_lock);
+		// The kthread can NOT sleep while having the spin_lock.
+		msleep_interruptible(msecs);
 	}
 
 	return 0;
