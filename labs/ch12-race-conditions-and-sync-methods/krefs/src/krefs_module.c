@@ -32,9 +32,30 @@ static void release_thunder_cat(struct kref *ref)
 	kfree(td);
 }
 
+static int thunder_cat_handler(void *td_data)
+{
+    struct thunder_cat *td = td_data;
+    pr_info("thunder_cat_handler() has the thunder cat %s\n", td->name);
+    thunder_cat_print(td);
+
+    // Decrementing the kref counter.
+    kref_put(&td->refcount, release_thunder_cat);
+
+    return 0;
+}
+
+/*
+ * Perform the tasks below:
+ *
+ * - Create a thunder cat and initialize the {@code panthro} reference with the
+ *   new object.
+ * - Keeps the {@code panthro->refcount} updated.
+ * - Creates a kthread and pass the {@code panthro} reference.
+ */
 static int __init krefs_module_init(void)
 {
-	// struct task_struct *task;
+	struct task_struct *task;
+	int ret  =0;
 
 	pr_info("%s: Loading the module %s\n", KBUILD_MODNAME, KBUILD_MODNAME);
 
@@ -44,16 +65,18 @@ static int __init krefs_module_init(void)
 	}
 
 	thunder_cat_init(panthro, "Panthro", 30);
-
 	thunder_cat_print(panthro);
 
-	// Create a pthread and pass the thunder cat reference.
+	// Incrememting the kref counter.
+	kref_get(&panthro->refcount);
+	task = kthread_run(thunder_cat_handler, panthro, "thunder_cat_handler");
+	if (task == ERR_PTR(-ENOMEM)) {
+		ret = -ENOMEM;
+		// Decrementing the kref counter if there is an error creating kthread.
+		kref_put(&panthro->refcount, release_thunder_cat);
+	}
 
-
-	// Increment the ref counter.
-	// kref_get(&panthro->refcount);
-
-	return 0;
+	return ret;
 }
 
 static void __exit krefs_module_exit(void)
@@ -62,7 +85,7 @@ static void __exit krefs_module_exit(void)
 
 	thunder_cat_print(panthro);
 
-	// Releasing the reference in this module.
+	// Decrementing and releasing the reference in this module.
 	kref_put(&panthro->refcount, release_thunder_cat);
 }
 
