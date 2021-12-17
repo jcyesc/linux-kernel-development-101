@@ -2,6 +2,8 @@
 # Note: There is not a thunder_cats_module.c file. The file thunder_cats_module.o
 # is a concatenation of the files in thunder_cats_module-y.
 obj-m += thunder_cats_module.o
+obj-m += thunder_cats_client1_module.o
+obj-m += thunder_cats_client2_module.o
 
 # When kbuild executes, the current directory is always the root of the kernel
 # tree (the argument to “-C”) and therefore an absolute path is needed. $(src)
@@ -14,6 +16,12 @@ ccflags-y := -I$(src)/include
 # https://www.kernel.org/doc/html/latest/kbuild/modules.html#several-subdirectories
 thunder_cats_module-y := src/krefs_module.o
 thunder_cats_module-y += src/thunder_cat.o
+
+thunder_cats_client1_module-y := src/krefs_client_module1.o
+thunder_cats_client1_module-y += src/thunder_cat.o
+
+thunder_cats_client2_module-y := src/krefs_client_module2.o
+thunder_cats_client2_module-y += src/thunder_cat.o
 
 # Assumes that the Linux Kernel source code is in:
 KERNEL_DIR ?= $(HOME)/Development/lsf-kernel-dev/linux-kernel-internals-LFD420/linux

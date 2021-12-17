@@ -12,7 +12,7 @@
 #include <linux/kref.h>
 #include <linux/module.h>
 #include <linux/printk.h>
-#include <linux/sched.h> //
+#include <linux/sched.h> // task_struct
 #include <linux/slab.h>  // kmalloc(), kfree().
 #include <linux/string.h>
 
@@ -31,6 +31,8 @@ static void release_thunder_cat(struct kref *ref)
 
 	kfree(td);
 }
+EXPORT_SYMBOL(release_thunder_cat);
+
 
 static int thunder_cat_handler(void *td_data)
 {
