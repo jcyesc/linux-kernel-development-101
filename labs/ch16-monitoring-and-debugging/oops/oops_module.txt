@@ -1,0 +1,58 @@
+
+oops_module.ko:     file format elf64-littleaarch64
+
+
+Disassembly of section .init.text:
+
+0000000000000000 <init_module>:
+/*
+ * When the module is loaded, it will generate an oops message because a NULL
+ * pointer is trying to be deferenced.
+ */
+static int __init oops_module_init(void)
+{
+   0:	a9bf7bfd 	stp	x29, x30, [sp,#-16]!
+   4:	910003fd 	mov	x29, sp
+   8:	aa1e03e0 	mov	x0, x30
+   c:	94000000 	bl	0 <_mcount>
+  10:	90000002 	adrp	x2, 0 <init_module>
+  14:	90000003 	adrp	x3, 0 <init_module>
+  18:	91000042 	add	x2, x2, #0x0
+  1c:	90000000 	adrp	x0, 0 <init_module>
+  20:	aa0203e1 	mov	x1, x2
+  24:	91000063 	add	x3, x3, #0x0
+  28:	91000000 	add	x0, x0, #0x0
+  2c:	94000000 	bl	0 <printk>
+  30:	d2800001 	mov	x1, #0x0                   	// #0
+	int *ptr = NULL;
+
+	pr_info("%s: Loading the module %s at address %p\n",
+  34:	90000000 	adrp	x0, 0 <init_module>
+  38:	91000000 	add	x0, x0, #0x0
+  3c:	b9400021 	ldr	w1, [x1]
+  40:	94000000 	bl	0 <printk>
+  44:	52800000 	mov	w0, #0x0                   	// #0
+  48:	a8c17bfd 	ldp	x29, x30, [sp],#16
+  4c:	d65f03c0 	ret
+
+Disassembly of section .exit.text:
+
+0000000000000000 <cleanup_module>:
+   0:	a9bf7bfd 	stp	x29, x30, [sp,#-16]!
+   4:	90000002 	adrp	x2, 0 <cleanup_module>
+   8:	91000042 	add	x2, x2, #0x0
+   c:	90000003 	adrp	x3, 0 <cleanup_module>
+  10:	90000000 	adrp	x0, 0 <cleanup_module>
+  14:	910003fd 	mov	x29, sp
+  18:	91000063 	add	x3, x3, #0x0
+  1c:	aa0203e1 	mov	x1, x2
+  20:	91000000 	add	x0, x0, #0x0
+/*
+ * When the module is loaded, it will generate an oops message because a NULL
+ * pointer is trying to be deferenced.
+ */
+static int __init oops_module_init(void)
+{
+  24:	94000000 	bl	0 <printk>
+  28:	a8c17bfd 	ldp	x29, x30, [sp],#16
+  2c:	d65f03c0 	ret
