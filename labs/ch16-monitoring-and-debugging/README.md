@@ -71,3 +71,17 @@ $ echo 1 > /proc/sys/kernel/panic_on_oops
 $ cat /proc/sys/kernel/panic_on_oops
 $ sysctl kernel.panic_on_oops
 ```
+# Kernel debuggers
+
+There are several kernel debuggers:
+
+- gdb
+- crash
+- kdb and kgdb
+- eBPF (extended Berkeley Packet Filter):
+http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
+- debugfs: Alternative filesystem to `/proc` to debug. It is mounted using:
+
+```shell
+$mount -t debugfs none /sys/kernel/debug
+```

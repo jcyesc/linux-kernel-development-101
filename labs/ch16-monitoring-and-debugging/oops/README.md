@@ -81,4 +81,3 @@ To generate `oops_module.txt`, we run:
 ```shell
 $ aarch64-linux-gnu-objdump -S -d oops_module.ko > oops_module.txt
 ```
-
