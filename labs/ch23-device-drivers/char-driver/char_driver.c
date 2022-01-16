@@ -64,7 +64,8 @@ static ssize_t char_dev_read(
 
 	if (bytes_to_read == 0)  {
 		pr_info("char_dev_read(): The %s reached the end of the file\n", CHAR_DEV_NAME);
-		return -ENOSPC; /* Causes read() to return EOF */
+		//return -ENOSPC; /* Causes read() to return EOF */
+		return 0;
 	}
 
 	/* copy_to_user() returns the amount left to copy. */
@@ -101,7 +102,8 @@ char_dev_write(struct file *file, const char __user *buf, size_t lbuf, loff_t *p
 
     if( bytes_to_write == 0 ) {
 		pr_info("char_dev_write(): The %s reached the end of the file\n", CHAR_DEV_NAME);
-        return -ENOSPC; /* Returns EOF at write() */
+        // return -ENOSPC; /* Returns EOF at write() */
+        return 0;
     }
 
 	/* copy_from_user() returns the amount left to copy. */
