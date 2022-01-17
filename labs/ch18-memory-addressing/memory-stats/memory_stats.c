@@ -40,7 +40,7 @@
 
 #define MEMORY_STATS_DEV_NAME "memorystats"
 #define RAMDISK_SIZE ((size_t) (2 * PAGE_SIZE))
-#define PAGE_STAT(stat, num_pages) snprintf(ramdisk + bytes_written, \
+#define PAGE_STAT(offset, stat, num_pages) snprintf(ramdisk + offset, \
                                    RAMDISK_SIZE, \
                                    "%-15s=%10d %10ld %8ld\n", \
                                    stat, \
@@ -129,18 +129,18 @@ static int populate_memory_stats(void)
     bytes_written += snprintf(ramdisk + bytes_written,
             RAMDISK_SIZE,
             "\n                     Pages         KB       MB\n\n");
-    bytes_written += PAGE_STAT("free", free);
-    bytes_written += PAGE_STAT("locked", locked);
-    bytes_written += PAGE_STAT("reserved", reserved);
-    bytes_written += PAGE_STAT("swapcache", swapcache);
-    bytes_written += PAGE_STAT("referenced", referenced);
-    bytes_written += PAGE_STAT("slab", slab);
-    bytes_written += PAGE_STAT("private", private);
-    bytes_written += PAGE_STAT("uptodate", uptodate);
-    bytes_written += PAGE_STAT("dirty", dirty);
-    bytes_written += PAGE_STAT("active", active);
-    bytes_written += PAGE_STAT("writeback", writeback);
-    bytes_written += PAGE_STAT("mappedtodisk", mappedtodisk);
+    bytes_written += PAGE_STAT(bytes_written, "free", free);
+    bytes_written += PAGE_STAT(bytes_written, "locked", locked);
+    bytes_written += PAGE_STAT(bytes_written, "reserved", reserved);
+    bytes_written += PAGE_STAT(bytes_written, "swapcache", swapcache);
+    bytes_written += PAGE_STAT(bytes_written, "referenced", referenced);
+    bytes_written += PAGE_STAT(bytes_written, "slab", slab);
+    bytes_written += PAGE_STAT(bytes_written, "private", private);
+    bytes_written += PAGE_STAT(bytes_written, "uptodate", uptodate);
+    bytes_written += PAGE_STAT(bytes_written, "dirty", dirty);
+    bytes_written += PAGE_STAT(bytes_written, "active", active);
+    bytes_written += PAGE_STAT(bytes_written, "writeback", writeback);
+    bytes_written += PAGE_STAT(bytes_written, "mappedtodisk", mappedtodisk);
 
     dev_info(mem_dev,
             "populate_memory_stats() %d chars for %s\n",
