@@ -30,14 +30,14 @@
  * Note that the best way to check if a page is free is to require
  * page_count(page) = 0.
  *
- *       Note: Before using pfn_to_page() you should make sure you
- *       have a valid page frame number with pfn_valid(unsigned long
- *       pfn).
+ * Note: Before using pfn_to_page() you should make sure you
+ * have a valid page frame number with pfn_valid(unsigned long
+ * pfn).
  *
- *       On some systems with 4 GB of RAM or more, there may be some
- *       re-mapping which creates holes so that num_physpages is
- *       greater than the actual number of physical pages, depending
- *       on kernel configuration options.
+ * On some systems with 4 GB of RAM or more, there may be some
+ * re-mapping which creates holes so that num_physpages is
+ * greater than the actual number of physical pages, depending
+ * on kernel configuration options.
  *
  */
 #include <linux/version.h>
@@ -61,7 +61,7 @@ static int __init my_init(void)
 	int slab = 0;
 	int private = 0;
 	int uptodate = 0;
-	int  dirty = 0;
+	int dirty = 0;
 	int active = 0;
 	int writeback = 0;
 	int mappedtodisk = 0;
