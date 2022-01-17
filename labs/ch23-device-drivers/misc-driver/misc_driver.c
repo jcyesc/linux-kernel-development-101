@@ -127,7 +127,6 @@ static const struct file_operations fops = {
     .release = misc_dev_release,
 };
 
-
 static struct miscdevice sample_misc_device = {
     .minor = MISC_DYNAMIC_MINOR,
     .name = MISC_DEV_NAME,
@@ -137,6 +136,12 @@ static struct miscdevice sample_misc_device = {
 static int __init misc_dev_init(void)
 {
     ramdisk = kmalloc(RAMDISK_SIZE, GFP_KERNEL);
+
+    if (!ramdisk) {
+        pr_err("misc_dev_init() kmalloc() failed to allocate memory!\n");
+        return -EINVAL;
+    }
+
     if (misc_register(&sample_misc_device)) {
         pr_err("misc_dev_init() failed to register the %s\n", MISC_DEV_NAME);
         kfree(ramdisk);
