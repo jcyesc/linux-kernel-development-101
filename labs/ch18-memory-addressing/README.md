@@ -3,7 +3,18 @@
 Linux's Virtual Memory Management system is used to control all access to
 memory, including page caching, swapping, file access, process isolation, etc.
 
-# NUMA (Non-Uniform Memory Access)
+
+## Memory Zones
+
+| Zone        | Meaning        | 32-bit Usage    | 64-bit Usage  |
+| ----------- | -------------- |-----------------|---------------|
+| DMA         | 24-bit ISA DMA | 0-16 MB         | 0-16 MB       |
+| DMA32       | 32-bit DMA     | 16MB - 4GB      | 16MB - 4GB    |
+| Normal      | Low Memory     | 16MB - 896MB    | 4GB - All RAM |
+| HIGH        | High Memory    | 896MB - All Ram | No such zone  |
+
+
+## NUMA (Non-Uniform Memory Access)
 
 This term refers to architectures where the cpus don't have access to the same
 memory.
