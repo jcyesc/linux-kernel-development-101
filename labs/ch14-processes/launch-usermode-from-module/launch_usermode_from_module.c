@@ -62,7 +62,7 @@ struct cmd_param {
 	struct list_head node;
 };
 
-static int launch_usermode_dev_open(struct inode *indoe, struct file *file)
+static int launch_usermode_dev_open(struct inode *inode, struct file *file)
 {
 	dev_info(launch_usermode_dev,
 			"launch_usermode_dev_open(): Opening device %s\n",
@@ -70,7 +70,7 @@ static int launch_usermode_dev_open(struct inode *indoe, struct file *file)
 	return 0;
 }
 
-static int launch_usermode_dev_release(struct inode *indoe, struct file *file)
+static int launch_usermode_dev_release(struct inode *inode, struct file *file)
 {
 	dev_info(launch_usermode_dev,
 			"launch_usermode_dev_release(): Releasing device %s\n",
