@@ -52,7 +52,7 @@ static int misc_dev_release(struct inode * inode, struct file *file)
  * @buf  The user's buffer that will be populated with the content of the
  *       ramdisk.
  * @lbuf The length of the buffer.
- * @ppos The present position pointer.
+ * @ppos The present position pointer. It is assumed that it starts in ZERO.
  * @return The number of characters that were read.
  */
 static ssize_t misc_dev_read(
@@ -62,7 +62,8 @@ static ssize_t misc_dev_read(
     int bytes_to_read;
     int maxbytes;
 
-    dev_info(misc_dev, "misc_dev_read(): Starts lbuf=%d, *ppos=%d\n", (int)lbuf, (int)*ppos);
+    dev_info(misc_dev, "misc_dev_read(): Starts lbuf=%d, *ppos=%d\n",
+    		(int)lbuf, (int)*ppos);
 
     maxbytes = RAMDISK_SIZE - *ppos;
 
