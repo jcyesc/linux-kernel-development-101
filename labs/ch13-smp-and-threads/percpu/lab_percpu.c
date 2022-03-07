@@ -20,6 +20,21 @@
  *
  * Try using both methods; a fixed allocation and a dynamical
  * allocation.
+ *
+ * After loading and unloading the module, you should see something like:
+ *
+ * [  611.723405] lab_percpu: loading out-of-tree module taints kernel.
+ * [  611.723895] cpuvar=10
+ * [  611.723911] Hello: module loaded at 0x00000000b085a52f
+ * [  611.723918] Set variables on cpu:0
+ * [  633.427323] Now on cpu:2
+ * [  633.427352] cpu:0 cpuvar=11 per_cpu_ptr=1000
+ * [  633.427368] cpu:1 cpuvar=10 per_cpu_ptr=0
+ * [  633.427384] cpu:2 cpuvar=10 per_cpu_ptr=0
+ * [  633.427399] cpu:3 cpuvar=10 per_cpu_ptr=0
+ * [  633.427428] Bye: module unloaded from 0x0000000098269bb0
+pi@raspberrypi:~/Development $
+ *
  */
 
 #include <linux/module.h>
@@ -44,6 +59,7 @@ static int __init my_init(void)
 {
 	int cpu;
 
+	/* Printing and incrementing cpuvar. */
 	pr_info("cpuvar=%ld\n", get_cpu_var(cpuvar)++);
 	cpu = which_cpu();
 	put_cpu_var(cpuvar);
@@ -51,6 +67,7 @@ static int __init my_init(void)
 	*per_cpu_ptr(cpualloc, cpu) = 1000;
 	pr_info("Hello: module loaded at 0x%p\n", my_init);
 	pr_info("Set variables on cpu:%d\n", cpu);
+
 	return 0;
 }
 
@@ -58,7 +75,7 @@ static void __exit my_exit(void)
 {
 	int cpu;
 
-	pr_info("Now on cpu:%d\n", which_cpu());
+	pr_info("Exiting: Now on cpu:%d\n", which_cpu());
 
 	for_each_online_cpu(cpu) {
 		pr_info("cpu:%d cpuvar=%ld per_cpu_ptr=%ld\n", \
