@@ -42,56 +42,70 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int ntask = 10;			/* how many tasks */
-int ntime = 10;			/* how much time units to give at max
-				 * the actual time given is tim * ntime where
-				 * time < ntask so we can do integer arithmetic
-				 */
-int modprint = 1000;		/* how often to print out as we go; */
-int *prio, *total;		/* priority vector, total time spent vector */
-int ktop = 1000000;		/* maximum number of simulations */
+int num_tasks = 10;          /* how many tasks */
+const int ktime_units = 10;  /* how much time units to give at max
+                              * the actual time given is tim * ktime_units where
+                              * time < num_tasks so we can do integer arithmetic
+                              */
+int modprint = 1000;         /* how often to print out as we go; */
+int *prio;                   /* priority vector */
+int *total;                  /* total time spent vector */
+int ktop = 1000000;          /* maximum number of simulations */
 
 static int k;
 
-#define PRINTF if (k%modprint == 0) printf
+/* Try running the algorithm with (k % modprint != 0) so
+ * you can see the algorith clearly.
+ */
+#define PRINTF if (k % modprint == 0) printf
 
+/*
+ * Return the task that has the highest priority.
+ */
 int schedule(void)
 {
-	int j, tsk = 0, test = -1;
+	int j;
+	int tsk = 0;
+	int test = -1;
 
-	for (j = 0; j < ntask; j++)
+	for (j = 0; j < num_tasks; j++) {
 		if (prio[j] > test) {
 			test = prio[j];
 			tsk = j;
 		}
+	}
+
 	return tsk;
 }
 
-void update(int tsk, int tim)
+void update_priorities_and_totals(int tsk, int time)
 {
-	int j, timeslot, fairtime;	/* note fairtime will always be tim ! */
+	int j;
+	int timeslot;
+	int fairtime;	/* note fairtime will always be time. */
 
-	timeslot = tim * ntask;
-	fairtime = timeslot / ntask;
-	for (j = 0; j < ntask; j++)
+	timeslot = time * num_tasks;
+	fairtime = timeslot / num_tasks;
+	for (j = 0; j < num_tasks; j++)
 		prio[j] += fairtime;
+
 	prio[tsk] += -timeslot;	/* don't make it not be negative */
-	total[tsk] += timeslot;
+	total[tsk] += time;
 }
 
 void printit(int tsk, int tim)
 {
 	int j, diff, totave = 0, disp = 0;
 
-	PRINTF("\nn=%4d, tsk=%d, tim=%d,\n", k, tsk, tim);
-	for (j = 0; j < ntask; j++) {
+	PRINTF("\nk=%4d, tsk=%d, time slice=%d,\n", k, tsk, tim);
+	for (j = 0; j < num_tasks; j++) {
 		PRINTF("[%2d]=%3d  ", j, prio[j]);
 		totave += total[j];
 	}
 	PRINTF("\n");
 
-	totave = totave / ntask;
-	for (j = 0; j < ntask; j++) {
+	totave = totave / num_tasks;
+	for (j = 0; j < num_tasks; j++) {
 		diff = total[j] - totave;
 		PRINTF("%8d  ", diff);
 		if (diff > 0)
@@ -99,32 +113,45 @@ void printit(int tsk, int tim)
 		else
 			disp += -diff;
 	}
-	PRINTF("\n average=%d, dispersion =%d\n", totave, disp / ntask);
+
+	PRINTF("\n average=%d, dispersion =%d\n", totave, disp / num_tasks);
 }
 
 int main(int argc, char *argv[])
 {
-	int tsk, tim;
+	int tsk;
+	int tim;
+	int i;
 
 	if (argc > 1)
-		ntask = atoi(argv[1]);
+		num_tasks = atoi(argv[1]);
 	if (argc > 2)
 		modprint = atoi(argv[2]);
 	if (argc > 3)
 		ktop = atoi(argv[3]);
+
 	srand(getpid());
-	prio = calloc(ntask, sizeof(int));
-	total = calloc(ntask, sizeof(int));
+	prio = calloc(num_tasks, sizeof(int));
+	total = calloc(num_tasks, sizeof(int));
 
 	for (k = 0; k < ktop; k++) {
 		/* select how long to run */
-		tim = rand() % ntime + 1;
+		tim = rand() % ktime_units + 1;
 		/* select which process to run */
 		tsk = schedule();
 		/* print results */
 		printit(tsk, tim);
 		/* update priorities and total times */
-		update(tsk, tim);
+		update_priorities_and_totals(tsk, tim);
 	}
+
+	/* Print final totals */
+	printf("\n===============================\n");
+	printf("Task  Priority  Total Execution");
+	printf("\n===============================\n");
+	for (i = 0; i < num_tasks; i++) {
+		printf("%4d  %8d      %d\n", i, prio[i], total[i]);
+	}
+
 	exit(EXIT_SUCCESS);
 }
