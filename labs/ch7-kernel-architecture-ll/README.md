@@ -1,4 +1,4 @@
-# Kernel Architecture II
+# Chapter 7 - Kernel Architecture II
 
 
 ## Processes, Threads and Tasks

@@ -1,5 +1,5 @@
 
-# Kernel Configuration and Compilation
+# Chapter 9 - Kernel Configuration and Compilation
 
 
 To configure different options in the Linux kernel, we can use `menuconfig`:
