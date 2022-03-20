@@ -36,6 +36,13 @@
  *
  * Evaluate how well the load is balanced as time proceeds.
  *
+ * Note: Try first with:
+ *
+ *    #define PRINTF printf
+ *
+ *    int ktop = 15;
+ *
+ * So you can see the progress of the algorithm.
  */
 
 #include <stdio.h>
@@ -60,7 +67,8 @@ static int k;
 #define PRINTF if (k % modprint == 0) printf
 
 /*
- * Return the task that has the highest priority.
+ * Return the task that has the highest priority. The CFS would use a Red Black
+ * Tree to get the next task instead of iterating throught the whole list.
  */
 int schedule(void)
 {
