@@ -15,6 +15,16 @@ $ strace [options] myprogram.o [arguments]
 
 ```
 
+## `powertop`
+
+`powertop` is a tool to analyze power consumption. To install it, use:
+
+```shell
+$ tar -xvf powertop.tar.gz
+$ ./configure
+$ make
+$ make install
+```
 
 ## `sysctl`
 
@@ -71,7 +81,7 @@ $ echo 1 > /proc/sys/kernel/panic_on_oops
 $ cat /proc/sys/kernel/panic_on_oops
 $ sysctl kernel.panic_on_oops
 ```
-# Kernel debuggers
+## Kernel debuggers
 
 There are several kernel debuggers:
 
@@ -80,8 +90,28 @@ There are several kernel debuggers:
 - kdb and kgdb
 - eBPF (extended Berkeley Packet Filter):
 http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
-- debugfs: Alternative filesystem to `/proc` to debug. It is mounted using:
+- debugfs: Alternative filesystem to `/proc`.
+
+
+### Debugfs
+
+The `debugfs` was created to store debug information and it is an alternative
+to `/proc` filesystem. Some of the handy APIs are below:
+
+
+```c
+void debugfs_create_u8(const char *name, umode_t mode, struct dentry *parent, u8 *value);
+void debugfs_create_u16(const char *name, umode_t mode, struct dentry *parent, u16 *value);
+void debugfs_create_u32(const char *name, umode_t mode, struct dentry *parent, u32 *value);
+void debugfs_create_u64(const char *name, umode_t mode, struct dentry *parent, u64 *value);
+void debugfs_create_u32_array(const char *name, umode_t mode, struct dentry *parent, struct debugfs_u32_array *array);
+struct dentry *debugfs_create_bool(const char *name, umode_t mode, struct dentry *parent, bool *value);
+struct dentry *debugfs_create_ulong(const char *name, umode_t mode, struct dentry *parent, unsigned long *value);
+```
+
+It is mounted using:
 
 ```shell
-$mount -t debugfs none /sys/kernel/debug
+$ mount -t debugfs none /sys/kernel/debug
 ```
+

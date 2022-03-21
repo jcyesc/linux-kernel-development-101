@@ -10,7 +10,7 @@ the topics is below:
 - Memory Polls
 - kmalloc()
 - vmalloc()
-- bootmen()
+- Early allocations and bootmem()
 - Memory defragmentation
 
 
@@ -20,8 +20,13 @@ There are a couple of functions define in `/include/linux/gfp.h` and implemented
 in `/mm/page_alloc.c`. GFP stands for Get Free Pages.
 
 ```
-unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order)
-unsigned long get_zeroed_page(gfp_t gfp_mask)
+#include <linux/mm.h>
+
+unsigned long get_zeroed_page (gfp_t gfp_mask);
+unsigned long __get_free_page (gfp_t gfp_mask);
+unsigned long __get_free_pages (gfp_t gfp_mask, unsigned long order);
+void free_page (unsigned long addr);
+void free_pages (unsigned long addr, unsigned long order);
 ```
 
 - https://elixir.bootlin.com/linux/latest/source/mm/page_alloc.c#L5431

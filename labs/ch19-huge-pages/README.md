@@ -1,6 +1,12 @@
 
 # Chapter 19 - Huge Pages
 
+
+- Huge Page Support
+- libhugetlbfs
+- Transparent Huge Pages
+
+
 Huge Pages support in the Linux kernel allows us to use large pages (4 MB or
 2 MB in size) instead of 4KB pages, which drops the memory overhead for storing
 page tables.
@@ -45,6 +51,7 @@ the `proc` filesystem.
 ```shell
 $ cat /proc/sys/vm/nr_hugepages
 0
+# Makes 10 huge pages.
 $ echo 10 > /proc/sys/vm/nr_hugepages
 ```
 
@@ -71,6 +78,16 @@ $ cat /sys/kernel/mm/hugepages/hugepages-2048kB/surplus_hugepages
 0
 ```
 
+It is a good idea to set up the huge pages during booting time, otherwise, due
+to fragmentation, it might be difficult to get the huge pages later.
+
+```
+hu`gepagesz=64K hugepages=128 hugepagesz=16M hugepages=4
+```
+
+It is possible to use the huge pages by using memory-mapping and shared-memory APIs.
+
+
 ## libhugetlbfs
 
 
@@ -89,9 +106,34 @@ $ export HUGETLB_MORECORE=yes
 $ ./foo
 ```
 
+To allocate memory from huge pages, you can also use the API:
+
+```c
+#include <hugetlbfs.h>
+void *get_hugepage_region(size_t len, ghr_t flags);
+void free_hugepage_region(void *ptr);
+void *get_huge_pages(size_t len, ghr_t flags);
+void free_huge_pages(void *ptr);
+```
+
+The main difference between `get_hugepage_region()` and `get_huge_pages` is
+that the former doesn't require to be `hugepage-aligned`, ond the other hand,
+the second function it requires `len` to be `hugepage-aligned`.
+
+
 ## Transparent Huge Pages
 
 The Linux kernel introduced in the version `2.6.38` transparent huge pages. This
 functionality allows us to use huge pages without too much management or attention
 from the user.
+
+Support for Transparent Huge Pages can be added to the kernel by setting:
+
+```
+CONFIG_TRANSPARENT_HUGEPAGE=y
+```
+
+More information in:
+
+- https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html
 
