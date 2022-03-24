@@ -5,6 +5,10 @@ In this chapter we discuss
 
 - Caches
 - Swapping
+- Swap Areas
+- Swapping pages in and out
+- Swappiness
+- Swap cache
 - Reverse Mapping
 - OOM killer
 
@@ -13,16 +17,18 @@ In this chapter we discuss
 
 Linux uses different caches such as
 
-- Hardware caches: You can see this information in:
+- `Hardware caches`: You can see this information in:
 
 ```
 $ cat /sys/devices/system/cpu/cpu2/cache/index0/size
 32KB
 ```
 
-- Software caches
+- `Software caches`
 
-- Page cache: Linux uses page caches in order to minimize the disk access due
+- `Dentry cache` is used to speed up the disk access.
+
+- `Page cache`: Linux uses page caches in order to minimize the disk access due
 it is expensive. The `sync` command flushes the modified memory into the block
 device. The function `fsync()` flushes the modified memory into the block device.
 
@@ -38,19 +44,59 @@ more physical memory available.
 
 We can find the `swap areas` using:
 
-```
+```shell
 $ cat /proc/swaps
 Filename				Type		Size	Used	Priority
 /dev/sda5                               partition	1046524	0	-2
 ```
 
+## Swap areas
+
+The swap area is where the pages swapped are going to be stored. This is usually
+a location in a file. We can see the swap areas by running:
+
+```shell
+$ cat /proc/swaps
+Filename				Type		Size	Used	Priority
+/dev/sda5                               partition	1046524	0	-2
+```
+
+## Swapping pages in and out
+
+- `Swap in` refers to the action of bringing the page from disk and install it in
+memory.
+- `Swap out` refers to the action of storing the page in memory to disk. The
+memory mapped files are not swapped out to disk because they are already stored
+in disk.
+
+
+## Swappiness
+
+If we want to increase the swaps in the system, we can write in the proc file
+below:
+
+```shell
+$ cat /proc/sys/vm/swappiness
+```
+
+The values in `/proc/sys/vm/swappiness` are between 0 and 100 where 0 means
+not swaps and 100 means increase the swaps.
+
+
+## Swap cache
+
+When a page is selected to be swapped out, this page might be shared by several
+processes, which means that it won't be sent to the swap area (disk). It will place
+in a special area called `swap cache`.
+
+
 ## Reverse mapping
 
-The kernel memory manager includes a `reverse mapping (rmap)` algorithm. The
-central idea is that when a page is to be freed one has to know more than the number
-of tasks using the page; because it has to update the page table entries for each
-task it must be able to walk its way from the page structure to all the page table
-entries that point to it.
+The kernel memory manager includes a `reverse mapping (rmap)` algorithm. When
+a page is swapped, the page descriptor is updated to indicate that the page was
+swapped. Because a page might be used by several processes, it is necessary to
+be able to find all the proccesses given a page. This is where the `reverse mapping (rmap)`
+algorithm comes into play.
 
 Without reverse mapping the kernel has to examine every page it is considering
 swapping out and then identify all processes currently using it, so it can update
@@ -61,11 +107,9 @@ the page-table entry for the page in that process.
 Linux permits the system to overcommit memory, so that it can grant memory
 requests that exceed the size of RAM plus swap area.
 
-
 Linux kernel permits overcommission of memory only for user processes. For
 kernel processes, the pages are not swappable and are always allocated at request
 time.
-
 
 The overcommision is set by `/proc/sys/vm/overcommit_memory`:
 
@@ -123,10 +167,16 @@ Depending on how much memory your system has, the OOM Killer might not have been
 called. In a system with 8GB, this will certainly kill several process:
 
 
-```
+```shell
 $ stress -m 25 -t 50
 stress: info: [31784] dispatching hogs: 0 cpu, 0 io, 25 vm, 0 hdd
 ```
+
+This command will
+
+- Fork off 25 memory-intensive processes, each spinning on malloc(), allocating 256 MB by default.
+  The size can be changed as in --vm-bytes 128M.
+- Run the stress test for 50 seconds.
 
 To see the processes that were killed by the OOM Killer, see the kernel log
 messages:

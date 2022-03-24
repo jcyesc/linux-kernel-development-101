@@ -2,8 +2,24 @@
 # Chapter 24 - Signals
 
 
+- What are signals
+- Available signals
+- System calls for signals
+- Sigaction
+- Signals and Threads
+- How the kernel install signal handlers
+- How the kernel sends signals
+- How the kernel invokes signal handlers
+- Real time signals
+
+
+## Signal
+
 A `signal` is a message sent to a task (process, thread or group) to perform
 something.
+
+
+## Available signals
 
 The list of available tasks are in:
 
@@ -66,6 +82,7 @@ typedef struct {
 
 The size of `sigset_t` is always `64 bits = sizeof (sigset_t)`
 
+
 To see the available signals in Linux, you can run:
 
 ```shell
@@ -85,11 +102,78 @@ $ kill -l
 63) SIGRTMAX-1	64) SIGRTMAX
 ```
 
+## System calls for signals
+
+```c
+#include <sys/types.h>
+#include <signal.h>
+
+int kill (pid_t pid, int sig);
+int raise (int sig);
+void (*signal (int signum, void (*sighandler)(int)))(int);
+int sigaction (int signum, const struct sigaction *act,
+struct sigaction *oldact);
+
+int sigprocmask (int how, const sigset_t *set, sigset_t *oldset);
+int sigpending (sigset_t *set);
+int sigsuspend (const sigset_t *mask);
+```
+
+and
+
+```c
+#include <signal.h>
+int sigemptyset (sigset_t *set);
+int sigfillset (sigset_t *set);
+int sigaddset (sigset_t *set, int signum);
+int sigdelset (sigset_t *set, int signum);
+int sigismember (const sigset_t *set, int signum);
+```
+
+## Sigaction
+
+sigaction is a data structure and function that replaces `signal()`. It provides
+more functionality than `signal()`.
+
+## Singals and threads
+
+The threads shared the same signal handlers, however, each thread can configure
+the signals that will listen. To do that, it will use the functions:
+
+```c
+#include <signal.h>
+
+int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
+int sigwait(const sigset_t *set, int *sig);
+```
+
+## How the kernel install signal handlers
+
+Inside `struct task` there are several fields dedicated to signals. The
+`struct sighand_struct` data structure contains the handlers for the different
+signals and it is this field that has to be updated.
+
+
+```c
+struct sighand_struct {
+    atomic_t count;
+    struct k_sigaction action[_NSIG];
+    spinlock_t siglock;
+    wait_queue_head_t signalfd_wqh;
+};
+```
+
 ## How the kernel sends signals
 
 The essential part of sending a signal to a process is merely setting a bit
-int the pending signal mask; the details may be complicated but this is essentially
-what it happens.
+in the pending signal mask located in struct task.
+
+
+## How the kernel invokes signal handlers
+
+The kernel invokes the signal handler by examining the pending signal mask. If
+several bits are set in the mask, the handlers for these signals will be invoked
+before the process can resume.
 
 
 ## Real time signals

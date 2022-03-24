@@ -229,10 +229,11 @@ $ cat .config | grep HZ
 $ stress -c 9 -i 7 -m 8 -t 30s
 ```
 will:
-– Fork off 9 CPU-intensive processes, each spinning on a sqrt() calculation.
-– Fork off 7 I/O-intensive processes, each spinning on sync().
-– Fork off 8 memory-intensive processes, each spinning on malloc(), allocating 256 MB by default.
+
+- Fork off 9 CPU-intensive processes, each spinning on a sqrt() calculation.
+- Fork off 7 I/O-intensive processes, each spinning on sync().
+- Fork off 8 memory-intensive processes, each spinning on malloc(), allocating 256 MB by default.
   The size can be changed as in --vm-bytes 128M.
-– Run the stress test for 30 seconds.
+- Run the stress test for 30 seconds.
 
 
