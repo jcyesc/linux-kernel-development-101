@@ -1,7 +1,8 @@
 # Linux Kernel Internals and Development Version 5.14 (LFD420)
 
 This repo contains the labs for the LFD420 training. It uses
-the `Raspberry Pi 3 B+` and `Raspbian` to perform the exercises.
+the `Raspberry Pi 3 B+` and `Raspbian` to perform the exercises. The Raspbian
+version is 5.10.75.
 
 ## Structure of the repo
 

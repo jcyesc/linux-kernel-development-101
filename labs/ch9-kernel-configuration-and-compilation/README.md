@@ -27,6 +27,18 @@ CONFIG_IKCONFIG=y
 CONFIG_IKCONFIG_PROC=y
 ```
 
+## Kernel version and Kernel release
+
+The following commands helps you to identify the kernel version that you are building
+and the name of the kernel release:
+
+```shell
+$ make ARCH=arm kernelversion
+5.10.75
+$ make ARCH=arm kernelrelease
+5.10.75+
+```
+
 ## Kernel browsers
 
 
