@@ -27,6 +27,30 @@ CONFIG_IKCONFIG=y
 CONFIG_IKCONFIG_PROC=y
 ```
 
+## IS_ENABLED(option) macro
+
+The macro `IS_ENABLED(option)` checks if one configuration was set in the
+kernel. The usage is:
+
+```c
+if (IS_ENABLED(CONFIG_OF_FLATTREE)) {
+	do something here
+}
+
+```
+
+The functionality is similar to:
+
+```shell
+$ cat .config | grep CONFIG_OF_FLATTREE
+CONFIG_OF_FLATTREE=y
+...
+
+```
+
+- https://elixir.bootlin.com/linux/v5.17.4/source/include/linux/kconfig.h#L73
+
+
 ## Kernel browsers
 
 
