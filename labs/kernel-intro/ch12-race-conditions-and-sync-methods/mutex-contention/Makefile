@@ -3,7 +3,7 @@ obj-m += export_mutex.o grab_mutex1.o grab_mutex2.o
 
 
 # Assumes that the Linux Kernel source code is in:
-KERNEL_DIR ?= $(HOME)/Development/lsf-kernel-dev/linux-kernel-internals-LFD420/linux
+KERNEL_DIR ?= $(HOME)/Development/linux-kernel-development-101/linux
 
 # Compile the module.
 all:

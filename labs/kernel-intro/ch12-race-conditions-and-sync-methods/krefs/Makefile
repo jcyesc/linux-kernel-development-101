@@ -24,7 +24,7 @@ thunder_cats_client2_module-y := src/krefs_client_module2.o
 thunder_cats_client2_module-y += src/thunder_cat.o
 
 # Assumes that the Linux Kernel source code is in:
-KERNEL_DIR ?= $(HOME)/Development/lsf-kernel-dev/linux-kernel-internals-LFD420/linux
+KERNEL_DIR ?= $(HOME)/Development/linux-kernel-development-101/linux
 
 # Compile the module.
 all:

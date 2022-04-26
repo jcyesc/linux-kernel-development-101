@@ -3,7 +3,7 @@ obj-m += lab_sem1.o lab_sem2.o lab_sem3.o
 
 
 # Assumes that the Linux Kernel source code is in:
-KERNEL_DIR ?= $(HOME)/Development/lsf-kernel-dev/linux-kernel-internals-LFD420/linux
+KERNEL_DIR ?= $(HOME)/Development/linux-kernel-development-101/linux
 
 # Compile the module.
 all:
