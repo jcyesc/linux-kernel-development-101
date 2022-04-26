@@ -7,7 +7,11 @@ The Raspbian version is 5.10.75.
 The chapters for the Linux Kernel intro are below:
 
 ```
-labs/kernel-intro/
+tree labs/kernel-intro/
+├── ch5-kernel-programming-preview
+├── ch6-modules
+├── ch7-kernel-architecture-ll
+├── ch9-kernel-configuration-and-compilation
 ├── ch10-system-calls
 ├── ch11-kernel-style-general-considerations
 ├── ch12-race-conditions-and-sync-methods
@@ -23,9 +27,5 @@ labs/kernel-intro/
 ├── ch22-disk-caches-and-swapping
 ├── ch23-device-drivers
 ├── ch24-signals
-├── ch5-kernel-programming-preview
-├── ch6-modules
-├── ch7-kernel-architecture-ll
-├── ch9-kernel-configuration-and-compilation
 └── README.md
 ```
