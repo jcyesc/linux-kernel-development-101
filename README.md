@@ -147,6 +147,19 @@ $ sudo umount mnt/fat32
 $ sudo umount mnt/ext4
 ```
 
+## Kernel version and Kernel release
+
+The following commands helps you to identify the kernel version that you are building
+and the name of the kernel release:
+
+```shell
+$ make ARCH=arm64 kernelversion
+5.10.75
+$ make ARCH=arm64 kernelrelease
+arch/arm64/Makefile:25: ld does not support --fix-cortex-a53-843419; kernel may be susceptible to erratum
+5.10.75-v8+
+```
+
 ## Find out if the OS is 32-bit or 64-bit
 
 ```shell
