@@ -1,5 +1,7 @@
 # Character driver
 
+## Steps to test the driver
+
 The steps to run the driver are:
 
 
@@ -82,4 +84,11 @@ $ dmesg
 [  359.400280] sam_cdev_read(): Starts lbuf=512, *ppos=0, *num_of_char_written=512
 [  359.400515] sam_cdev_release(): Releasing device: samcdev101 with private_data = 2333
 [  369.801774] Character driver samcdev101 was unregistered successfully
+```
+
+## Steps to compile and run the user-space app
+
+```shell
+$ arm-linux-gnueabi-gcc app_for_cdev.c  -o exec
+$ scp exec pi@192.168.2.2:~
 ```

@@ -182,4 +182,14 @@ pi@raspberrypi:~ $ file /lib/systemd/systemd
 /lib/systemd/systemd: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 3.2.0, BuildID[sha1]=125fb1f7bd746a32b6d763ad9a91d30ddc03a96c, stripped
 ```
 
+## Compiling user space applications
+
+The user space for Linux raspberrypi 5.10.75 uses ARM 32-bit architecture, so
+we need to use an ARM 32+bit compiler. The steps to install the compiler and
+compile the apps are below:
+
+```c
+$ sudo apt install gcc-arm-linux-gnueabi
+$ arm-linux-gnueabi-gcc app.c -o app.bin
+```
 

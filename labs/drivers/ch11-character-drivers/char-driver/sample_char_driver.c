@@ -127,14 +127,14 @@ static int __init character_driver_init(void)
 	/* Create the union of major and minor. */
 	sam_cdev_num = MKDEV(sam_cdev_major, sam_cdev_minor);
 
-	/* Register the char device number and name. */
+	/* Register a single major with a specified minor range. */
 	ret = register_chrdev_region(sam_cdev_num, num_of_sam_cdevs, SAM_CDEV_NAME);
 	if (ret < 0) {
 		pr_err("Failed to register character device region for %s\n",
 				SAM_CDEV_NAME);
 	}
 
-	/* Allocate and initialize the char device. */
+	/* Allocate the cdev structure.. */
 	char_cdev = cdev_alloc();
 	if (!char_cdev) {
 		pr_err("cdev_alloc() failed for %s\n", SAM_CDEV_NAME);
@@ -142,9 +142,13 @@ static int __init character_driver_init(void)
 		return -1;
 	}
 
+	/*
+	 * Initializes @char_cdev, remembering @fops, making it ready to add to the
+	 * system with cdev_add().
+	 */
 	cdev_init(char_cdev, &fops);
 
-	/* Associate the char device number with the new cdev. */
+	/* Add a char device to the system */
 	ret = cdev_add(char_cdev, sam_cdev_num, num_of_sam_cdevs);
 	if (ret < 0) {
 		pr_err("cdev_add() failed for %s\n", SAM_CDEV_NAME);
