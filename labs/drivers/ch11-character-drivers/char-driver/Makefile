@@ -1,5 +1,5 @@
 
-obj-m += char_driver.o
+obj-m += sample_char_driver.o
 
 # -g flag will allow objdump to intersperse the source code with the assembly.
 # To see the object dump use:

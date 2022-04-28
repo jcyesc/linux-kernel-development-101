@@ -16,7 +16,8 @@ $ sudo mknod -m 666 /dev/chardev101 c 500 0
 $ echo Thundercats > /dev/chardev101
 $ cat /dev/chardev101
 
-$ dd if=/dev/random of=/dev/chardev101 count=4096
+# Fill with 2 blocks. Blocks are usually 512 bytes.
+$ dd if=/dev/random of=/dev/chardev101 count=2
 $ cat /dev/chardev101
 $ dd if=/dev/chardev101 count=1
 

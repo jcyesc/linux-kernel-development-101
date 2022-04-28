@@ -42,7 +42,7 @@ static int char_dev_release(struct inode * inode, struct file *file)
 /**
  * Read from the character device.
  *
- * @file The file to read from. In this example is not used.
+ * @file The file object that was created by the open() function.
  * @buf  The user's buffer that will be populated with the content of the
  *       ramdisk.
  * @lbuf The length of the buffer.
@@ -80,8 +80,7 @@ static ssize_t char_dev_read(
 /**
  * Writes to the character device.
  *
- * @file The file where the user's buffer will be written. It is not used in
- *       this example.
+ * @file The file object that was created by the open() function.
  * @buf  The user's buffer to write to the character device.
  * @lbuf The length of the buffer.
  * @ppos The present position pointer.
