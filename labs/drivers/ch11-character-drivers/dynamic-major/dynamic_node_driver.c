@@ -1,7 +1,8 @@
 /*
  * This driver shows:
  *
- * - how to create a dynamic node using alloc_chrdev_region().
+ * - how to create a dynamic node using alloc_chrdev_region(). This means that
+ *   it is not necessary to pick a Major and Minor number.
  * - how to populate file_operations.
  * - how to access file and inode information.
  *
@@ -21,6 +22,9 @@
 
 #define DYNA_CDEV_NAME "dynamicnode101"
 
+/*
+ * The @ramdisk will be shared for all user-space apps..
+ */
 static char *ramdisk;
 #define RAMDISK_SIZE ((size_t) (2 * PAGE_SIZE))
 // Stores the number of bytes that have been written.
@@ -158,6 +162,6 @@ module_init(cdriver_init);
 module_exit(cdriver_exit);
 
 MODULE_AUTHOR("John");
-MODULE_LICENSE("GLP v2");
+MODULE_LICENSE("GPL v2");
 
 

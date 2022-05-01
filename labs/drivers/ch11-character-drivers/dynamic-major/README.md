@@ -1,7 +1,8 @@
 
 # Character driver that uses dynamic device node creation
 
-Below are the steps to test the driver.
+Below are the steps to test the driver that gets a MAJOR and MINOR number
+dynamically.
 
 
 ```shell

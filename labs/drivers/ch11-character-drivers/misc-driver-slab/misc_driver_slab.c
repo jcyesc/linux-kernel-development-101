@@ -93,5 +93,5 @@ module_exit(cdriver_exit);
 
 MODULE_AUTHOR("John");
 MODULE_DESCRIPTION("Misc device, llseek() and slab usage example");
-MODULE_LICENSE("GLP v2");
+MODULE_LICENSE("GPL v2");
 
