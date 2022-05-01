@@ -283,5 +283,5 @@ module_exit(mem_stats_exit);
 
 MODULE_AUTHOR("John");
 MODULE_DESCRIPTION("Memory stats module");
-MODULE_LICENSE("GLP v2");
+MODULE_LICENSE("GPL v2");
 

@@ -24,7 +24,7 @@
 #define SAM_CDEV_NAME "samcdev101"
 
 /*
- * The @ramdisk will be shared for all user-space apps..
+ * The @ramdisk will be shared for all user-space apps.
  */
 static char *ramdisk;
 #define RAMDISK_SIZE ((size_t) (2 * PAGE_SIZE))

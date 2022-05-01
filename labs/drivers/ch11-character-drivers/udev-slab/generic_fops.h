@@ -142,7 +142,9 @@ loff_t generic_cdev_llseek(struct file *file, loff_t offset, int whence)
 			}
 			/*
 			 * Update the file->f_pos directly. file->f_pos is the same pointer
-			 * that is passed to read() and write().
+			 * that is passed to read() and write(). Note, in the read() and
+			 * write() methods, loff_t *ppos has to be used instead of
+			 * file->f_pos. See pread() and pwrite() for more information.
 			 */
 			file->f_pos = offset;
 			retval = offset;

@@ -38,61 +38,79 @@ static int __init udev_init(void)
 	unsigned int baseminor = 0;
 	int align = 0;
 	void *ctor = NULL;
+	int ret = 0;
 
 	// Note: In prod drivers, we must check if kmalloc() was successful.
 	if (OBJ_SIZE > (1024 * PAGE_SIZE)) {
 		pr_err("obj_size is too large. The limit is 1024 pages.\n");
-		return -1;
+		ret = -1;
+		goto exit;
 	}
 
 	objs_cache = kmem_cache_create(
 		"objscache", OBJ_SIZE, align, SLAB_HWCACHE_ALIGN, ctor);
 	if (!objs_cache) {
 		pr_err("kmem_cache_create couldn't create the objs_cache.\n");
-		return -ENOMEM;
+		ret = -ENOMEM;
+		goto exit;
 	}
 
 	if (alloc_chrdev_region(&udev_dev_num, baseminor, count_cdevs, UDEV_SLAB_NAME) < 0) {
 		pr_err("Failed to allocate character device region \n");
-		kmem_cache_destroy(objs_cache);
-		return -1;
+		ret = -1;
+		goto rel_cache;
 	}
 
 	udev_cdev = cdev_alloc();
 	if (!udev_cdev) {
 		pr_err("cdev_alloc() failed");
-		unregister_chrdev_region(udev_dev_num, count_cdevs);
-		kmem_cache_destroy(objs_cache);
-		return -1;
+		ret = -1;
+		goto unreg_region;
 	}
 
 	cdev_init(udev_cdev, &fops);
 	if (cdev_add(udev_cdev, udev_dev_num, count_cdevs) < 0) {
 		pr_err("cdev_add() failed\n");
-		cdev_del(udev_cdev);
-		unregister_chrdev_region(udev_dev_num, count_cdevs);
-		kmem_cache_destroy(objs_cache);
-		return -1;
+		ret = -1;
+		goto dev_del;
 	}
 
 	udev_class = class_create(THIS_MODULE, "udevslabclass");
 	if (IS_ERR(udev_class)) {
 		pr_err("class_create() failed\n");
-		cdev_del(udev_cdev);
-		unregister_chrdev_region(udev_dev_num, count_cdevs);
-		kmem_cache_destroy(objs_cache);
-		return -1;
+		ret = -1;
+		goto dev_del;
 	}
 
 	/*
 	 * Creates a device and registers it with sysfs
 	 */
 	udev_device = device_create(udev_class, parent, udev_dev_num, drvdata, "%s", UDEV_SLAB_NAME);
+	if (IS_ERR(udev_device)) {
+		pr_err("device_create() failed\n");
+		ret = -1;
+		goto dest_class;
+	}
 
 	dev_info(udev_device, "udev_device was registered successfully.");
 	dev_info(udev_device, "MAJOR=%d, MINOR=%d\n", MAJOR(udev_dev_num), MINOR(udev_dev_num));
 
-	return 0;
+	goto exit;
+
+	dest_class:
+		class_destroy(udev_class);
+
+	dev_del:
+		cdev_del(udev_cdev);
+
+	unreg_region:
+		unregister_chrdev_region(udev_dev_num, count_cdevs);
+
+	rel_cache:
+		kmem_cache_destroy(objs_cache);
+
+	exit:
+		return ret;
 }
 
 static void __exit udev_exit(void)

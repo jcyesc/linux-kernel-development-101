@@ -28,10 +28,12 @@
 
 #define MISC_DEV_NAME "miscdev101"
 
-static struct device *misc_dev;
+/*
+ * The @ramdisk will be shared for all user-space apps.
+ */
 static char *ramdisk;
+static struct device *misc_dev;
 #define RAMDISK_SIZE ((size_t) (2 * PAGE_SIZE))
-
 
 static int misc_dev_open(struct inode *inode, struct file *file)
 {
@@ -167,5 +169,5 @@ module_exit(misc_dev_exit);
 
 MODULE_AUTHOR("John");
 MODULE_DESCRIPTION("Misc device example");
-MODULE_LICENSE("GLP v2");
+MODULE_LICENSE("GPL v2");
 

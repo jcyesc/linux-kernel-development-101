@@ -17,6 +17,9 @@
 
 #define CHAR_DEV_NAME "chardev101"
 
+/*
+ * The @ramdisk will be shared for all user-space apps.
+ */
 static char *ramdisk;
 #define RAMDISK_SIZE ((size_t) (2 * PAGE_SIZE))
 
@@ -154,5 +157,5 @@ module_init(character_driver_init);
 module_exit(character_driver_exit);
 
 MODULE_AUTHOR("John");
-MODULE_LICENSE("GLP v2");
+MODULE_LICENSE("GPL v2");
 
