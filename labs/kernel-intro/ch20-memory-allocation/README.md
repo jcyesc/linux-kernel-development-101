@@ -1,7 +1,7 @@
 
 # Chapter 20 - Memory Allocation
 
-This chapter discuesses the different types of memory allocation. The list of
+This chapter discusses the different types of memory allocation. The list of
 the topics is below:
 
 - Requesting and Releasing Pages
@@ -19,7 +19,7 @@ the topics is below:
 There are a couple of functions define in `/include/linux/gfp.h` and implemented
 in `/mm/page_alloc.c`. GFP stands for Get Free Pages.
 
-```
+```c
 #include <linux/mm.h>
 
 unsigned long get_zeroed_page (gfp_t gfp_mask);
@@ -37,7 +37,7 @@ See the list and descriptions in [gfp.h](https://elixir.bootlin.com/linux/latest
 
 The list of flags for the kernel 5.16.10 is below:
 
-```
+```c
 GFP_ATOMIC
 GFP_KERNEL
 GFP_KERNEL_ACCOUNT
@@ -88,10 +88,9 @@ first address of the block is a multiple of new merged block. Once that the page
 are merged, the algorithm tries to merge the new block with other contiguos block.
 This algorithm keeps going till there are no more blocks to merge.
 
-
 To see the list of free blocks per group, execute:
 
-```
+```shell
 $ cat /proc/buddyinfo
 Node 0, zone      DMA      1      0      1      0      2      1      1      0      1      1      3
 Node 0, zone    DMA32    934   1211   1367   1406   1264   1096    920    552    305    129    337
@@ -110,7 +109,7 @@ objects are free/used. This helps you to make better use of the memory.
 
 To find out information about the `slab allocator` run:
 
-```
+```shell
 $  sudo slabtop -o
  Active / Total Objects (% used)    : 730247 / 738798 (98.8%)
  Active / Total Slabs (% used)      : 18680 / 18680 (100.0%)
@@ -223,7 +222,7 @@ void *kcalloc (size_t n, size_t size, gfp_t flags);
 void *krealloc (const void *p, size_t new_size, gfp_t flags);
 void *kmalloc_array(size_t n, size_t size, gfp_t flags)
 void *kmemdup (const void *src, size_t len, gfp_t gfp);
-void kree (void * address);
+void kfree (void * address);
 ```
 
 The maximum you can request with kmalloc() is 1024 pages (4 MB on x86).
@@ -234,9 +233,8 @@ The memory returned by kmalloc is contiguous.
 ## vmalloc
 
 Whenever possible it is preferable to map a continuous range of memory addresses
-into contiguous pagess; this makes better use of caches and speeds memory access
+into contiguous pages; this makes better use of caches and speeds memory access
 as it requires less frequent modification of page tables.
-
 
 The memory allocation methods considered so far (`__get_free_pages()`,
 `kmalloc()`, and `kmem_cache_alloc`) all result in contiguous memory.
@@ -249,7 +247,7 @@ infrequently.
 fashion; i.e., greater than the 1024 pages (4 MB with 4 KB pages) possible with
 __get_free_pages().
 
-The functions to allocate non=continguous free memory are:
+The functions to allocate non-continguous free memory are:
 
 ```c
 #include <linux/vmalloc.h>
@@ -259,6 +257,7 @@ void vfree (void *ptr);
 ```
 
 The `vmalloc` allocations can be seen with:
+
 
 ```shell
 $ cat  /proc/vmallocinfo
@@ -279,7 +278,8 @@ When it is necessary to allocate more than 1024 pages (4MB) of contiguous memory
 `__get_free_pages()` can not be used. However, we can allocate more than 1024
 pages during booting time using the functions:
 
-```
+
+```c
 #include <linux/bootmem.h>
 
 void *alloc_bootmem (unsigned long size);
@@ -301,9 +301,11 @@ of data from one physical page to another in some kind of iterative process unti
 large free memory blocks appear.
 
 To force the defragmentation process, once must force the pages in memory to be
-swapped to this. We can do this by running:
+swapped to disk. We can do this by running:
+
 
 ```c
+// Poor's man defragmentor.
 int main(void) {
 	while(malloc(getpagesize()));
 }

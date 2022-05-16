@@ -8,7 +8,7 @@ The main topics
 - High and Low Memory
 - Memory zones
 - Special device nodes
-- NUM
+- NUMA
 - Paging
 - Page Tables
 - page structure
@@ -52,7 +52,7 @@ The address ranges for user-space memory and kernel space are:
 
 ## High and Low memory
 
-- Low memory is the memory that has been already jmapped by the kernel.
+- Low memory is the memory that has been already mapped by the kernel.
 - High memory refers to the memory in 32-bits systems that is above 896MB and it
 hasn't been mapped.
 
@@ -70,9 +70,8 @@ hasn't been mapped.
 
 There are several device memory nodes in the Linux kernel.
 
-- /dev/men
+- /dev/mem
 - /dev/kmem
-- /dev/null
 - /dev/port
 - /dev/zero
 - /dev/null
@@ -89,12 +88,12 @@ memory.
 `SMP` is an opposite architecture in which all CPUs share the same memory bus
 and all memory is local.
 
-As the number of CPUs gros the `SMP` architecture faces certain challenges
-because the access to the same memory has to by synchronized for the different
+As the number of CPUs grows the `SMP` architecture faces certain challenges
+because the access to the same memory has to be synchronized for the different
 CPUs and this is the main cause of bottlenecks.
 
 A central concept in `NUMA` is the `node`. A node is a block of CPUs and
-memory physically on the same bus. For instance once could have a `NUMA`
+memory physically on the same bus. For instance one could have a `NUMA`
 machine consisting of a number of `nodes`, each containing two CPUs which share
 a 4GB `RAM`.
 

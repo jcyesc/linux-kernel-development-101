@@ -159,9 +159,12 @@ The main functions to allocate and free memory regions are below:
 ```c
 #include <linux/mm.h>
 
-unsigned long do_mmap (struct file *file, unsigned long addr,
-unsigned long len, unsigned long prot,
-unsigned long flag, unsigned long offset);
+unsigned long do_mmap (struct file *file,
+                       unsigned long addr,
+                       unsigned long len,
+                       unsigned long prot,
+                       unsigned long flag,
+                       unsigned long offset);
 int do_munmap (struct mm_struct *mm, unsigned long addr, size_t len)
 ```
 

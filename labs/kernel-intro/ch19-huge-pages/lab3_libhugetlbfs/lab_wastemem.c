@@ -12,7 +12,7 @@
  * License, which you should have received with the source.
  *
  */
-/* simple program to defragment memory, J. Cooperstein 2/04
+/* Simple program to defragment memory, J. Cooperstein 2/04
  */
 
 #include <stdio.h>
@@ -26,6 +26,7 @@
 #define BS 16			/* will allocate BS*MB at each step */
 #define CHUNK (MB*BS)
 #define QUIT_TIME 20
+
 void quit_on_timeout(int sig)
 {
 	printf("\n\nTime expired, quitting\n");

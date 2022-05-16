@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 		DEATH("mallocing");
 
 	if (mlock(buf, length))
-		DEATH("meloc:");
+		DEATH("mlock:");
 	printf("Succeeding in locking memory, %d pages!\n", np);
 
 	/*

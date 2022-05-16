@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 {
 	char *addr;
 	/* The file has to be created under the hugetlbfs file system that was
-	 * mounted, other was we would get Kernel Bus errors.
+	 * mounted, otherwise we would get Kernel Bus errors.
 	 */
 	char *filename = "/mnt/huge/hugemmtestfile";
 	int fd;

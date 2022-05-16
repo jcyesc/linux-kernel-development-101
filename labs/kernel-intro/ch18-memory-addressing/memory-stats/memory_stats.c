@@ -10,7 +10,7 @@
  *   Pages with valid PFN's=242688, = 948 MB
  *
  *                        Pages         KB       MB
-
+ *
  *   free           =    148510     594040      580
  *   locked         =         0          0        0
  *   reserved       =      9429      37716       36

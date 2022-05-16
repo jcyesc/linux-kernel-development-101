@@ -29,10 +29,10 @@
  * at the maps entry in /proc for any process (such as /proc/self).
  *
  *
- *                         Address Space
- *                         mm_struct
- *                      /       |       \
- *                 vm_area   vm_area   vm_area
+ *                                 Address Space
+ *                                   mm_struct
+ *                                /       |       \
+ * Memory regions            vm_area   vm_area   vm_area
  */
 
 #include <linux/module.h>

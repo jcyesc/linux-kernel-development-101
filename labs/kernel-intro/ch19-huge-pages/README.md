@@ -117,7 +117,7 @@ void free_huge_pages(void *ptr);
 ```
 
 The main difference between `get_hugepage_region()` and `get_huge_pages` is
-that the former doesn't require to be `hugepage-aligned`, ond the other hand,
+that the former doesn't require to be `hugepage-aligned`, on the other hand,
 the second function it requires `len` to be `hugepage-aligned`.
 
 
