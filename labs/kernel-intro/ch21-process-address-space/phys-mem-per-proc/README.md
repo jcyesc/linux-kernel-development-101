@@ -24,7 +24,6 @@ fork_userspace-objdump.txt   Memory dump of the ELF file.
 README.md                    Contains instructions to build and deploy module.
 ```
 
-
 # Compile and dump the ELF file
 
 ```shell
@@ -199,16 +198,29 @@ Disassembly of section .data:
 ```shell
 # Clean the module
 $ perl ~/linux/scripts/checkpatch.pl -f phys_mem_per_proc.c
+total: 0 errors, 0 warnings, 217 lines checked
+
+phys_mem_per_proc.c has no obvious style problems and is ready for submission.
 $ make
 $ make deploy
 
 # Install driver
 $ ssh pi@192.168.2.2
-pi@raspberrypi:~ $ sudo insmod phys_mem_per_proc.ko 
-pi@raspberrypi:~ $ sudo chmod 666 /dev/physmem 
+pi@raspberrypi:~ $ sudo insmod phys_mem_per_proc.ko
+
+# Create the device node.
+pi@raspberrypi:~ $ sudo mknod -m 666 /dev/physmem c 500 0
+
+# Check that the device is registered.
+pi@raspberrypi:~ $ cat /proc/devices | grep physmem
+500 physmem
+pi@raspberrypi:~ $ lsmod
+Module                  Size  Used by
+phys_mem_per_proc      16384  0
+cmac                   16384  1
 ```
 
-# Execute the program and print the me
+# Execute the program and print the memory
 
 
 Execute the program and don't type anything:
@@ -232,84 +244,84 @@ pi@raspberrypi:~ $ dmesg
 
 ```
 [ 2381.177281] phys_mem_per_proc: loading out-of-tree module taints kernel.
-[ 2381.177962] misc physmem: init() succeedded in registering device physmem
-[ 2531.719800] misc physmem: Page information for PID [994]
-[ 2531.719831] misc physmem:  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
-[ 2531.719860] misc physmem:      1:         c68c3bdd        10000        11000       1000 =    4096 =      4KB  R-E--
-[ 2531.719885] misc physmem:      2:         16a5aed5        20000        21000       1000 =    4096 =      4KB  R----
-[ 2531.719908] misc physmem:      3:         fd1499bf        21000        22000       1000 =    4096 =      4KB  RW---
-[ 2531.719944] misc physmem:      4:         ab74b047      1AA2000      1AC3000      21000 =  135168 =    135KB  RW---
-[ 2531.719969] misc physmem:      5:         7bbf5575     F7B2A000     F7C62000     138000 = 1277952 =   1277KB  R-E--
-[ 2531.719993] misc physmem:      6:         2f09b9f4     F7C62000     F7C72000      10000 =   65536 =     65KB  -----
-[ 2531.720099] misc physmem:      7:         ed4fa3a1     F7C72000     F7C74000       2000 =    8192 =      8KB  R----
-[ 2531.720129] misc physmem:      8:         16aa35cf     F7C74000     F7C75000       1000 =    4096 =      4KB  RW---
-[ 2531.720153] misc physmem:      9:         4ba7fe56     F7C75000     F7C78000       3000 =   12288 =     12KB  RW---
-[ 2531.720178] misc physmem:     10:         feadf9f5     F7C8C000     F7C90000       4000 =   16384 =     16KB  R-E--
-[ 2531.720202] misc physmem:     11:         e3521f22     F7C90000     F7C9F000       F000 =   61440 =     61KB  -----
-[ 2531.720226] misc physmem:     12:         62be89ad     F7C9F000     F7CA0000       1000 =    4096 =      4KB  R----
-[ 2531.720267] misc physmem:     13:         763b248c     F7CA0000     F7CA1000       1000 =    4096 =      4KB  RW---
-[ 2531.720291] misc physmem:     14:         2810d81f     F7CA1000     F7CC1000      20000 =  131072 =    131KB  R-E--
-[ 2531.720315] misc physmem:     15:          f35f66d     F7CCD000     F7CCF000       2000 =    8192 =      8KB  RW---
-[ 2531.720339] misc physmem:     16:         f5d23ed3     F7CD0000     F7CD1000       1000 =    4096 =      4KB  R-E--
-[ 2531.720363] misc physmem:     17:          d4d8e75     F7CD1000     F7CD2000       1000 =    4096 =      4KB  R----
-[ 2531.720387] misc physmem:     18:         33517b87     F7CD2000     F7CD3000       1000 =    4096 =      4KB  RW---
-[ 2531.720411] misc physmem:     19:         c7389f30     FFD03000     FFD24000      21000 =  135168 =    135KB  RW---
-[ 2531.720447] misc physmem:     20:         18c385ff     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
-[ 2531.720464] misc physmem:  
-[ 2531.720481] misc physmem:          Physical Address       Virtual Address
-[ 2531.720505] misc physmem:            155DC003 (PGD)                 10000
-[ 2531.720526] misc physmem:      20000015CFDFC3 (PTE)                 10000
-[ 2531.720543] misc physmem:  
-[ 2531.720560] misc physmem:          Physical Address       Virtual Address
-[ 2531.720579] misc physmem:            155DC003 (PGD)                 20000
-[ 2531.720599] misc physmem:      E0000015D7FFC3 (PTE)                 20000
-[ 2531.720616] misc physmem:  
-[ 2531.720633] misc physmem:          Physical Address       Virtual Address
-[ 2531.720652] misc physmem:            155DC003 (PGD)                 21000
-[ 2531.720671] misc physmem:      E8000015E2AF43 (PTE)                 21000
-[ 2531.720688] misc physmem:  
-[ 2531.720704] misc physmem:          Physical Address       Virtual Address
-[ 2531.720723] misc physmem:            155DC003 (PGD)               1AA2000
-[ 2531.720743] misc physmem:      E8000015D7DF43 (PTE)               1AA2000
+[ 2381.177962] init() succeedded in registering device physmem
+[ 2531.719800] Page information for PID [994]
+[ 2531.719831]  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
+[ 2531.719860]      1:         c68c3bdd        10000        11000       1000 =    4096 =      4KB  R-E--
+[ 2531.719885]      2:         16a5aed5        20000        21000       1000 =    4096 =      4KB  R----
+[ 2531.719908]      3:         fd1499bf        21000        22000       1000 =    4096 =      4KB  RW---
+[ 2531.719944]      4:         ab74b047      1AA2000      1AC3000      21000 =  135168 =    135KB  RW---
+[ 2531.719969]      5:         7bbf5575     F7B2A000     F7C62000     138000 = 1277952 =   1277KB  R-E--
+[ 2531.719993]      6:         2f09b9f4     F7C62000     F7C72000      10000 =   65536 =     65KB  -----
+[ 2531.720099]      7:         ed4fa3a1     F7C72000     F7C74000       2000 =    8192 =      8KB  R----
+[ 2531.720129]      8:         16aa35cf     F7C74000     F7C75000       1000 =    4096 =      4KB  RW---
+[ 2531.720153]      9:         4ba7fe56     F7C75000     F7C78000       3000 =   12288 =     12KB  RW---
+[ 2531.720178]     10:         feadf9f5     F7C8C000     F7C90000       4000 =   16384 =     16KB  R-E--
+[ 2531.720202]     11:         e3521f22     F7C90000     F7C9F000       F000 =   61440 =     61KB  -----
+[ 2531.720226]     12:         62be89ad     F7C9F000     F7CA0000       1000 =    4096 =      4KB  R----
+[ 2531.720267]     13:         763b248c     F7CA0000     F7CA1000       1000 =    4096 =      4KB  RW---
+[ 2531.720291]     14:         2810d81f     F7CA1000     F7CC1000      20000 =  131072 =    131KB  R-E--
+[ 2531.720315]     15:          f35f66d     F7CCD000     F7CCF000       2000 =    8192 =      8KB  RW---
+[ 2531.720339]     16:         f5d23ed3     F7CD0000     F7CD1000       1000 =    4096 =      4KB  R-E--
+[ 2531.720363]     17:          d4d8e75     F7CD1000     F7CD2000       1000 =    4096 =      4KB  R----
+[ 2531.720387]     18:         33517b87     F7CD2000     F7CD3000       1000 =    4096 =      4KB  RW---
+[ 2531.720411]     19:         c7389f30     FFD03000     FFD24000      21000 =  135168 =    135KB  RW---
+[ 2531.720447]     20:         18c385ff     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
+[ 2531.720464]  
+[ 2531.720481]          Physical Address       Virtual Address
+[ 2531.720505]            155DC003 (PGD)                 10000
+[ 2531.720526]      20000015CFDFC3 (PTE)                 10000
+[ 2531.720543]
+[ 2531.720560]          Physical Address       Virtual Address
+[ 2531.720579]            155DC003 (PGD)                 20000
+[ 2531.720599]      E0000015D7FFC3 (PTE)                 20000
+[ 2531.720616]
+[ 2531.720633]          Physical Address       Virtual Address
+[ 2531.720652]            155DC003 (PGD)                 21000
+[ 2531.720671]      E8000015E2AF43 (PTE)                 21000
+[ 2531.720688]
+[ 2531.720704]          Physical Address       Virtual Address
+[ 2531.720723]            155DC003 (PGD)               1AA2000
+[ 2531.720743]      E8000015D7DF43 (PTE)               1AA2000
 ```
 
 ## Child memory
 
 ```
-[ 2537.276597] misc physmem: Page information for PID [995]
-[ 2537.276628] misc physmem:  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
-[ 2537.276656] misc physmem:      1:         d15dc113        10000        11000       1000 =    4096 =      4KB  R-E--
-[ 2537.276680] misc physmem:      2:         b61b567e        20000        21000       1000 =    4096 =      4KB  R----
-[ 2537.276704] misc physmem:      3:         82f6bd47        21000        22000       1000 =    4096 =      4KB  RW---
-[ 2537.276729] misc physmem:      4:         706801d0      1AA2000      1AC3000      21000 =  135168 =    135KB  RW---
-[ 2537.276754] misc physmem:      5:         91003647     F7B2A000     F7C62000     138000 = 1277952 =   1277KB  R-E--
-[ 2537.276778] misc physmem:      6:         8a36ab8b     F7C62000     F7C72000      10000 =   65536 =     65KB  -----
-[ 2537.276814] misc physmem:      7:         5de9b326     F7C72000     F7C74000       2000 =    8192 =      8KB  R----
-[ 2537.276838] misc physmem:      8:         4c4b225f     F7C74000     F7C75000       1000 =    4096 =      4KB  RW---
-[ 2537.276862] misc physmem:      9:         cdd369ec     F7C75000     F7C78000       3000 =   12288 =     12KB  RW---
-[ 2537.276886] misc physmem:     10:         fa879c86     F7C8C000     F7C90000       4000 =   16384 =     16KB  R-E--
-[ 2537.276909] misc physmem:     11:         2e4ebe70     F7C90000     F7C9F000       F000 =   61440 =     61KB  -----
-[ 2537.276933] misc physmem:     12:         93896eab     F7C9F000     F7CA0000       1000 =    4096 =      4KB  R----
-[ 2537.276957] misc physmem:     13:         9583cfd2     F7CA0000     F7CA1000       1000 =    4096 =      4KB  RW---
-[ 2537.276981] misc physmem:     14:         eb4f50bc     F7CA1000     F7CC1000      20000 =  131072 =    131KB  R-E--
-[ 2537.277102] misc physmem:     15:         1497bb1e     F7CCD000     F7CCF000       2000 =    8192 =      8KB  RW---
-[ 2537.277126] misc physmem:     16:         a7929294     F7CD0000     F7CD1000       1000 =    4096 =      4KB  R-E--
-[ 2537.277150] misc physmem:     17:         e286f593     F7CD1000     F7CD2000       1000 =    4096 =      4KB  R----
-[ 2537.277174] misc physmem:     18:         1b384602     F7CD2000     F7CD3000       1000 =    4096 =      4KB  RW---
-[ 2537.277200] misc physmem:     19:         f2d3df95     FFD03000     FFD24000      21000 =  135168 =    135KB  RW---
-[ 2537.277241] misc physmem:     20:         5a5c4e04     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
-[ 2537.277258] misc physmem:  
-[ 2537.277275] misc physmem:          Physical Address       Virtual Address
-[ 2537.277300] misc physmem:            155F0003 (PGD)                 10000
-[ 2537.277324] misc physmem:      20000015CFDFC3 (PTE)                 10000
-[ 2537.277341] misc physmem:  
-[ 2537.277359] misc physmem:          Physical Address       Virtual Address
-[ 2537.277378] misc physmem:            155F0003 (PGD)                 20000
-[ 2537.277398] misc physmem:      E0000015D7FFC3 (PTE)                 20000
-[ 2537.277415] misc physmem:  
-[ 2537.277432] misc physmem:          Physical Address       Virtual Address
-[ 2537.277451] misc physmem:            155F0003 (PGD)                 21000
-[ 2537.277470] misc physmem:      E800001266CF43 (PTE)                 21000
+[ 2537.276597] Page information for PID [995]
+[ 2537.276628]  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
+[ 2537.276656]      1:         d15dc113        10000        11000       1000 =    4096 =      4KB  R-E--
+[ 2537.276680]      2:         b61b567e        20000        21000       1000 =    4096 =      4KB  R----
+[ 2537.276704]      3:         82f6bd47        21000        22000       1000 =    4096 =      4KB  RW---
+[ 2537.276729]      4:         706801d0      1AA2000      1AC3000      21000 =  135168 =    135KB  RW---
+[ 2537.276754]      5:         91003647     F7B2A000     F7C62000     138000 = 1277952 =   1277KB  R-E--
+[ 2537.276778]      6:         8a36ab8b     F7C62000     F7C72000      10000 =   65536 =     65KB  -----
+[ 2537.276814]      7:         5de9b326     F7C72000     F7C74000       2000 =    8192 =      8KB  R----
+[ 2537.276838]      8:         4c4b225f     F7C74000     F7C75000       1000 =    4096 =      4KB  RW---
+[ 2537.276862]      9:         cdd369ec     F7C75000     F7C78000       3000 =   12288 =     12KB  RW---
+[ 2537.276886]     10:         fa879c86     F7C8C000     F7C90000       4000 =   16384 =     16KB  R-E--
+[ 2537.276909]     11:         2e4ebe70     F7C90000     F7C9F000       F000 =   61440 =     61KB  -----
+[ 2537.276933]     12:         93896eab     F7C9F000     F7CA0000       1000 =    4096 =      4KB  R----
+[ 2537.276957]     13:         9583cfd2     F7CA0000     F7CA1000       1000 =    4096 =      4KB  RW---
+[ 2537.276981]     14:         eb4f50bc     F7CA1000     F7CC1000      20000 =  131072 =    131KB  R-E--
+[ 2537.277102]     15:         1497bb1e     F7CCD000     F7CCF000       2000 =    8192 =      8KB  RW---
+[ 2537.277126]     16:         a7929294     F7CD0000     F7CD1000       1000 =    4096 =      4KB  R-E--
+[ 2537.277150]     17:         e286f593     F7CD1000     F7CD2000       1000 =    4096 =      4KB  R----
+[ 2537.277174]     18:         1b384602     F7CD2000     F7CD3000       1000 =    4096 =      4KB  RW---
+[ 2537.277200]     19:         f2d3df95     FFD03000     FFD24000      21000 =  135168 =    135KB  RW---
+[ 2537.277241]     20:         5a5c4e04     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
+[ 2537.277258]
+[ 2537.277275]          Physical Address       Virtual Address
+[ 2537.277300]            155F0003 (PGD)                 10000
+[ 2537.277324]      20000015CFDFC3 (PTE)                 10000
+[ 2537.277341]
+[ 2537.277359]          Physical Address       Virtual Address
+[ 2537.277378]            155F0003 (PGD)                 20000
+[ 2537.277398]      E0000015D7FFC3 (PTE)                 20000
+[ 2537.277415]
+[ 2537.277432]          Physical Address       Virtual Address
+[ 2537.277451]            155F0003 (PGD)                 21000
+[ 2537.277470]      E800001266CF43 (PTE)                 21000
 ```
 
 
@@ -326,15 +338,16 @@ E0000015D7FFC3 (PTE)                 20000
 
 ```
 # Parent memory
-[ 2531.720633] misc physmem:          Physical Address       Virtual Address
-[ 2531.720652] misc physmem:            155DC003 (PGD)                 21000
-[ 2531.720671] misc physmem:      E8000015E2AF43 (PTE)                 21000
+[ 2531.720633]          Physical Address       Virtual Address
+[ 2531.720652]            155DC003 (PGD)                 21000
+[ 2531.720671]      E8000015E2AF43 (PTE)                 21000
 
 # Child Memory
-[ 2537.277432] misc physmem:          Physical Address       Virtual Address
-[ 2537.277451] misc physmem:            155F0003 (PGD)                 21000
-[ 2537.277470] misc physmem:      E800001266CF43 (PTE)                 21000
+[ 2537.277432]          Physical Address       Virtual Address
+[ 2537.277451]            155F0003 (PGD)                 21000
+[ 2537.277470]      E800001266CF43 (PTE)                 21000
 ```
+
 If we check the objdump, we will see that the stack is located in the virtual
 page `21000`. Remember that when `fork()` is executed, parent and child has
 different stack.

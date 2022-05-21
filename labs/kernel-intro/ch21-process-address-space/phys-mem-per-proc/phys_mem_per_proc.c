@@ -3,7 +3,7 @@
  * Module that prints the physical and virtual memory addresses for a process.
  */
 
-#include <linux/device.h>
+#include <linux/cdev.h>
 #include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
@@ -18,12 +18,17 @@
 #define PHYS_MEM_DEV_NAME "physmem"
 #define BUFFER_SIZE 30
 
-static struct device *phys_mem_dev;
+static int phys_dev_major = 500;
+static int phys_dev_minor;
+static struct cdev *phys_cdev;
+static dev_t phys_cdev_num;
+static const unsigned int num_cdevs = 1;
+
 
 int walk_pgd(pgd_t *pgd, unsigned long addr, unsigned long next,
 		struct mm_walk *walk)
 {
-	dev_info(phys_mem_dev, " %18llX (PGD)    %18lX", pgd_val(*pgd), addr);
+	pr_info(" %18llX (PGD)    %18lX", pgd_val(*pgd), addr);
 
 	return 0;
 }
@@ -31,7 +36,7 @@ int walk_pgd(pgd_t *pgd, unsigned long addr, unsigned long next,
 int walk_pte(pte_t *pte, unsigned long addr, unsigned long next,
 		struct mm_walk *walk)
 {
-	dev_info(phys_mem_dev, " %18llX (PTE)    %18lX", pte_val(*pte), addr);
+	pr_info(" %18llX (PTE)    %18lX", pte_val(*pte), addr);
 
 	return 0;
 }
@@ -50,8 +55,7 @@ static inline void print_vma_areas(struct mm_struct *mm)
 	unsigned long length;
 	unsigned long flags;
 
-	dev_info(phys_mem_dev,
-			" # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH\n");
+	pr_info(" # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH\n");
 
 	vma = mm->mmap;
 	while (vma) {
@@ -61,11 +65,13 @@ static inline void print_vma_areas(struct mm_struct *mm)
 		length = end - start;
 		flags = vma->vm_flags;
 
-		dev_info(phys_mem_dev,
+		pr_info(
 			"%6d: %16p %12lX %12lX   %8lX =%8ld = %6ldKB  %s%s%s%s%s\n", j,
 			vma, start, end, length, length, length / 1000,
-			flags & VM_READ ? "R" : "-", flags & VM_WRITE ? "W" : "-",
-			flags & VM_EXEC ? "E" : "-", flags & VM_SHARED ? "S" : "-",
+			flags & VM_READ ? "R" : "-",
+			flags & VM_WRITE ? "W" : "-",
+			flags & VM_EXEC ? "E" : "-",
+			flags & VM_SHARED ? "S" : "-",
 			flags & VM_HUGEPAGE ? "H" : "-");
 
 		vma = vma->vm_next;
@@ -86,13 +92,13 @@ static inline void print_phys_mem(struct mm_struct *mm)
 		start = vma->vm_start;
 		end = vma->vm_end;
 
-		dev_info(phys_mem_dev, " ");
-		dev_info(phys_mem_dev, "         Physical Address       Virtual Address");
+		pr_info(" ");
+		pr_info("         Physical Address       Virtual Address");
 
 		// walk_page_range() symbol has to be exported in the Kernel.
 		ret = walk_page_range(mm, start, end, &phys_walk_ops, NULL);
 		if (ret) {
-			dev_err(phys_mem_dev, "Failed to walk page range [%ld, %ld]\n",
+			pr_err("Failed to walk page range [%ld, %ld]\n",
 					start, end);
 		}
 
@@ -140,16 +146,16 @@ static ssize_t phys_mem_per_proc_write(struct file *file,
 
 	tsk = pid_task(find_vpid(pid), PIDTYPE_PID);
 	if (!tsk) {
-		dev_info(phys_mem_dev, "Task with pid=%d not found", pid);
+		pr_info("Task with pid=%d not found", pid);
 		goto out;
 	}
 
 	if (tsk->mm == NULL) {
-		dev_info(phys_mem_dev, "Kernel threads don't have 'mm' set");
+		pr_info("Kernel threads don't have 'mm' set");
 		goto out;
 	}
 
-	dev_info(phys_mem_dev, "Page information for PID [%d]", pid);
+	pr_info("Page information for PID [%d]", pid);
 	print_mem(tsk);
 
 out:
@@ -161,30 +167,46 @@ static const struct file_operations fops = {
 	.write = phys_mem_per_proc_write,
 };
 
-static struct miscdevice phys_mem_per_proc_dev = {
-	.minor = MISC_DYNAMIC_MINOR,
-	.name = PHYS_MEM_DEV_NAME,
-	.fops = &fops,
-};
-
 static int __init phys_mem_per_proc_init(void)
 {
-	if (misc_register(&phys_mem_per_proc_dev)) {
-		dev_err(phys_mem_dev, "Failed to initialize module!\n");
-		return -EBUSY;
+	int ret;
+
+	phys_cdev_num = MKDEV(phys_dev_major, phys_dev_minor);
+
+	ret = register_chrdev_region(phys_cdev_num, num_cdevs, PHYS_MEM_DEV_NAME);
+	if (ret < 0) {
+		pr_err("Failed to register for %s\n", PHYS_MEM_DEV_NAME);
+		return ret;
 	}
 
-	phys_mem_dev = phys_mem_per_proc_dev.this_device;
-	dev_info(phys_mem_dev, "init() succeedded in registering device %s\n",
-		PHYS_MEM_DEV_NAME);
+	phys_cdev = cdev_alloc();
+	if (!phys_cdev) {
+		pr_err("Failed to allocate %s\n", PHYS_MEM_DEV_NAME);
+		unregister_chrdev_region(phys_cdev_num, num_cdevs);
+		return -EINVAL;
+	}
+
+	cdev_init(phys_cdev, &fops);
+
+	ret = cdev_add(phys_cdev, phys_cdev_num, num_cdevs);
+	if (ret < 0) {
+		pr_err("Failed to add %s\n", PHYS_MEM_DEV_NAME);
+		cdev_del(phys_cdev);
+		unregister_chrdev_region(phys_cdev_num, num_cdevs);
+		return ret;
+	}
+
+	pr_info("%s was registered successfully!\n", PHYS_MEM_DEV_NAME);
 
 	return 0;
 }
 
 static void __exit phys_mem_per_proc_exit(void)
 {
-	dev_info(phys_mem_dev, "Unregistering device %s\n", PHYS_MEM_DEV_NAME);
-	misc_deregister(&phys_mem_per_proc_dev);
+	cdev_del(phys_cdev);
+	unregister_chrdev_region(phys_cdev_num, num_cdevs);
+
+	pr_info("%s was unregistered successfully\n", PHYS_MEM_DEV_NAME);
 }
 
 module_init(phys_mem_per_proc_init);
