@@ -31,11 +31,11 @@ Disassembly of section .note.gnu.build-id:
    1018c:	00000014 	andeq	r0, r0, r4, lsl r0
    10190:	00000003 	andeq	r0, r0, r3
    10194:	00554e47 	subseq	r4, r5, r7, asr #28
-   10198:	89244c86 	stmdbhi	r4!, {r1, r2, r7, sl, fp, lr}
-   1019c:	bd29dd7f 	stclt	13, cr13, [r9, #-508]!	; 0xfffffe04
-   101a0:	e663cde9 	strbt	ip, [r3], -r9, ror #27
-   101a4:	07fd36e8 	ldrbeq	r3, [sp, r8, ror #13]!
-   101a8:	a7d2ef70 			; <UNDEFINED> instruction: 0xa7d2ef70
+   10198:	4bc67336 	blmi	ff1ace78 <__bss_end__+0xff186e78>
+   1019c:	dba4dfcc 	blle	fe9480d4 <__bss_end__+0xfe9220d4>
+   101a0:	991237c9 	ldmdbls	r2, {r0, r3, r6, r7, r8, r9, sl, ip, sp}
+   101a4:	28776ec3 	ldmdacs	r7!, {r0, r1, r6, r7, r9, sl, fp, sp, lr}^
+   101a8:	cc74947e 	cfldrdgt	mvd9, [r4], #-504	; 0xfffffe08
 
 Disassembly of section .gnu.hash:
 
@@ -69,7 +69,7 @@ Disassembly of section .dynsym:
 	...
    10218:	00000020 	andeq	r0, r0, r0, lsr #32
    1021c:	0000006e 	andeq	r0, r0, lr, rrx
-   10220:	00021048 	andeq	r1, r2, r8, asr #32
+   10220:	00022000 	andeq	r2, r2, r0
    10224:	00000004 	andeq	r0, r0, r4
    10228:	00180011 	andseq	r0, r8, r1, lsl r0
    1022c:	00000038 	andeq	r0, r0, r8, lsr r0
@@ -113,10 +113,10 @@ Disassembly of section .dynstr:
    102dc:	74696177 	strbtvc	r6, [r9], #-375	; 0xfffffe89
    102e0:	72657000 	rsbvc	r7, r5, #0
    102e4:	00726f72 	rsbseq	r6, r2, r2, ror pc
-   102e8:	6b726f66 	blvs	1cac088 <__bss_end__+0x1c8b02c>
+   102e8:	6b726f66 	blvs	1cac088 <__bss_end__+0x1c86088>
    102ec:	735f5f00 	cmpvc	pc, #0, 30
-   102f0:	6b636174 	blvs	18e88c8 <__bss_end__+0x18c786c>
-   102f4:	6b68635f 	blvs	1a29078 <__bss_end__+0x1a0801c>
+   102f0:	6b636174 	blvs	18e88c8 <__bss_end__+0x18c28c8>
+   102f4:	6b68635f 	blvs	1a29078 <__bss_end__+0x1a03078>
    102f8:	6961665f 	stmdbvs	r1!, {r0, r1, r2, r3, r4, r6, r9, sl, sp, lr}^
    102fc:	6261006c 	rsbvs	r0, r1, #108	; 0x6c
    10300:	0074726f 	rsbseq	r7, r4, pc, ror #4
@@ -183,7 +183,7 @@ Disassembly of section .rel.dyn:
 000103c0 <.rel.dyn>:
    103c0:	00021038 	andeq	r1, r2, r8, lsr r0
    103c4:	00000115 	andeq	r0, r0, r5, lsl r1
-   103c8:	00021048 	andeq	r1, r2, r8, asr #32
+   103c8:	00022000 	andeq	r2, r2, r0
    103cc:	00000214 	andeq	r0, r0, r4, lsl r2
 
 Disassembly of section .rel.plt:
@@ -353,7 +353,7 @@ Disassembly of section .text:
    105ac:	e3a03001 	mov	r3, #1
    105b0:	e5c43000 	strb	r3, [r4]
    105b4:	e8bd8010 	pop	{r4, pc}
-   105b8:	0002104c 	andeq	r1, r2, ip, asr #32
+   105b8:	00022004 	andeq	r2, r2, r4
 
 000105bc <frame_dummy>:
    105bc:	e59f0028 	ldr	r0, [pc, #40]	; 105ec <frame_dummy+0x30>
@@ -438,9 +438,9 @@ Disassembly of section .text:
    106f0:	ebffff5a 	bl	10460 <__stack_chk_fail@plt>
    106f4:	e24bd004 	sub	sp, fp, #4
    106f8:	e8bd8800 	pop	{fp, pc}
-   106fc:	00021048 	andeq	r1, r2, r8, asr #32
+   106fc:	00022000 	andeq	r2, r2, r0
    10700:	00010784 	andeq	r0, r1, r4, lsl #15
-   10704:	00021050 	andeq	r1, r2, r0, asr r0
+   10704:	00023000 	andeq	r3, r2, r0
    10708:	0001079c 	muleq	r1, ip, r7
    1070c:	000107c4 	andeq	r0, r1, r4, asr #15
    10710:	000107ec 	andeq	r0, r1, ip, ror #15
@@ -498,7 +498,7 @@ Disassembly of section .rodata:
    107b0:	43202c64 			; <UNDEFINED> instruction: 0x43202c64
    107b4:	646c6968 	strbtvs	r6, [ip], #-2408	; 0xfffff698
    107b8:	44495020 	strbmi	r5, [r9], #-32	; 0xffffffe0
-   107bc:	0a642520 	beq	1919c44 <__bss_end__+0x18f8be8>
+   107bc:	0a642520 	beq	1919c44 <__bss_end__+0x18f3c44>
    107c0:	00000000 	andeq	r0, r0, r0
    107c4:	65726170 	ldrbvs	r6, [r2, #-368]!	; 0xfffffe90
    107c8:	203a746e 	eorscs	r7, sl, lr, ror #8
@@ -508,12 +508,12 @@ Disassembly of section .rodata:
    107d8:	64657461 	strbtvs	r7, [r5], #-1121	; 0xfffffb9f
    107dc:	7473202c 	ldrbtvc	r2, [r3], #-44	; 0xffffffd4
    107e0:	73757461 	cmnvc	r5, #1627389952	; 0x61000000
-   107e4:	0a642520 	beq	1919c6c <__bss_end__+0x18f8c10>
+   107e4:	0a642520 	beq	1919c6c <__bss_end__+0x18f3c6c>
    107e8:	00000000 	andeq	r0, r0, r0
    107ec:	6f727245 	svcvs	0x00727245
    107f0:	68772072 	ldmdavs	r7!, {r1, r4, r5, r6, sp}^
    107f4:	20656c69 	rsbcs	r6, r5, r9, ror #24
-   107f8:	6b726f66 	blvs	1cac598 <__bss_end__+0x1c8b53c>
+   107f8:	6b726f66 	blvs	1cac598 <__bss_end__+0x1c86598>
    107fc:	00676e69 	rsbeq	r6, r7, r9, ror #28
 
 Disassembly of section .ARM.exidx:
@@ -623,19 +623,19 @@ Disassembly of section .data:
 
 Disassembly of section .bss:
 
-00021048 <__stack_chk_guard@@GLIBC_2.4>:
-   21048:	00000000 	andeq	r0, r0, r0
+00022000 <__stack_chk_guard@@GLIBC_2.4>:
+   22000:	00000000 	andeq	r0, r0, r0
 
-0002104c <completed.9905>:
-   2104c:	00000000 	andeq	r0, r0, r0
+00022004 <completed.9905>:
+	...
 
-00021050 <buffer>:
+00023000 <buffer>:
 	...
 
 Disassembly of section .comment:
 
 00000000 <.comment>:
-   0:	3a434347 	bcc	10d0d24 <__bss_end__+0x10afcc8>
+   0:	3a434347 	bcc	10d0d24 <__bss_end__+0x10aad24>
    4:	62552820 	subsvs	r2, r5, #32, 16	; 0x200000
    8:	75746e75 	ldrbvc	r6, [r4, #-3701]!	; 0xfffff18b
    c:	6e694c2f 	cdpvs	12, 6, cr4, cr9, cr15, {1}

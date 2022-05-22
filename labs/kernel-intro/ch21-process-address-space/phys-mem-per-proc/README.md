@@ -42,84 +42,12 @@ $ arm-linux-gnueabi-objdump -D fork_userspace
 
 fork_userspace:     file format elf32-littlearm
 
-Disassembly of section .gnu.version_r:
+Disassembly of section .init:
 
 00010428 <_init>:
    10428:	e92d4008 	push	{r3, lr}
    1042c:	eb000035 	bl	10508 <call_weak_fn>
    10430:	e8bd8008 	pop	{r3, pc}
-
-Disassembly of section .plt:
-
-00010434 <printf@plt-0x14>:
-   10434:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
-   10438:	e59fe004 	ldr	lr, [pc, #4]	; 10444 <_init+0x1c>
-   1043c:	e08fe00e 	add	lr, pc, lr
-   10440:	e5bef008 	ldr	pc, [lr, #8]!
-   10444:	00010bbc 			; <UNDEFINED> instruction: 0x00010bbc
-
-00010448 <printf@plt>:
-   10448:	e28fc600 	add	ip, pc, #0, 12
-   1044c:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   10450:	e5bcfbbc 	ldr	pc, [ip, #3004]!	; 0xbbc
-
-00010454 <getchar@plt>:
-   10454:	e28fc600 	add	ip, pc, #0, 12
-   10458:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   1045c:	e5bcfbb4 	ldr	pc, [ip, #2996]!	; 0xbb4
-
-00010460 <__stack_chk_fail@plt>:
-   10460:	e28fc600 	add	ip, pc, #0, 12
-   10464:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   10468:	e5bcfbac 	ldr	pc, [ip, #2988]!	; 0xbac
-
-0001046c <wait@plt>:
-   1046c:	e28fc600 	add	ip, pc, #0, 12
-   10470:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   10474:	e5bcfba4 	ldr	pc, [ip, #2980]!	; 0xba4
-
-00010478 <perror@plt>:
-   10478:	e28fc600 	add	ip, pc, #0, 12
-   1047c:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   10480:	e5bcfb9c 	ldr	pc, [ip, #2972]!	; 0xb9c
-
-00010484 <__libc_start_main@plt>:
-   10484:	e28fc600 	add	ip, pc, #0, 12
-   10488:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   1048c:	e5bcfb94 	ldr	pc, [ip, #2964]!	; 0xb94
-
-00010490 <__gmon_start__@plt>:
-   10490:	e28fc600 	add	ip, pc, #0, 12
-   10494:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   10498:	e5bcfb8c 	ldr	pc, [ip, #2956]!	; 0xb8c
-
-0001049c <getpid@plt>:
-   1049c:	e28fc600 	add	ip, pc, #0, 12
-   104a0:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   104a4:	e5bcfb84 	ldr	pc, [ip, #2948]!	; 0xb84
-
-000104a8 <exit@plt>:
-   104a8:	e28fc600 	add	ip, pc, #0, 12
-   104ac:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   104b0:	e5bcfb7c 	ldr	pc, [ip, #2940]!	; 0xb7c
-
-000104b4 <fork@plt>:
-   104b4:	e28fc600 	add	ip, pc, #0, 12
-   104b8:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   104bc:	e5bcfb74 	ldr	pc, [ip, #2932]!	; 0xb74
-
-000104c0 <abort@plt>:
-   104c0:	e28fc600 	add	ip, pc, #0, 12
-   104c4:	e28cca10 	add	ip, ip, #16, 20	; 0x10000
-   104c8:	e5bcfb6c 	ldr	pc, [ip, #2924]!	; 0xb6c
-
-Disassembly of section .bss:
-
-00021048 <__stack_chk_guard@@GLIBC_2.4>:
-   21048:       00000000        andeq   r0, r0, r0
-
-0002104c <completed.9905>:
-   2104c:       00000000        andeq   r0, r0, r0
 
 Disassembly of section .text:
 
@@ -152,6 +80,31 @@ Disassembly of section .text:
    10614:	e50b300c 	str	r3, [fp, #-12]
    10618:	e51b300c 	ldr	r3, [fp, #-12]
    1061c:	e3530000 	cmp	r3, #0
+   10620:	1a000014 	bne	10678 <main+0x84>
+   10624:	ebffff9c 	bl	1049c <getpid@plt>
+   10628:	e1a03000 	mov	r3, r0
+   1062c:	e1a01003 	mov	r1, r3
+   10630:	e59f00c8 	ldr	r0, [pc, #200]	; 10700 <main+0x10c>
+   10634:	ebffff83 	bl	10448 <printf@plt>
+   10638:	ebffff85 	bl	10454 <getchar@plt>
+   1063c:	e50b0010 	str	r0, [fp, #-16]
+   10640:	ea000007 	b	10664 <main+0x70>
+   10644:	e51b3010 	ldr	r3, [fp, #-16]
+   10648:	e353004d 	cmp	r3, #77	; 0x4d
+   1064c:	1a000002 	bne	1065c <main+0x68>
+   10650:	e59f30ac 	ldr	r3, [pc, #172]	; 10704 <main+0x110>
+   10654:	e3a02054 	mov	r2, #84	; 0x54
+   10658:	e5c32000 	strb	r2, [r3]
+   1065c:	ebffff7c 	bl	10454 <getchar@plt>
+   10660:	e50b0010 	str	r0, [fp, #-16]
+   10664:	e51b3010 	ldr	r3, [fp, #-16]
+   10668:	e3530045 	cmp	r3, #69	; 0x45
+   1066c:	1afffff4 	bne	10644 <main+0x50>
+   10670:	e3a00000 	mov	r0, #0
+   10674:	ebffff8b 	bl	104a8 <exit@plt>
+   10678:	e51b300c 	ldr	r3, [fp, #-12]
+   1067c:	e3530000 	cmp	r3, #0
+   10680:	da000011 	ble	106cc <main+0xd8>
 
 Disassembly of section .rodata:
 
@@ -167,30 +120,27 @@ Disassembly of section .rodata:
    107a0:	203a746e 	eorscs	r7, sl, lr, ror #8
    107a4:	65726150 	ldrbvs	r6, [r2, #-336]!	; 0xfffffeb0
    107a8:	5020746e 	eorpl	r7, r0, lr, ror #8
-
-Disassembly of section .dynamic:
-
-00020f10 <_DYNAMIC>:
-   20f10:	00000001 	andeq	r0, r0, r1
-   20f14:	00000001 	andeq	r0, r0, r1
-   20f18:	00000001 	andeq	r0, r0, r1
-   20f1c:	00000060 	andeq	r0, r0, r0, rrx
-   20f20:	0000000c 	andeq	r0, r0, ip
-   20f24:	00010428 	andeq	r0, r1, r8, lsr #8
-   20f28:	0000000d 	andeq	r0, r0, sp
-   20f2c:	00010778 	andeq	r0, r1, r8, ror r7
-   20f30:	00000019 	andeq	r0, r0, r9, lsl r0
-   20f34:	00020f04 	andeq	r0, r2, r4, lsl #30
-   20f38:	0000001b 	andeq	r0, r0, fp, lsl r0
-   20f3c:	00000004 	andeq	r0, r0, r4
-   20f40:	0000001a 	andeq	r0, r0, sl, lsl r0
-   20f44:	00020f08 	andeq	r0, r2, r8, lsl #30
-   20f48:	0000001c 	andeq	r0, r0, ip, lsl r0
+   107ac:	25204449 	strcs	r4, [r0, #-1097]!	; 0xfffffbb7
+   107b0:	43202c64 			; <UNDEFINED> instruction: 0x43202
 
 Disassembly of section .data:
 
 0002103c <__data_start>:
    2103c:	00000000 	andeq	r0, r0, r0
+
+00021040 <__dso_handle>:
+   21040:	00000000 	andeq	r0, r0, r0
+
+Disassembly of section .bss:
+
+00022000 <__stack_chk_guard@@GLIBC_2.4>:
+   22000:	00000000 	andeq	r0, r0, r0
+
+00022004 <completed.9905>:
+	...
+
+00023000 <buffer>:
+	...
 ```
 
 ## Compile and deploy the driver
@@ -226,134 +176,197 @@ cmac                   16384  1
 Execute the program and don't type anything:
 
 ```shell
-pi@raspberrypi:~ $ ./fork_userspace 
-parent: Parent PID 994, Child PID 995
-child: Child, PID 995
+pi@raspberrypi:~ $  ./fork_userspace
+parent: Parent PID 863, Child PID 864
+child: Child, PID 864
 ```
 
 In another console print the memory for the parent and child and verify that
 `copy-on-write` hasn't been done:
 
 ```shell
-pi@raspberrypi:~ $ echo 994 > /dev/physmem 
-pi@raspberrypi:~ $ echo 995 > /dev/physmem 
+pi@raspberrypi:~ $ echo 863 > /dev/physmem
+pi@raspberrypi:~ $ echo 864 > /dev/physmem
 pi@raspberrypi:~ $ dmesg
 ```
 
 ## Parent Memory
 
 ```
-[ 2381.177281] phys_mem_per_proc: loading out-of-tree module taints kernel.
-[ 2381.177962] init() succeedded in registering device physmem
-[ 2531.719800] Page information for PID [994]
-[ 2531.719831]  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
-[ 2531.719860]      1:         c68c3bdd        10000        11000       1000 =    4096 =      4KB  R-E--
-[ 2531.719885]      2:         16a5aed5        20000        21000       1000 =    4096 =      4KB  R----
-[ 2531.719908]      3:         fd1499bf        21000        22000       1000 =    4096 =      4KB  RW---
-[ 2531.719944]      4:         ab74b047      1AA2000      1AC3000      21000 =  135168 =    135KB  RW---
-[ 2531.719969]      5:         7bbf5575     F7B2A000     F7C62000     138000 = 1277952 =   1277KB  R-E--
-[ 2531.719993]      6:         2f09b9f4     F7C62000     F7C72000      10000 =   65536 =     65KB  -----
-[ 2531.720099]      7:         ed4fa3a1     F7C72000     F7C74000       2000 =    8192 =      8KB  R----
-[ 2531.720129]      8:         16aa35cf     F7C74000     F7C75000       1000 =    4096 =      4KB  RW---
-[ 2531.720153]      9:         4ba7fe56     F7C75000     F7C78000       3000 =   12288 =     12KB  RW---
-[ 2531.720178]     10:         feadf9f5     F7C8C000     F7C90000       4000 =   16384 =     16KB  R-E--
-[ 2531.720202]     11:         e3521f22     F7C90000     F7C9F000       F000 =   61440 =     61KB  -----
-[ 2531.720226]     12:         62be89ad     F7C9F000     F7CA0000       1000 =    4096 =      4KB  R----
-[ 2531.720267]     13:         763b248c     F7CA0000     F7CA1000       1000 =    4096 =      4KB  RW---
-[ 2531.720291]     14:         2810d81f     F7CA1000     F7CC1000      20000 =  131072 =    131KB  R-E--
-[ 2531.720315]     15:          f35f66d     F7CCD000     F7CCF000       2000 =    8192 =      8KB  RW---
-[ 2531.720339]     16:         f5d23ed3     F7CD0000     F7CD1000       1000 =    4096 =      4KB  R-E--
-[ 2531.720363]     17:          d4d8e75     F7CD1000     F7CD2000       1000 =    4096 =      4KB  R----
-[ 2531.720387]     18:         33517b87     F7CD2000     F7CD3000       1000 =    4096 =      4KB  RW---
-[ 2531.720411]     19:         c7389f30     FFD03000     FFD24000      21000 =  135168 =    135KB  RW---
-[ 2531.720447]     20:         18c385ff     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
-[ 2531.720464]  
-[ 2531.720481]          Physical Address       Virtual Address
-[ 2531.720505]            155DC003 (PGD)                 10000
-[ 2531.720526]      20000015CFDFC3 (PTE)                 10000
-[ 2531.720543]
-[ 2531.720560]          Physical Address       Virtual Address
-[ 2531.720579]            155DC003 (PGD)                 20000
-[ 2531.720599]      E0000015D7FFC3 (PTE)                 20000
-[ 2531.720616]
-[ 2531.720633]          Physical Address       Virtual Address
-[ 2531.720652]            155DC003 (PGD)                 21000
-[ 2531.720671]      E8000015E2AF43 (PTE)                 21000
-[ 2531.720688]
-[ 2531.720704]          Physical Address       Virtual Address
-[ 2531.720723]            155DC003 (PGD)               1AA2000
-[ 2531.720743]      E8000015D7DF43 (PTE)               1AA2000
+[   78.605553] Page information for PID [863]
+[   78.605577]  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
+[   78.605608]      1:         de49375d        10000        11000       1000 =    4096 =      4KB  R-E--
+[   78.605629]      2:         c5e4c977        20000        21000       1000 =    4096 =      4KB  R----
+[   78.605650]      3:         15e9fc8c        21000        22000       1000 =    4096 =      4KB  RW---
+[   78.605893]      4:         6890388d        22000        26000       4000 =   16384 =     16KB  RW---
+[   78.605915]      5:         882392d1       107000       128000      21000 =  135168 =    135KB  RW---
+[   78.605936]      6:         7bf1cbca     F7A00000     F7B38000     138000 = 1277952 =   1277KB  R-E--
+[   78.605957]      7:         adacb148     F7B38000     F7B48000      10000 =   65536 =     65KB  -----
+[   78.605977]      8:         6b22e567     F7B48000     F7B4A000       2000 =    8192 =      8KB  R----
+[   78.605998]      9:         c79c4fb1     F7B4A000     F7B4B000       1000 =    4096 =      4KB  RW---
+[   78.606018]     10:         11fc2915     F7B4B000     F7B4E000       3000 =   12288 =     12KB  RW---
+[   78.606051]     11:         e9d40903     F7B62000     F7B66000       4000 =   16384 =     16KB  R-E--
+[   78.606072]     12:         bdf5bc06     F7B66000     F7B75000       F000 =   61440 =     61KB  -----
+[   78.606193]     13:         f83ba0c5     F7B75000     F7B76000       1000 =    4096 =      4KB  R----
+[   78.606222]     14:         ca78f8a9     F7B76000     F7B77000       1000 =    4096 =      4KB  RW---
+[   78.606243]     15:         38513afe     F7B77000     F7B97000      20000 =  131072 =    131KB  R-E--
+[   78.606264]     16:         891ca4aa     F7BA3000     F7BA5000       2000 =    8192 =      8KB  RW---
+[   78.606285]     17:         f7f97a65     F7BA6000     F7BA7000       1000 =    4096 =      4KB  R-E--
+[   78.606306]     18:         5ce50e05     F7BA7000     F7BA8000       1000 =    4096 =      4KB  R----
+[   78.606327]     19:         3371d847     F7BA8000     F7BA9000       1000 =    4096 =      4KB  RW---
+[   78.606365]     20:         1f0e336c     FFB8D000     FFBAE000      21000 =  135168 =    135KB  RW---
+[   78.606385]     21:         a714764d     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
+[   78.606399]  
+[   78.606414]          Physical Address       Virtual Address
+[   78.606435]            11323003 (PGD)                 10000
+[   78.606454]      20000013A2DFC3 (PTE)                 10000
+[   78.606467]  
+[   78.606481]          Physical Address       Virtual Address
+[   78.606497]            11323003 (PGD)                 20000
+[   78.606513]      E0000004A82FC3 (PTE)                 20000
+[   78.606538]  
+[   78.606552]          Physical Address       Virtual Address
+[   78.606568]            11323003 (PGD)                 21000
+[   78.606584]      E800000500BF43 (PTE)                 21000
+[   78.606597]  
+[   78.606611]          Physical Address       Virtual Address
+[   78.606626]            11323003 (PGD)                 22000
+[   78.606641]      E000000498FFC3 (PTE)                 22000
+[   78.606655]                   0 (PTE)                 23000
+[   78.606669]                   0 (PTE)                 24000
+[   78.606683]                   0 (PTE)                 25000
 ```
 
 ## Child memory
 
 ```
-[ 2537.276597] Page information for PID [995]
-[ 2537.276628]  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
-[ 2537.276656]      1:         d15dc113        10000        11000       1000 =    4096 =      4KB  R-E--
-[ 2537.276680]      2:         b61b567e        20000        21000       1000 =    4096 =      4KB  R----
-[ 2537.276704]      3:         82f6bd47        21000        22000       1000 =    4096 =      4KB  RW---
-[ 2537.276729]      4:         706801d0      1AA2000      1AC3000      21000 =  135168 =    135KB  RW---
-[ 2537.276754]      5:         91003647     F7B2A000     F7C62000     138000 = 1277952 =   1277KB  R-E--
-[ 2537.276778]      6:         8a36ab8b     F7C62000     F7C72000      10000 =   65536 =     65KB  -----
-[ 2537.276814]      7:         5de9b326     F7C72000     F7C74000       2000 =    8192 =      8KB  R----
-[ 2537.276838]      8:         4c4b225f     F7C74000     F7C75000       1000 =    4096 =      4KB  RW---
-[ 2537.276862]      9:         cdd369ec     F7C75000     F7C78000       3000 =   12288 =     12KB  RW---
-[ 2537.276886]     10:         fa879c86     F7C8C000     F7C90000       4000 =   16384 =     16KB  R-E--
-[ 2537.276909]     11:         2e4ebe70     F7C90000     F7C9F000       F000 =   61440 =     61KB  -----
-[ 2537.276933]     12:         93896eab     F7C9F000     F7CA0000       1000 =    4096 =      4KB  R----
-[ 2537.276957]     13:         9583cfd2     F7CA0000     F7CA1000       1000 =    4096 =      4KB  RW---
-[ 2537.276981]     14:         eb4f50bc     F7CA1000     F7CC1000      20000 =  131072 =    131KB  R-E--
-[ 2537.277102]     15:         1497bb1e     F7CCD000     F7CCF000       2000 =    8192 =      8KB  RW---
-[ 2537.277126]     16:         a7929294     F7CD0000     F7CD1000       1000 =    4096 =      4KB  R-E--
-[ 2537.277150]     17:         e286f593     F7CD1000     F7CD2000       1000 =    4096 =      4KB  R----
-[ 2537.277174]     18:         1b384602     F7CD2000     F7CD3000       1000 =    4096 =      4KB  RW---
-[ 2537.277200]     19:         f2d3df95     FFD03000     FFD24000      21000 =  135168 =    135KB  RW---
-[ 2537.277241]     20:         5a5c4e04     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
-[ 2537.277258]
-[ 2537.277275]          Physical Address       Virtual Address
-[ 2537.277300]            155F0003 (PGD)                 10000
-[ 2537.277324]      20000015CFDFC3 (PTE)                 10000
-[ 2537.277341]
-[ 2537.277359]          Physical Address       Virtual Address
-[ 2537.277378]            155F0003 (PGD)                 20000
-[ 2537.277398]      E0000015D7FFC3 (PTE)                 20000
-[ 2537.277415]
-[ 2537.277432]          Physical Address       Virtual Address
-[ 2537.277451]            155F0003 (PGD)                 21000
-[ 2537.277470]      E800001266CF43 (PTE)                 21000
+[   82.564689] Page information for PID [864]
+[   82.564704]  # vmas         vma(ptr)        start          end       length(Hex=Decimal=KB)     RWESH
+[   82.564718]      1:         b7131ecc        10000        11000       1000 =    4096 =      4KB  R-E--
+[   82.564728]      2:         bae1b8f1        20000        21000       1000 =    4096 =      4KB  R----
+[   82.564737]      3:         9b93775c        21000        22000       1000 =    4096 =      4KB  RW---
+[   82.564746]      4:         65dd6410        22000        26000       4000 =   16384 =     16KB  RW---
+[   82.564756]      5:         de319011       107000       128000      21000 =  135168 =    135KB  RW---
+[   82.564765]      6:         7d447791     F7A00000     F7B38000     138000 = 1277952 =   1277KB  R-E--
+[   82.564774]      7:         e3c7653e     F7B38000     F7B48000      10000 =   65536 =     65KB  -----
+[   82.564783]      8:         37f08a01     F7B48000     F7B4A000       2000 =    8192 =      8KB  R----
+[   82.564792]      9:         24bbae2b     F7B4A000     F7B4B000       1000 =    4096 =      4KB  RW---
+[   82.564801]     10:         3afcf48e     F7B4B000     F7B4E000       3000 =   12288 =     12KB  RW---
+[   82.564811]     11:         34ac0b54     F7B62000     F7B66000       4000 =   16384 =     16KB  R-E--
+[   82.564820]     12:         751cccf4     F7B66000     F7B75000       F000 =   61440 =     61KB  -----
+[   82.564829]     13:          58fa35c     F7B75000     F7B76000       1000 =    4096 =      4KB  R----
+[   82.564838]     14:          2a32bde     F7B76000     F7B77000       1000 =    4096 =      4KB  RW---
+[   82.564847]     15:         eac046c7     F7B77000     F7B97000      20000 =  131072 =    131KB  R-E--
+[   82.564856]     16:         7df6194f     F7BA3000     F7BA5000       2000 =    8192 =      8KB  RW---
+[   82.564865]     17:         7a792cce     F7BA6000     F7BA7000       1000 =    4096 =      4KB  R-E--
+[   82.564874]     18:         f840c873     F7BA7000     F7BA8000       1000 =    4096 =      4KB  R----
+[   82.564883]     19:         b563bf4f     F7BA8000     F7BA9000       1000 =    4096 =      4KB  RW---
+[   82.564892]     20:         4948ac3d     FFB8D000     FFBAE000      21000 =  135168 =    135KB  RW---
+[   82.564901]     21:         16112989     FFFF0000     FFFF1000       1000 =    4096 =      4KB  R-E--
+[   82.564907]  
+[   82.564913]          Physical Address       Virtual Address
+[   82.564922]            125C9003 (PGD)                 10000
+[   82.564931]      20000013A2DFC3 (PTE)                 10000
+[   82.564937]  
+[   82.564943]          Physical Address       Virtual Address
+[   82.564950]            125C9003 (PGD)                 20000
+[   82.564957]      E0000004A82FC3 (PTE)                 20000
+[   82.564963]  
+[   82.564968]          Physical Address       Virtual Address
+[   82.564975]            125C9003 (PGD)                 21000
+[   82.564982]      E8000013DDAF43 (PTE)                 21000
+[   82.564988]  
+[   82.564994]          Physical Address       Virtual Address
+[   82.565000]            125C9003 (PGD)                 22000
+[   82.565007]      E000000498FFC3 (PTE)                 22000
+[   82.565013]                   0 (PTE)                 23000
+[   82.565025]                   0 (PTE)                 24000
+[   82.565031]                   0 (PTE)                 25000
 ```
-
 
 ## Important things to `note`
 
 - The first 2 pages for the parent and child point to the same physical page tables:
 
 ```
-20000015CFDFC3 (PTE)                 10000
-E0000015D7FFC3 (PTE)                 20000
+20000013A2DFC3 (PTE)                 10000
+E0000004A82FC3 (PTE)                 20000
 ```
 
-- The third page in the parent and child point to different physical page tables:
+- The 3rd page in the parent and child point to different physical page tables,
+however, the 4th page in the parent and child point to the same physical page.
 
 ```
 # Parent memory
-[ 2531.720633]          Physical Address       Virtual Address
-[ 2531.720652]            155DC003 (PGD)                 21000
-[ 2531.720671]      E8000015E2AF43 (PTE)                 21000
+[   78.606552]          Physical Address       Virtual Address
+[   78.606568]            11323003 (PGD)                 21000
+[   78.606584]      E800000500BF43 (PTE)                 21000
+[   78.606597]  
+[   78.606611]          Physical Address       Virtual Address
+[   78.606626]            11323003 (PGD)                 22000
+[   78.606641]      E000000498FFC3 (PTE)                 22000
+[   78.606655]                   0 (PTE)                 23000
+[   78.606669]                   0 (PTE)                 24000
+[   78.606683]                   0 (PTE)                 25000
 
 # Child Memory
-[ 2537.277432]          Physical Address       Virtual Address
-[ 2537.277451]            155F0003 (PGD)                 21000
-[ 2537.277470]      E800001266CF43 (PTE)                 21000
+[   82.564968]          Physical Address       Virtual Address
+[   82.564975]            125C9003 (PGD)                 21000
+[   82.564982]      E8000013DDAF43 (PTE)                 21000
+[   82.564988]  
+[   82.564994]          Physical Address       Virtual Address
+[   82.565000]            125C9003 (PGD)                 22000
+[   82.565007]      E000000498FFC3 (PTE)                 22000
+[   82.565013]                   0 (PTE)                 23000
+[   82.565025]                   0 (PTE)                 24000
+[   82.565031]                   0 (PTE)                 25000
 ```
 
-If we check the objdump, we will see that the stack is located in the virtual
-page `21000`. Remember that when `fork()` is executed, parent and child has
-different stack.
+What is in the vitual pages `0x21000`, `0x22000`, `0x23000`, `0x24000` and
+`0x25000`? As per the objdump of the userspace program in the virtual page `0x21000`
+we find the `stack`. The `buffer` was placed in`00023000 <buffer>:` and the
+`.bss` section starts at `0x00022000`.
+
+
+As soon as we type `M` (from Modify) in the user space program, we can see that
+physical page has been allocated in the child process:
+
+```shell
+pi@raspberrypi:~ $ ./fork_userspace 
+parent: Parent PID 863, Child PID 864
+child: Child, PID 864
+M
+```
+
+in another console
+
+```
+pi@raspberrypi:~ $ echo 864 > /dev/physmem
+pi@raspberrypi:~ $ dmesg
+[  869.551050]          Physical Address       Virtual Address
+[  869.551065]            125C9003 (PGD)                 22000
+[  869.551157]      E000000498FFC3 (PTE)                 22000
+[  869.551180]      E8000007422F43 (PTE)                 23000
+[  869.551197]                   0 (PTE)                 24000
+[  869.551212]                   0 (PTE)                 25000
+```
+
+In the parent address space there is no change registered:
+
+
+```
+pi@raspberrypi:~ $ echo 863 > /dev/physmem
+pi@raspberrypi:~ $ dmesg
+[ 1092.845521]          Physical Address       Virtual Address
+[ 1092.845537]            11323003 (PGD)                 22000
+[ 1092.845552]      E000000498FFC3 (PTE)                 22000
+[ 1092.845566]                   0 (PTE)                 23000
+[ 1092.845581]                   0 (PTE)                 24000
+[ 1092.845595]                   0 (PTE)                 25000
+```
+
+Congratulations, we just witnessed `copy-on-write` in action.
 
 - Note that the addresses `F7XXX000` are in higher memory (4GB~), and that is
 because the shared libraries are on those memory regions.
-
-
 

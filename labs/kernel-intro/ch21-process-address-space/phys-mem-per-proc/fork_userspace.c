@@ -1,14 +1,21 @@
+/**
+ * Fork a child thread.
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-/**
- * Fork a child thread.
- */
+#define PAGE_SIZE 4096
 
-char buffer[10];
+/*
+ * The buffer is placed in a PAGE_SIZE offset so we can see clearly in the
+ * objdump where it is placed in virtual memory.
+ */
+char __attribute__ ((aligned (PAGE_SIZE))) buffer[PAGE_SIZE * 3];
 
 int main(void) {
   int pid;
