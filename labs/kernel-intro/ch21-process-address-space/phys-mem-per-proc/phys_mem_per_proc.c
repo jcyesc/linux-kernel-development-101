@@ -131,16 +131,19 @@ static ssize_t phys_mem_per_proc_write(struct file *file,
 		const char __user *buf, size_t lbuf,
 		loff_t *ppos)
 {
-	char kbuffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
 	int nbytes;
 	int ret;
+	int index;
 	pid_t pid;
 	struct task_struct *tsk;
 
-	nbytes = simple_write_to_buffer(kbuffer, BUFFER_SIZE, ppos, buf, lbuf);
+	nbytes = simple_write_to_buffer(buffer, BUFFER_SIZE, ppos, buf, lbuf);
 
-	kbuffer[lbuf > BUFFER_SIZE ? BUFFER_SIZE : lbuf] = '\0';
-	ret = kstrtoint(kbuffer, 10, &pid);
+	index = lbuf > BUFFER_SIZE ? BUFFER_SIZE : lbuf;
+	buffer[index - 1] = '\0';
+
+	ret = kstrtoint(buffer, 10, &pid);
 	if (ret)
 		return -EINVAL;
 
