@@ -41,3 +41,7 @@ clean:
 	make -C $(KERNEL_DIR) \
 		M=$(PWD) clean
 ```
+
+## References
+
+- https://linux-kernel-labs.github.io/refs/heads/master/labs/device_drivers.html
