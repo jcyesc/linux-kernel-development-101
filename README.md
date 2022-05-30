@@ -194,3 +194,9 @@ $ sudo apt install gcc-arm-linux-gnueabi
 $ arm-linux-gnueabi-gcc app.c -o app.bin
 ```
 
+## Format the drivers and modules
+
+```shell
+perl $(HOME)/linux-kernel-development-101/linux/scripts/checkpatch.pl -f my_module.c
+```
+
