@@ -1,5 +1,5 @@
 
-obj-m += basic_kfifo.o
+obj-m += kfifo_basic.o
 
 
 # Assumes that the Linux Kernel source code is in:

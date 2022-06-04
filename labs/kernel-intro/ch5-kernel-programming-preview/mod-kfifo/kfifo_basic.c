@@ -111,3 +111,5 @@ module_exit(kfifo_mod_exit);
 
 MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("kfifo library usage");
+MODULE_LICENSE("GPL v2");
+
