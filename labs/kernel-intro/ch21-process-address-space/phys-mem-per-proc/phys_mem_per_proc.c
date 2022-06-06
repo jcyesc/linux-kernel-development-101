@@ -12,7 +12,9 @@
 #include <linux/module.h>
 #include <linux/pagewalk.h>
 #include <linux/printk.h>
+#include <linux/rwlock.h>
 #include <linux/sched.h>
+#include <linux/sched/task.h>
 #include <linux/types.h>
 
 #define PHYS_MEM_DEV_NAME "physmem"
@@ -23,7 +25,6 @@ static int phys_dev_minor;
 static struct cdev *phys_cdev;
 static dev_t phys_cdev_num;
 static const unsigned int num_cdevs = 1;
-
 
 int walk_pgd(pgd_t *pgd, unsigned long addr, unsigned long next,
 		struct mm_walk *walk)
@@ -147,7 +148,15 @@ static ssize_t phys_mem_per_proc_write(struct file *file,
 	if (ret)
 		return -EINVAL;
 
+//	When the a task_struct it is used, the lasklist_lock should be used. The
+//	tasklist_lock hasn't been exported in the Kernel because it is not recommended
+//	to use it in modules. Below it is how it is supposed to be used outside modules.
+//	read_lock(&tasklist_lock);
 	tsk = pid_task(find_vpid(pid), PIDTYPE_PID);
+//	if (tsk)
+//		get_task_struct(tsk);
+//	read_unlock(&tasklist_lock);
+
 	if (!tsk) {
 		pr_info("Task with pid=%d not found", pid);
 		goto out;
