@@ -42,7 +42,7 @@
 #define MEMORY_STATS_DEV_NAME "memorystats"
 #define RAMDISK_SIZE ((size_t) (2 * PAGE_SIZE))
 #define PAGE_STAT(offset, stat, num_pages) snprintf(ramdisk + offset, \
-			RAMDISK_SIZE, \
+			(RAMDISK_SIZE - offset), \
 			"%-15s=%10d %10ld %8ld\n", \
 			stat, \
 			num_pages, \
@@ -111,24 +111,26 @@ static int populate_memory_stats(void)
 			mappedtodisk++;
 	}
 
+	// Note: Instead of keeping track of the offsets manually, the seq_file
+	// interface and single_open() function can be used.
 	bytes_written = 0;
 	bytes_written += snprintf(ramdisk + bytes_written,
-		RAMDISK_SIZE,
+		RAMDISK_SIZE - bytes_written,
 		"--------------- Memory Stats ---------------\n");
 
 	bytes_written += snprintf(ramdisk + bytes_written,
-		RAMDISK_SIZE,
+		RAMDISK_SIZE - bytes_written,
 		"Examining %ld pages (num_phys_pages) = %ld MB\n",
 		num_physpages,
 		num_physpages * PAGE_SIZE / 1024 / 1024);
 	bytes_written += snprintf(ramdisk + bytes_written,
-		RAMDISK_SIZE,
+		RAMDISK_SIZE - bytes_written,
 		"Pages with valid PFN's=%ld, = %ld MB\n",
 		valid,
 		valid * PAGE_SIZE / 1024 / 1024);
 
 	bytes_written += snprintf(ramdisk + bytes_written,
-		RAMDISK_SIZE,
+		RAMDISK_SIZE - bytes_written,
 		"\n                     Pages         KB       MB\n\n");
 	bytes_written += PAGE_STAT(bytes_written, "free", free);
 	bytes_written += PAGE_STAT(bytes_written, "locked", locked);
@@ -163,6 +165,8 @@ static ssize_t mem_dev_read(
 
 	mutex_lock(&ram_mutex);
 
+	// Note: The ramdisk should be populated in the open() method because the
+	// read() function can be called several times.
 	stats_size = populate_memory_stats();
 	nbytes = simple_read_from_buffer(buf, lbuf, ppos, ramdisk, stats_size);
 
