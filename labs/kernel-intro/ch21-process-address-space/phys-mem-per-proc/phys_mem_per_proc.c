@@ -152,6 +152,7 @@ static ssize_t phys_mem_per_proc_write(struct file *file,
 //	tasklist_lock hasn't been exported in the Kernel because it is not recommended
 //	to use it in modules. Below it is how it is supposed to be used outside modules.
 //	read_lock(&tasklist_lock);
+//	tasklist_lock is defined in https://elixir.bootlin.com/linux/v5.18.3/source/kernel/fork.c#L142
 	tsk = pid_task(find_vpid(pid), PIDTYPE_PID);
 //	if (tsk)
 //		get_task_struct(tsk);

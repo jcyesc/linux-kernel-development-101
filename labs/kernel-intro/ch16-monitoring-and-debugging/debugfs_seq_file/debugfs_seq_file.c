@@ -82,6 +82,7 @@ static int debugfs_seq_show(struct seq_file *s, void *v)
 {
 	struct reg *r = (struct reg *) v;
 
+	pr_info("%s executing", __func__==);
 	seq_printf(s, "%5s = 0x%9llX\n", r->name, r->value);
 
 	return 0;
@@ -94,9 +95,9 @@ static void debugfs_seq_stop(struct seq_file *s, void *v)
 
 static const struct seq_operations seq_ops = {
 	.start = debugfs_seq_start,
-	.next = debugfs_seq_next,
-	.show = debugfs_seq_show,
-	.stop = debugfs_seq_stop,
+	.next  = debugfs_seq_next,
+	.show  = debugfs_seq_show,
+	.stop  = debugfs_seq_stop,
 };
 
 static int debugfs_open(struct inode *inode, struct file *file)
