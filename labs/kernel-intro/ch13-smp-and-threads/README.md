@@ -62,8 +62,9 @@ where $$ = 35585 is the current shell pid, and the second number is the cat proc
 ## Per-CPU variables
 
 
-When we have SoC that has several CPUs, we can define variables per cpu. See
-the API below:
+When we have SoC that has several CPUs, we can define variables per cpu. Typically,
+Per-CPU data is stored in an array. Each item in the array corresponds to a possible
+processor in the system. See the API below:
 
 
 ```c
@@ -94,3 +95,17 @@ To find out in which CPU your task is running, you can use:
 #define get_cpu() ({ preempt_disable(); smp_processor_id(); })
 #define put_cpu() preempt_enable()
 ```
+
+Kernel preemption is the only concert with per-CPU data. Kernel preemption poses
+two problems, listed here:
+
+- If your code is preempted and reschedules on another processor, the cpu variable
+is no longer valid because it points to the wrong processor. In general, code cannot
+sleep after obtaining the current processor.
+
+- If another task preempts your code, it can concurrently access my_percpu on the
+same processor, which is a race condition.
+
+This can be avoided by calling `get_cpu()`, which disables kernel preemption. The
+corresponding call to `put_cpu()` enables kernel preemption.
+
