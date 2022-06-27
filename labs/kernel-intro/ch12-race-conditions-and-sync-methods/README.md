@@ -201,6 +201,13 @@ static inline void __raw_spin_unlock(raw_spinlock_t *lock)
 
 ```
 
+Note: The configure option `CONFIG_DEBUG_SPINLOCK` enables a handful of debugging
+checks in the spin lock code. For example, with this option the spin lock code
+checks for the used of uninitialized spin locks and unlocking a lock that is not
+yet locked. When testing the code_ we should run with spin lock debugging enabled.
+For additional debugging of lock lifecycles, enable `CONFIG_DEBUG_LOCK_ALLOC`.
+
+
 ## Seqlocks
 
 `Seqlocks` are used when we have the conditions below:
