@@ -426,3 +426,26 @@ static void my_release (struct kref *kr){
 
 For more information, see: https://www.kernel.org/doc/html/latest/core-api/kref.html
 
+## BKL: The Big Kernel Lock
+
+The Big Kernel Lock (BKL) is a global spin lock that was created to ease the transition
+from Linux's original SMP implementation to fine grained locking.
+
+- You can sleep while holding the BKL. The lock is automatically dropped when the
+task is unscheduled and reacquired when the task is rescheduled. Of course, this
+does not mean it is always safe to sleep while holding the BKL, merely that you
+can and you will not deadlock.
+- The BKL is a recursive lock. A single process can acquire the lock multiple times
+and not deadlock, as it would with a spin lock.
+- You can use the BKL only in process context. Unlike spin locks, you cannot acquire
+the BKL in interrupt context.
+- New users of the BLK are forbidden. With every kernel release, fewer and fewre
+drivers and subsystems rely on the BKL.
+
+The BKL functions are:
+
+```c
+lock_kernel()
+unlock_kernel()
+kernel_locked()
+```
