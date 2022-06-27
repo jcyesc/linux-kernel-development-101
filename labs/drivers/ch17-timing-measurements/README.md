@@ -66,3 +66,14 @@ jiffies = jiffies_64l
 
 Thus, jiffies is the lover 32 bits of the full 64-bit jiffies_64 variable.
 
+
+## BogoMIPS
+
+The `BogoMIPS` value is the number of busy loop iterations the processor can
+perform in a given period. In effect, BogoMIPS are a measurement of how fast a
+processor can do nothing. This value is stored in the `loops_per_jiffy` variable
+and is readable from `/proc/cpuinfo`.
+
+The kernel computes `loops_per_jiffy` on boot via `calibrate_delay()` in
+`init/main.c`.
+
