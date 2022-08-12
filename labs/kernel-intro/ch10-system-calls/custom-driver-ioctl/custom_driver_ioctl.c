@@ -11,8 +11,8 @@
  * chmod 755 /dev/customdev
  *
  * Note:
- * - unlocked_ioctl() - Use it for ARM32
- * - compat_ioctl() - Use it for ARM64
+ * - unlocked_ioctl() - Use it for ARM64 user space.
+ * - compat_ioctl() - Use it for ARM32 user space.
  */
 #include <linux/device.h>  // Use to create and destroy nodes.
 #include <linux/fs.h>      // Defines the file operations prototypes for driver.

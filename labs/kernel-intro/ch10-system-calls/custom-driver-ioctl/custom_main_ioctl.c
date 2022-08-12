@@ -4,6 +4,13 @@
  *
  * This files has to be compiled in the target device, in this case the RPi 3
  * or crosscompile using arm32 option.
+ *
+ * To compile and run:
+ *
+ *    arm-linux-gnueabi-gcc custom_main_ioctl.c -o custom_main_ioctl.bin
+ *    scp custom_main_ioctl.bin pi@192.168.2.2:~
+ *
+ *    pi$ sudo ./custom_main_ioctl.bin
  */
 
 
