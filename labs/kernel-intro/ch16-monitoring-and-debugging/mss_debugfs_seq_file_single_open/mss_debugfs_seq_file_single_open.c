@@ -126,16 +126,89 @@ static int debugfs_single_open(struct seq_file *s, void *v)
 	for (i = 0; i < MC_REGS_PER_LPDDR4_NR; i++)
 		seq_printf(s, "%-10s 0x%.8x\n", reg_names[i], mc->regs[i]);
 
+	kfree(mc);
+
 	return 0;
 }
+
+#define MAX_VALUE_SIZE 10
+
+struct user_value {
+	int lpddr_id;
+	char input[MAX_VALUE_SIZE];
+	int value;
+};
 
 static int mss_mc_open(struct inode *inode, struct file *file)
 {
 	int *lpddr_id = (int *)inode->i_private;
+	struct user_value *uv = kzalloc(sizeof(*uv), GFP_KERNEL);
 
-	pr_info("%s is executing lpddr = %d", __func__, *lpddr_id);
+	uv->lpddr_id = *lpddr_id;
 
-	return single_open(file, debugfs_single_open, lpddr_id);
+	pr_info("%s: Opening file for lpddr = %d", __func__, uv->lpddr_id);
+
+	return single_open(file, debugfs_single_open, uv);
+}
+
+/*
+ * When the user writes anything in the debugfs file, the write function is
+ * called. For example:
+ *
+ * echo 1 > /sys/kernel/debug/mssdbg/mc0/lpddr4-1
+ */
+static ssize_t
+mss_mc_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
+
+{
+	int num_bytes_written;
+	struct seq_file *sf = file->private_data;
+	struct user_value *uv = (struct user_value *)(sf->private);
+	int lpddr_id = uv->lpddr_id;
+	int ret;
+	int i;
+
+	pr_info("%s: Starts lpddr = %d, count=%d, *ppos=%d buf=%s",
+			__func__, lpddr_id, (int)count, (int)*ppos, buf);
+
+	if (count > MAX_VALUE_SIZE - 1) {
+		pr_info("%s: Invalid string, expected size %d, found %ld\n",
+				__func__, MAX_VALUE_SIZE - 1, count);
+		return -EINVAL;
+	}
+
+	num_bytes_written = simple_write_to_buffer(
+		uv->input, MAX_VALUE_SIZE - 1, ppos, buf, count);
+	pr_info("%s: num_bytes_written = %d", __func__, num_bytes_written);
+
+	if (num_bytes_written == count) {
+		// We are done copying the user input.
+		uv->input[num_bytes_written] = '\0';
+
+		for (i = 0; i < num_bytes_written; i++) {
+			pr_info("%s: char input[%d] = %d, char buf[%d] = %d",
+					__func__, i, uv->input[i], i, buf[i]);
+		}
+
+		ret = kstrtoint(uv->input, 10, &uv->value);
+		if (ret)
+			return ret;
+
+		pr_info("%s: Success, value passed is %d", __func__, uv->value);
+	}
+
+	return num_bytes_written;
+}
+
+int mss_mc_release(struct inode *inode, struct file *file)
+{
+	struct seq_file *sf = file->private_data;
+	struct user_value *uv = (struct user_value *)(sf->private);
+
+	pr_info("%s: Releasing struct user_value", __func__);
+	kfree(uv);
+
+	return single_release(inode, file);
 }
 
 static const struct file_operations fops = {
@@ -143,7 +216,8 @@ static const struct file_operations fops = {
 	.open = mss_mc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
-	.release = single_release,
+	.release = mss_mc_release,
+	.write = mss_mc_write,
 };
 
 static inline void create_mc_lpddr4_subdir(char *dirname, int idx)
@@ -151,10 +225,10 @@ static inline void create_mc_lpddr4_subdir(char *dirname, int idx)
 	struct dentry *mc;
 
 	mc = debugfs_create_dir(dirname, mssdbg);
-	debugfs_create_file("lpddr4-0", 0444, mc, &lpddr_ids[idx], &fops);
-	debugfs_create_file("lpddr4-1", 0444, mc, &lpddr_ids[++idx], &fops);
-	debugfs_create_file("lpddr4-2", 0444, mc, &lpddr_ids[++idx], &fops);
-	debugfs_create_file("lpddr4-3", 0444, mc, &lpddr_ids[++idx], &fops);
+	debugfs_create_file("lpddr4-0", 0644, mc, &lpddr_ids[idx++], &fops);
+	debugfs_create_file("lpddr4-1", 0644, mc, &lpddr_ids[idx++], &fops);
+	debugfs_create_file("lpddr4-2", 0644, mc, &lpddr_ids[idx++], &fops);
+	debugfs_create_file("lpddr4-3", 0644, mc, &lpddr_ids[idx++], &fops);
 }
 
 static int __init mss_debugfs_init(void)
@@ -172,7 +246,7 @@ static int __init mss_debugfs_init(void)
 	create_mc_lpddr4_subdir("mc1", MC1_LPDDR4_0);
 	create_mc_lpddr4_subdir("mc2", MC2_LPDDR4_0);
 
-	pr_info("Module loaded successfully!");
+	pr_info("Module loaded successfully. See /sys/kernel/debug/mssdbg");
 
 	return 0;
 }
