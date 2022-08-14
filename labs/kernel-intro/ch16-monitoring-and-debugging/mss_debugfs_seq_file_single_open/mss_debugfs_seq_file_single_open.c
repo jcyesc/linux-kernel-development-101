@@ -108,20 +108,28 @@ static inline void populate_regs(struct mc_struct *mc)
 		mc->regs[i] = mc->lpddr_id + i;
 }
 
+#define MAX_VALUE_SIZE 10
+
+struct user_value {
+	int lpddr_id;
+	char input[MAX_VALUE_SIZE];
+	int value;
+};
+
 static int debugfs_single_open(struct seq_file *s, void *v)
 {
 	int i;
 	struct mc_struct *mc;
-	int *lpddr_id = (int *)s->private;
+	struct user_value *uv = s->private;
 
 	mc = kzalloc(sizeof(*mc), GFP_KERNEL);
 	if (!mc)
 		return -ENOMEM;
 
-	mc->lpddr_id = *lpddr_id;
+	mc->lpddr_id = uv->lpddr_id;
 	populate_regs(mc);
 
-	pr_info("%s is printing regs for lpddr = %d", __func__, *lpddr_id);
+	pr_info("%s is printing regs for lpddr = %d", __func__, uv->lpddr_id);
 
 	for (i = 0; i < MC_REGS_PER_LPDDR4_NR; i++)
 		seq_printf(s, "%-10s 0x%.8x\n", reg_names[i], mc->regs[i]);
@@ -130,14 +138,6 @@ static int debugfs_single_open(struct seq_file *s, void *v)
 
 	return 0;
 }
-
-#define MAX_VALUE_SIZE 10
-
-struct user_value {
-	int lpddr_id;
-	char input[MAX_VALUE_SIZE];
-	int value;
-};
 
 static int mss_mc_open(struct inode *inode, struct file *file)
 {
@@ -159,7 +159,6 @@ static int mss_mc_open(struct inode *inode, struct file *file)
  */
 static ssize_t
 mss_mc_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
-
 {
 	int num_bytes_written;
 	struct seq_file *sf = file->private_data;
