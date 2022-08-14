@@ -30,18 +30,18 @@ int main()
 	fd = open(file_name, O_RDWR);
 	if(fd < 0) {
 		printf("Cannot open file %s \n", file_name);
-		return 0;
+		return -1;
 	}
 
 	ssize_t num = write(fd, input, strlen(input));
 
 	if (num < 0) {
 		printf("Error while writing\n");
-		goto exit;
+		close(fd);
+		return -1;
 	}
 
 	printf("Write was successful.\n");
 
-exit:
 	close(fd);
 }
