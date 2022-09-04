@@ -1,6 +1,8 @@
 # Linux Kernel Internals and Development Version 5.10.75
 
 
+The `Raspberry Pi 3 B+` has been used for the labs.
+
 
 ## Structure of the repo
 
