@@ -19,6 +19,10 @@
 		};
 	};
 
+	hwmon_101_dev {
+		compatible = "brcm,bcm2837,hwmon_101_dev";
+	};
+
 	arm-pmu {
 		compatible = "arm,cortex-a53-pmu";
 		interrupt-parent = <&local_intc>;
