@@ -87,6 +87,8 @@ static void __exit idr_mod_exit(void)
 
 	if (idr_is_empty(&usermap))
 		pr_info("User map is empty.");
+
+	idr_destroy(&usermap);
 }
 
 module_init(idr_mod_init);
