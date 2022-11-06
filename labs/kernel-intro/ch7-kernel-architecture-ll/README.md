@@ -20,6 +20,45 @@ The kernel can be in different contexts:
 To find out in which context the kernel is, use the functions in
 `include/linux/preempt.h`.
 
+- https://elixir.bootlin.com/linux/v5.16.5/source/include/linux/preempt.h
+
+
+## Kernel Preemption
+
+Code running in user space can be preempted any time by the kernel. The kernel
+can decide when it is time to assign the processor to another task.
+
+
+A kernel that is not preemptible does not mean that it can't be interrupted. A
+Not preemptible kernel can be interrupted in these cases:
+
+- The process goes to sleep because it is blocked waiting for a resource or
+simply decides to sleep.
+- An interrupt arrives while interrupts are enabled.
+
+Before kernel 2.6, the Linux kernel was not preemtible.
+
+There are 3 preemption options available:
+
+1. `No Force Preemption`, used generally in servers.
+2. `Voluntary Kernel Preemption`, used generally in Desktops. Explicit preeption
+points are inserted in the kernel code to reduce the latency.
+3. `Preemptible Kernel`, all kernel code is preemptible unless preemption is
+disabled in a code section.
+
+```shell
+linux $ cat .config | grep PREEMPT
+# CONFIG_PREEMPT_NONE is not set
+# CONFIG_PREEMPT_VOLUNTARY is not set
+CONFIG_PREEMPT=y
+CONFIG_PREEMPT_COUNT=y
+CONFIG_PREEMPTION=y
+CONFIG_PREEMPT_RCU=y
+CONFIG_DEBUG_PREEMPT=y
+CONFIG_PREEMPTIRQ_TRACEPOINTS=y
+# CONFIG_PREEMPT_TRACER is not set
+# CONFIG_PREEMPTIRQ_DELAY_TEST is not set
+```
 
 ## How to find the kernel configuration
 
