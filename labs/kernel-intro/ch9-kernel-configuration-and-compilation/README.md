@@ -21,10 +21,22 @@ CONFIG_IKCONFIG_PROC=y
 
 After the Kernel has been installed, run:
 
-```
+```shell
 pi@raspberrypi:~ $ zcat /proc/config.gz | grep IKCONFIG
 CONFIG_IKCONFIG=y
 CONFIG_IKCONFIG_PROC=y
+```
+
+IMPORTANT: if `CONFIG_IKCONFIG` is set as a module (`m`), then you need
+to install the module.
+
+```shell
+$ cat .config | grep CONFIG_IKCONFIG
+CONFIG_IKCONFIG=m
+CONFIG_IKCONFIG_PROC=y
+
+pi@raspberrypi:~ $ sudo modprobe configs
+pi@raspberrypi:~ $ zcat /proc/config.gz
 ```
 
 ## IS_ENABLED(option) macro
@@ -44,9 +56,8 @@ The functionality is similar to:
 ```shell
 $ cat .config | grep CONFIG_OF_FLATTREE
 CONFIG_OF_FLATTREE=y
-...
-
 ```
+
 
 - https://elixir.bootlin.com/linux/v5.17.4/source/include/linux/kconfig.h#L73
 
