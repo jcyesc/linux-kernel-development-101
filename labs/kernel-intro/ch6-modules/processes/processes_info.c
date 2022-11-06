@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Module to print information about processes.
  *
@@ -28,7 +29,7 @@ static int __init processes_info_init(void)
 		pr_info("%s\t\t%d\t\t%d", task->comm, task->tgid, task->pid);
 	}
 
-	pr_info("Total Tasks: %d", count);
+	pr_info("Total processes: %d", count);
 
 	pr_info("----- processes_info module (for_each_process_thread(p, t) -----");
 	count = 0;
@@ -38,7 +39,7 @@ static int __init processes_info_init(void)
 			task->tgid, task->pid, task->comm);
 	}
 
-	pr_info("Total Tasks: %d", count);
+	pr_info("Total threads: %d", count);
 
 	return 0;
 }
@@ -53,7 +54,7 @@ static void __exit processes_info_exit(void)
 module_init(processes_info_init);
 module_exit(processes_info_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("Processes info example");
 MODULE_LICENSE("GPL v2");
 

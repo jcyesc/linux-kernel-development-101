@@ -1,16 +1,22 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Module to print the same system information that uname -a
  *
  * You'll have to examine and print out the fields in a structure of
  * type new_utsname, as defined in
- * /usr/src/linux/include/linux/utsname.h. This can be accessed
- * through the name element in the exported structure init_uts_ns,
- * or through the inline function init_utsname() defined in
+ *
+ * https://elixir.bootlin.com/linux/v5.16.5/source/include/uapi/linux/utsname.h#L25
+ * https://elixir.bootlin.com/linux/v5.16.5/source/include/linux/utsname.h#L23
+ *
+ * This can be accessed through the name element in the exported structure
+ * init_uts_ns, or through the inline function init_utsname() defined in
  * include/linux/utsname.h.
  *
  * Compare your results with the results of uname -a.
  */
 J
+#define pr_fmt(fmt) KBUILD_MODNAME ": %s() " fmt, __func__
+
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/utsname.h>
@@ -46,7 +52,7 @@ static void __exit system_info_exit(void)
 module_init(system_info_init);
 module_exit(system_info_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("System info module");
 MODULE_LICENSE("GPL v2");
 

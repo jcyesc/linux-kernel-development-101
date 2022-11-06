@@ -17,7 +17,8 @@ The kernel function's return value can be checked by the macros defined in:
 
 - https://elixir.bootlin.com/linux/v5.16.5/source/include/linux/err.h#L24
 
-The Linux Kernel allows to encode the error in the return value.
+The Linux Kernel allows to encode the error in the return value instead of just
+returning NULL.
 
 ```c
 void *ERR_PTR (long error);
@@ -142,7 +143,7 @@ struct list_head *next, *prev;
 
 The common functions and macros used to manipulate lists are:
 
-```
+```c
 #include <linux/list.h>
 
 LIST_HEAD(list_head);

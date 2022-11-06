@@ -1,7 +1,7 @@
 
 # Chapter 6 - Kernel modules
 
-A `module` is kernel component that can be loaded or unloaded. The module helps
+A `module` is a kernel component that can be loaded or unloaded. The module helps
 to extend the kernel functionality and it has access to kernel libraries. When
 the kernel module is loaded, it becomes part of the big monolitic Linux kernel.
 
@@ -9,7 +9,7 @@ the kernel module is loaded, it becomes part of the big monolitic Linux kernel.
 A module:
 
 - has to have the `MODULE_LICENSE()` macro to avoid tainting the kernel.
-- needs to be specified the init and clean up functions using the macros: 
+- needs to specify the init and clean up functions using the macros:
 `module_init()` and `module_exit()`.
 
 
@@ -58,7 +58,7 @@ obj-m += my_basic_module.o
 mods-objs := my_basic1.o my_basic2.o
 ```
 
-If you are not crosscompiling the kernel and modules, you can install the
+If you are `not` crosscompiling the kernel and modules, you can install the
 modules using:
 
 
@@ -81,7 +81,6 @@ sudo rmmod my_module
 ```
 
 ## How to enable module usuage count
-
 
 One of the tasks of the kernel is to keep track of how many times a module
 is currently referenced by user-space processes. In order to enable this, we
@@ -125,7 +124,7 @@ The license to be used in the module is declared in this way:
 MODULE_LICENSE("Dual BSD/GPL");
 ```
 
-Any licence other than the ones in `include/linux/license.h` causes the
+Any license other than the ones in `include/linux/license.h` causes the
 kernel to be `tainted`. A warning appears when the module is loaded.
 
 
@@ -164,7 +163,18 @@ pi@raspberrypi:~ $ cat /proc/modules | awk ' {print $1;} ' | xargs modinfo  | gr
 
 ## How to find the kernel symbols
 
+
 ```shell
+$ cat /proc/kallsyms
+0000000000000000 T prl_tg_user_to_host_request_prepare	[prl_tg]
+0000000000000000 T prl_tg_probe_common	[prl_tg]
+0000000000000000 T prl_tg_remove_common	[prl_tg]
+
 sudo cat /proc/kallsyms
+ffffffffc002b630 T call_tg_async_cancel	[prl_tg]
+ffffffffc002b600 T call_tg_async_wait	[prl_tg]
+ffffffffc002a160 T prl_tg_user_to_host_request_prepare	[prl_tg]
+ffffffffc002acb0 T prl_tg_probe_common	[prl_tg]
+ffffffffc002a5e0 T prl_tg_remove_common	[prl_tg]
 ```
 

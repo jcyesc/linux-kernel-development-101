@@ -1,5 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
- * Module that export a variable and a function.
+ * Module that exports a variable and a function.
  *
  * Note: After loading the module, check that the symbols appear in:
  *
@@ -37,7 +38,7 @@ static void __exit module1_exit(void)
 module_init(module1_init);
 module_exit(module1_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("Module that exports symbols");
 MODULE_LICENSE("GPL v2");
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Module that uses exported symbols.
  */
@@ -31,7 +32,7 @@ static void __exit module2_exit(void)
 module_init(module2_init);
 module_exit(module2_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("Module that exports symbols");
 MODULE_LICENSE("GPL v2");
 

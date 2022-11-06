@@ -133,4 +133,5 @@ module_exit(users_rbtree_exit);
 
 MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("Red black trees library usage");
+MODULE_LICENSE("GPL v2");
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Module that shows how to use:
  *
@@ -78,6 +79,7 @@ static void __exit players_list_exit(void)
 module_init(players_list_init);
 module_exit(players_list_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("Linked list example");
+MODULE_LICENSE("GPL v2");
 
