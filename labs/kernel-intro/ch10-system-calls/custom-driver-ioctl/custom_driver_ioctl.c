@@ -1,4 +1,4 @@
-
+// SPDX-License-Identifier: GPL-2.0
 /**
  * Driver to define the file operations for a custom ioctl() call.
  *
@@ -91,12 +91,11 @@ static void __exit custom_driver_exit(void)
 	pr_info("Succeded in unregistering misc_custom_device\n");
 }
 
-
 module_init(custom_driver_init);
 module_exit(custom_driver_exit);
 
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("John");
-MODULE_DESCRIPTION("Custom driver for ioctl() system call");
 
+MODULE_AUTHOR("Juan Yescas");
+MODULE_DESCRIPTION("Custom driver for ioctl() system call");
+MODULE_LICENSE("GPL v2");
 

@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 	int fd, i;
 	char *dev_name = "/dev/customdev";
 
+	// Device nodes are opened as O_RDONLY.
 	fd = open(dev_name, O_RDONLY);
 	printf("open() returns %d\n", fd);
 	if (fd < 0) {
