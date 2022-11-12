@@ -1,5 +1,5 @@
 
-# Chapter 12 - Race conditions and synchronization methos
+# Chapter 12 - Race conditions and synchronization methods
 
 
 - Concurrency and Synchronization Methods
@@ -19,7 +19,7 @@
 don't want to sleep.
 
 When more instructions are needed, we can use `spinlocks`. Spinlocks busy
-wait to get the log. The spinlocks can suspend interrupts.
+wait to get the lock. The spinlocks can suspend interrupts.
 
 `seqlocks` are used when we want to read values that are hardly modified.
 
@@ -29,10 +29,8 @@ or `semaphores`.
 `Completion funtions` can be used instead of semaphores when contention is
 expected to be high.
 
-
-Before many of these sync constructions, there was the `Big Lock Kernel`. It
-was removed completely in the 2.6.39 kernel.
-
+Before many of these sync constructions existed, there was the `Big Lock Kernel`.
+It was removed completely in the 2.6.39 kernel.
 
 ## Atomic operations
 
@@ -42,7 +40,6 @@ The `atomic_t` structure is defined in `include/linux/types.h`.
 typedef struct {
 	int counter;
 } atomic_t;
-
 ```
 
 The atomic API consists of:
@@ -94,7 +91,7 @@ unsigned long ffs (int x);
 unsigned long fls (int x);
 ```
 
-The functions below are not atomit:
+The functions below are not atomic:
 
 
 ```c
@@ -105,7 +102,7 @@ long find_first_bit ( const unsigned long *addr, unsigned long size);
 
 ## Spin locks
 
-Spinlocks is a construction that helps to protect the critical sections of code.
+Spinlock is a construction that helps to protect the critical sections of code.
 It doesn't sleep and busy waits till the resource is free. The spinlocks are
 architecture dependant. The signature functions are defined in `include/linux/spinlock.h`.
 
@@ -156,9 +153,7 @@ region, we can use the functions below:
 unsigned long interrupts_state;
 rwlock_t my_lock;
 
-rw_lock_init (&my_lock);
-
-
+rwlock_init (&my_lock);
 
 read_lock_irqsave (&my_lock, interrupts_state);
 ...... critical code , reads only
@@ -174,9 +169,27 @@ write_unlock_irqrestore (&my_lock, interrupts_state);
 Another spinlocks functions are:
 
 ```c
-spin_unlock_wait (spinlock_t *lock);
+int spin_is_contended(spinlock_t *lock);
 int spin_is_locked (spinlock_t *lock);
 int spin_trylock (spinlock_t *lock);
+
+https://elixir.bootlin.com/linux/v5.16.5/source/include/linux/rwlock.h#L73
+
+typedef struct {
+	arch_rwlock_t raw_lock;
+#ifdef CONFIG_DEBUG_SPINLOCK
+	unsigned int magic, owner_cpu;
+	void *owner;
+#endif
+#ifdef CONFIG_DEBUG_LOCK_ALLOC
+	struct lockdep_map dep_map;
+#endif
+} rwlock_t;
+
+#define read_trylock(lock)	__cond_lock(lock, _raw_read_trylock(lock))
+#define write_trylock(lock)	__cond_lock(lock, _raw_write_trylock(lock))
+#define write_lock(lock)  	_raw_write_lock(lock)
+#define read_lock(lock)		_raw_read_lock(lock)
 ```
 
 The basic implementation of a spinlock is below:
