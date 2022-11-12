@@ -17,12 +17,15 @@
 #include <linux/init.h>
 #include <linux/miscdevice.h>
 #include <linux/module.h>
+#include <linux/rwlock.h>
 #include <linux/string.h>
 #include <linux/uaccess.h>
 
 #include "msg_lib.h"
 
 #define MSG_DEV "messagedev"
+
+rwlock_t content_lock;
 
 static struct content contnt = {
 	.msg = "Default message :)",
@@ -64,12 +67,16 @@ static long msg_driver_compact_ioctl(
 
 	switch (cmd) {
 	case MSG_PRINT_IOC:
+		read_lock(&content_lock);
 		pr_info("MSG_PRINT_IOC [%s]", contnt.msg);
+		read_unlock(&content_lock);
 		break;
 	case MSG_SET_IOC:
 		pr_info("MSG_SET_IOC");
 		size = _IOC_SIZE(MSG_SET_IOC);
+		write_lock(&content_lock);
 		res = copy_from_user(&contnt, (void __user *) arg, size);
+		write_unlock(&content_lock);
 		if (res) {
 			pr_info("Error copying from user [%d]\n", res);
 			return -EINVAL;
@@ -78,7 +85,9 @@ static long msg_driver_compact_ioctl(
 	case MSG_GET_IOC:
 		pr_info("MSG_GET_IOC");
 		size = _IOC_SIZE(MSG_GET_IOC);
+		read_lock(&content_lock);
 		res = copy_to_user((void __user *) arg, &contnt, size);
+		read_unlock(&content_lock);
 		if (res) {
 			pr_info("Error copying to user [%d]\n", res);
 			return -EINVAL;
@@ -111,6 +120,8 @@ static int __init msg_driver_init(void)
 		pr_err("Failed to register %s\n", MSG_DEV);
 		return -EBUSY;
 	}
+
+	rwlock_init(&content_lock);
 
 	pr_info(MSG_DEV " was registered successfully\n");
 	pr_info(MSG_DEV" got minor       %i\n", msg_misc_device.minor);

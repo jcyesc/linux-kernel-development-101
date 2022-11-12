@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 	// Device nodes are opened as O_RDONLY.
 	const int fd = open(dev_name, O_RDONLY);
-	printf("open() returns %d\n", fd);
+	printf("open() returns fd: %d\n", fd);
 	if (fd < 0) {
 		printf("There was a problem opening %s, error %d\n", dev_name, fd);
 		printf("Try: sudo chmod 755 %s\n", dev_name);
