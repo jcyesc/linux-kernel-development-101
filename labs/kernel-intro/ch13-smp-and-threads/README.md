@@ -96,7 +96,7 @@ To find out in which CPU your task is running, you can use:
 #define put_cpu() preempt_enable()
 ```
 
-Kernel preemption is the only concert with per-CPU data. Kernel preemption poses
+Kernel preemption is the only concern with per-CPU data. Kernel preemption poses
 two problems, listed here:
 
 - If your code is preempted and reschedules on another processor, the cpu variable

@@ -12,6 +12,13 @@
  *      preempt_disable();           \
  *      this_cpu_ptr(&var);          \
  * }))
+ *
+ * To compile and run:
+ *
+ * $ gcc macros_constructions.c
+ * $ ./a.out
+ * deference1 Value = 112
+ * deference2 Value = 113
  */
 
 #include <stdio.h>

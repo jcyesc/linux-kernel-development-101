@@ -12,7 +12,6 @@ it takes. This, in turn, serves to identify possible bottle necks.
 
 ```shell
 $ strace [options] myprogram.o [arguments]
-
 ```
 
 ## `powertop`

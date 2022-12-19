@@ -7,15 +7,13 @@ Linux is an operating system that is:
 - Multi-user
 - Multi-processor
 
-In a multi-process operating system, an process compete for the resources below:
-
+In a multi-process operating system, a process compete for the resources below:
 
 - CPU time
 - Memory
 - File and Filesystems
 - Peripheral devices such as Network card, speakers, mic, serial and parallel
 ports, etc.
-
 
 The `scheduler` is one of the most important parts of the operating sysstem. Its
 job is to coordinate the assigment of CPUs to the processes in a timely and orderly

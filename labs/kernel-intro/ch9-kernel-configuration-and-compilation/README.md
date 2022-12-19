@@ -80,8 +80,28 @@ $ sudo apt install cscope
 
 # Go where the kernel source code is:
 $ cd kernel_src/
-$ make cscope
+$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- COMPILED_SOURCE=1 cscope
 
-# Start searching using cscope.
+
+# Start searching using cscope. To exit type Ctrl + d
 $ cscope
+
+
+Find this C symbol:
+Find this global definition: task_struct
+Find functions called by this function:
+Find functions calling this function:
+Find this text string:
+Change this text string:
+Find this egrep pattern:
+Find this file:
+Find files #including this file:
+Find assignments to this symbol:
+
 ```
+
+## dump_stack()
+
+When you want to know the call stack of one kernel function, we can use
+the function `dump_stack()`.
+

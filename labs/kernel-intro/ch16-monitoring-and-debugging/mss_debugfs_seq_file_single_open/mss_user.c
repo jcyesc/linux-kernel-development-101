@@ -1,5 +1,5 @@
 /*
- * User space program to write to the debugfs file.s
+ * User space program to write to the debugfs file.
  *
  * To compile and run:
  *

@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	/* could do a  wait (&status) here if required */
+	/* could do a wait (&status) here if required */
 
 	for (j = 0; j < 6; j++) {
 		param = j;

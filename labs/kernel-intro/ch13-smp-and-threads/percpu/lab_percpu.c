@@ -61,8 +61,11 @@ static int __init my_init(void)
 
 	/* Printing and incrementing cpuvar. */
 	pr_info("cpuvar=%ld\n", get_cpu_var(cpuvar)++);
+
 	cpu = which_cpu();
+
 	put_cpu_var(cpuvar);
+
 	cpualloc = alloc_percpu(long);
 	*per_cpu_ptr(cpualloc, cpu) = 1000;
 	pr_info("Hello: module loaded at 0x%p\n", my_init);

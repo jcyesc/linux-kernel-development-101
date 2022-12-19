@@ -143,8 +143,10 @@ static int mss_mc_release(struct inode *inode, struct file *file)
 {
 	struct mc_struct *mc = file->private_data;
 
-	if (!mc)
+	if (!mc) {
+		WARN(!mc, "mc shouldn't be NULL\n");
 		return 0;
+	}
 
 	kfree(mc);
 
@@ -171,10 +173,10 @@ static inline void create_mc_lpddr4_subdir(char *dirname, int idx)
 	struct dentry *mc;
 
 	mc = debugfs_create_dir(dirname, mss);
-	debugfs_create_file("lpddr4-0", 0444, mc, &lpddr_ids[idx], &fops);
-	debugfs_create_file("lpddr4-1", 0444, mc, &lpddr_ids[++idx], &fops);
-	debugfs_create_file("lpddr4-2", 0444, mc, &lpddr_ids[++idx], &fops);
-	debugfs_create_file("lpddr4-3", 0444, mc, &lpddr_ids[++idx], &fops);
+	debugfs_create_file("lpddr4-0", 0444, mc, &lpddr_ids[idx++], &fops);
+	debugfs_create_file("lpddr4-1", 0444, mc, &lpddr_ids[idx++], &fops);
+	debugfs_create_file("lpddr4-2", 0444, mc, &lpddr_ids[idx++], &fops);
+	debugfs_create_file("lpddr4-3", 0444, mc, &lpddr_ids[idx++], &fops);
 }
 
 static int __init mss_debugfs_init(void)

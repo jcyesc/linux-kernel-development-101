@@ -14,24 +14,23 @@
  */
 /*
  * Getting and Setting Limits
-
+ *
  * Write a user-space program that examines and sets usage limits, and
  * reports statistics on total usage.
-
+ *
  * The program should first obtain and print out the current usage
  * limits.
-
+ *
  * It should then modify one or more of them, and then print out the
  * new limits.
-
+ *
  * The program should give birth to several children using fork(),
  * each of which should print out their usage limits, compare to those
  * of the parent and then sleep for a while.  The parent should wait
  * for the children using wait() or waitpid().
-
+ *
  * Have the parent use the getrusage() function to obtain statistics
  * both for itself and for the children.
-
  */
 
 #include <sys/time.h>
@@ -139,7 +138,8 @@ int main(int argc, char *argv[])
 
 	/*
 	 * If fflush(stdout) is not called, we will see the same message repeated
-	 * several times.
+	 * several times because the parent didn't flush the messages so every
+	 * children will flush them.
 	 */
 	fflush(stdout);
 

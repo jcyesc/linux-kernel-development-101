@@ -1,7 +1,7 @@
 /*
  * Extending SysRq keys.
  *
- * It is possible to extend they SysRq key mechanism to enable custom
+ * It is possible to extend the SysRq key mechanism to enable custom
  * defined keys and actions.  All the information needed can be found
  * in include/linux/sysrq.h.
  *
@@ -27,7 +27,7 @@
  * little as print a message.  See what occurs when you get the help
  * message.
  *
- * Make sure you that you have turned this option on in your kernel at
+ * Make sure that you have turned this option on in your kernel at
  * compilation and in /proc/sys/kernel/sysrq.  If you have keyboard
  * problems you may need to do something like
  *
@@ -59,7 +59,6 @@ static struct sysrq_key_op custom_sysrq_key_op = {
 	.help_msg = "Custom sysrq key `x`",
 	.action_msg = "`x` sysrq key in action",
 };
-
 
 static int __init custom_sysrq_init(void)
 {
@@ -96,7 +95,7 @@ static void __exit custom_sysrq_exit(void)
 module_init(custom_sysrq_init);
 module_exit(custom_sysrq_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("Custom sysrq key module");
 MODULE_LICENSE("GPL v2");
 

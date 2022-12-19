@@ -81,7 +81,7 @@ int getrlimit (int resource, struct rlimit *rlim);
 int setrlimit (int resource, const struct rlimit *rlim);
 ```
 
-we can also see th limits by executing:
+we can also see the limits by executing:
 
 ```shell
 $ ulimit -a

@@ -2,7 +2,7 @@
 obj-m += oops_module.o
 
 # -g flag will allow objdump to intersperse the source code with the assembly.
-# To see the object dume use:
+# To see the object dump use:
 #
 # $ aarch64-linux-gnu-objdump -S -d oops_module.ko
 ccflags-y += -g

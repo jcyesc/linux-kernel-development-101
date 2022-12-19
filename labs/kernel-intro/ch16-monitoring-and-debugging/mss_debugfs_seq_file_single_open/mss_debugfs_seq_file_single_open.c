@@ -75,8 +75,6 @@ enum {
 };
 
 #define MC_REGS_PER_LPDDR4_NR 5
-#define MC_REG_PRINT_SIZE 24
-#define MC_REGS_PRINT_SIZE (MC_REG_PRINT_SIZE * MC_REGS_PER_LPDDR4_NR)
 
 static int lpddr_ids[MC_LPPDR4_NR];
 
@@ -156,6 +154,9 @@ static int mss_mc_open(struct inode *inode, struct file *file)
  * called. For example:
  *
  * echo 1 > /sys/kernel/debug/mssdbg/mc0/lpddr4-1
+ *
+ * Note: The only purpose of writing something into struct user_value is to
+ * print it when mss_mc_release() is called.
  */
 static ssize_t
 mss_mc_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
@@ -204,7 +205,7 @@ int mss_mc_release(struct inode *inode, struct file *file)
 	struct seq_file *sf = file->private_data;
 	struct user_value *uv = (struct user_value *)(sf->private);
 
-	pr_info("%s: Releasing struct user_value", __func__);
+	pr_info("%s: Releasing struct user_value (uv->value=%d)", __func__, uv->value);
 	kfree(uv);
 
 	return single_release(inode, file);

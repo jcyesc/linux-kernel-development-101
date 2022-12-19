@@ -16,6 +16,25 @@
  * programming method that does not use the standard threading
  * libraries.  You can also play with sharing file descriptors or not
  * etc.
+ *
+ * To compile and execute:
+ *
+ *     $ gcc threads_and_clone.c
+ *     $ ./a.out
+ *     parent: Parent ppid[17019], pid[4589]
+ *     parent: Child stack [0x143c000], child stack size [16384], Page size [4096]
+ *     parent: Child tid[4590]
+ *     child: Thread starts execution: ppid[17019], pid[4589]
+ *     parent: ppid[17019], pid[4589], shared_value[18]
+ *     child:  ppid[17019], pid[4589], shared_value[29]
+ *     parent: ppid[17019], pid[4589], shared_value[36]
+ *     parent: ppid[17019], pid[4589], shared_value[36]
+ *     child:  ppid[17019], pid[4589], shared_value[54]
+ *     child:  ppid[17019], pid[4589], shared_value[54]
+ *     parent: ppid[17019], pid[4589], shared_value[72]
+ *     parent: ppid[17019], pid[4589], shared_value[72]
+ *     child:  ppid[17019], pid[4589], shared_value[72]
+ *     parent: Parent exits
  */
 
 /**
@@ -100,7 +119,7 @@ int main(int argc, char *argv[])
 	stack = create_stack();
 	tid = clone(handler,
 			stack,
-			CLONE_VM | // Parent and child process share memory space.
+			CLONE_VM | // Parent and child processes share memory space.
 			CLONE_FS | // Parent and child share filesystem information.
 			CLONE_FILES | // Parent and child share the same table of file descriptors.
 			CLONE_SYSVSEM | // Share system V SEM_UNDO semantics

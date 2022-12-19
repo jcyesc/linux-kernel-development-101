@@ -53,6 +53,7 @@ static ssize_t custom_read(
 {
 	int num_bytes;
 
+	// Note: The calculation of num_bytes should be in open() and write() :(.
 	num_bytes = sprintf(input_string, "%d\n", magic_num);
 	pr_info("%s: parent_dir->d_inode = %p\n", __func__, parent_dir->d_inode);
 
@@ -122,7 +123,7 @@ static void __exit debugfs_module_exit(void)
 module_init(debugfs_module_init);
 module_exit(debugfs_module_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("Using debugfs filesystem");
 MODULE_LICENSE("GPL v2");
 

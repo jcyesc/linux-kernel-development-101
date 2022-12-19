@@ -27,6 +27,6 @@ static void __exit oops_module_exit(void)
 module_init(oops_module_init);
 module_exit(oops_module_exit);
 
-MODULE_AUTHOR("John");
+MODULE_AUTHOR("Juan Yescas");
 MODULE_DESCRIPTION("oops message example");
 MODULE_LICENSE("GPL v2";)
