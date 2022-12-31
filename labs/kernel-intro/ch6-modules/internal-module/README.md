@@ -24,6 +24,7 @@ config TTY_PRINTK_LEVEL
 
 Examples of how to define an internal module are below:
 
+- [labs/kernel-intro/ch6-modules/internal-module](https://github.com/jcyesc/linux-kernel-development-101/commit/b45eda0c2f783686e9fa181aded60a52068998a0)
 - [raspbian-linux-kernel-dev/drivers/hellomodule/hellomodule](https://github.com/jcyesc/raspbian-linux-kernel-dev/commit/a275d67dd8fcc68a426dd18a88c9d03464bf3837)
 
 ## Goals
