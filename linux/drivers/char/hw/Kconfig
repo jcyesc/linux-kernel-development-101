@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# ARM64 info character device driver configuration.
+#
+
+menu "ARM64 info character device"
+
+config ARM64_INFO
+	tristate "ARM64 detailed info"
+	default y
+	help
+	  Enable support for printing ARM64 processor information. The ARM64 info
+	  will be available in the kernel logs for simplicity.
+
+	  The driver can be built as a module.
+
+config ARM64_MEMORY_INFO
+	bool "Prints ARM64 memory management info"
+	depends on ARM64_INFO
+	default y
+	help
+		if it is set to y, memory management info will be printed.
+
+config ARM64_CACHE_INFO
+	bool "Prints ARM64 cache info"
+	depends on ARM64_INFO
+	default y
+	help
+		if it is set to y, cache info will be printed.
+
+config ARM64_EXCEPTION_INFO
+	bool "Prints ARM64 exception handling info"
+	depends on ARM64_INFO
+	default y
+	help
+		if it is set to y, exception handling info will be printed.
+
+if ARM64_INFO
+
+config ARM64_SYSTEM_REG_INFO
+	bool "Prints ARM64 system registers info"
+	help
+		if it is set to y, system registers info will be printed.
+
+endif # if ARM64_INFO
+
+endmenu
+
