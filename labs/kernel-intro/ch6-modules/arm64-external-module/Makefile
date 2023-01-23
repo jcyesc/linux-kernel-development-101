@@ -1,8 +1,9 @@
 
-obj-m += arm64_conf.o
+obj-m += arm64_info_mod.o
 
-arm64_conf-y += arm64_conf_info.o
-arm64_conf-y += arm64lib.o
+arm64_info_mod-y += arm64_mod.o
+arm64_info_mod-y += arm64_mm.o
+arm64_info_mod-y += arm64_cache.o
 
 # https://www.kernel.org/doc/html/latest/kbuild/modules.html#several-subdirectories
 ccflags-y := -I$(src)

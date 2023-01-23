@@ -15,24 +15,16 @@
 #include <linux/printk.h>
 #include <linux/types.h>
 
-#include "arm64lib.h"
-
-#ifdef CONFIG_ARM64_SYSTEM_REG_INFO
-static void pr_system_regs(void)
-{
-	pr_aa64mmfr0_el1_reg();
-	pr_clidr_el1();
-}
-#endif // CONFIG_ARM64_SYSTEM_REG_INFO
+#include "arm64_cache.h"
+#include "arm64_mm.h"
 
 
 static int __init arm64_conf_info_init(void)
 {
 	pr_info("Loading module");
 
-#ifdef CONFIG_ARM64_SYSTEM_REG_INFO
-	pr_system_regs();
-#endif // CONFIG_ARM64_SYSTEM_REG_INFO
+	mm_print_aa64mmfr0_el1_reg();
+	cache_print_clidr_el1();
 
 	return 0;
 }

@@ -5,11 +5,9 @@
  *   - Cache configuration
  */
 
-#ifndef ARM64LIB_H_
-#define ARM64LIB_H_
+#ifndef ARM64_MM_H_
+#define ARM64_MM_H_
 
-void pr_aa64mmfr0_el1_reg(void);
+void mm_print_aa64mmfr0_el1_reg(void);
 
-void pr_clidr_el1(void);
-
-#endif // ARM64LIB_H_
+#endif // ARM64_MM_H_
