@@ -94,10 +94,8 @@ static void pr_tgranules(uint64_t aa64mmfr0_el1)
 	pr_tgranule64k(aa64mmfr0_el1);
 }
 
-static void pr_pa_range(uint64_t aa64mmfr0_el1)
+static void pr_pa_range(int pa_range)
 {
-	int pa_range = PA_RANGE(aa64mmfr0_el1);
-
 	switch (pa_range) {
 	case PA_RANGE_32BITS:
 		pr_info("\t\t Physical Address range 32bits (4GB)");
@@ -126,6 +124,13 @@ static void pr_pa_range(uint64_t aa64mmfr0_el1)
 	}
 }
 
+static void pr_supported_pa_range(uint64_t aa64mmfr0_el1)
+{
+	int pa_range = PA_RANGE(aa64mmfr0_el1);
+
+	pr_pa_range(pa_range);
+}
+
 /*
  * Prints the AArch64 memory model feature register 0.
  */
@@ -134,9 +139,106 @@ void mm_print_aa64mmfr0_el1_reg(void)
 	uint64_t aa64mmfr0_el1;
 
 	asm volatile ("mrs %0, id_aa64mmfr0_el1" : "=r" (aa64mmfr0_el1));
-	pr_info("ID_AA64MMFR0_EL1=0x%llx\n", aa64mmfr0_el1);
+	pr_info("id_aa64mmfr0_el1=0x%llx\n", aa64mmfr0_el1);
 
-	pr_pa_range(aa64mmfr0_el1);
+	pr_supported_pa_range(aa64mmfr0_el1);
 	pr_tgranules(aa64mmfr0_el1);
+}
+
+/*
+ * Prints the system control register for EL1.
+ */
+void mm_print_sctlr_el1_reg(void)
+{
+	uint64_t sctlr_el1;
+
+	asm volatile ("mrs %0, sctlr_el1" : "=r" (sctlr_el1));
+	pr_info("sctlr_el1=0x%llx\n", sctlr_el1);
+
+	if (sctlr_el1 & 0x1)
+		pr_info("\t\t EL0 & EL1 stage 1 address translation enabled.");
+
+	if (sctlr_el1 & 0x4)
+		pr_info("\t\t Data accesses to Normal memory from EL0 & EL1 are cacheable.");
+
+	if (sctlr_el1 & 0x1000)
+		pr_info("\t\t Instruction accesses to Normal memory from EL0 & EL1 are cacheable.");
+
+	if (sctlr_el1 & 0x8)
+		pr_info("\t\t SP has to be aligned to 16-byte boundary in EL1.");
+}
+
+static void pr_granule_ttbr1_el1(int granule_size)
+{
+	switch (granule_size) {
+	case 0x1:
+		pr_info("\t\t\t 16k granule configured");
+		break;
+	case 0x2:
+		pr_info("\t\t\t 4k granule configured");
+		break;
+	case 0x3:
+		pr_info("\t\t\t 64k granule configured");
+		break;
+	default:
+		pr_info("\t\t\t Unknown granule");
+		break;
+	}
+}
+
+static void pr_granule_ttbr0_el1(int granule_size)
+{
+	switch (granule_size) {
+	case 0x0:
+		pr_info("\t\t\t 4k granule configured");
+		break;
+	case 0x1:
+		pr_info("\t\t\t 64k granule configured");
+		break;
+	case 0x2:
+		pr_info("\t\t\t 16k granule configured");
+		break;
+	default:
+		pr_info("\t\t\t Unknown granule");
+		break;
+	}
+}
+
+/*
+ * Prints the table control register for EL1.
+ *
+ * https://developer.arm.com/documentation/ddi0595/2021-06/AArch64-Registers/TCR-EL1--Translation-Control-Register--EL1-
+ */
+void mm_print_tcr_el1_reg(void)
+{
+	int pa_range;
+	int granule_ttbr0_el1;
+	int granule_ttbr1_el1;
+	int t1sz;
+	int t0sz;
+	uint64_t tcr_el1;
+
+	asm volatile ("mrs %0, tcr_el1" : "=r" (tcr_el1));
+	pr_info("tcr_el1=0x%llx\n", tcr_el1);
+
+	pa_range = (tcr_el1 >> 32) & 0x7;
+	pr_info("\t\t Intermediate Physical Address (max output address size):");
+	pr_pa_range(pa_range);
+
+	granule_ttbr1_el1 = (tcr_el1 >> 30) & 0x3;
+	pr_info("\t\t Granule Size for ttbr1_el1");
+	pr_granule_ttbr1_el1(granule_ttbr1_el1);
+
+	// The region size is 2(64-T1SZ) bytes.
+	t1sz = (tcr_el1 >> 16) & 0x1F;
+	pr_info("\t\t The region size for ttbr1_el1 is 2^%d", (64 - t1sz));
+
+	granule_ttbr0_el1 = (tcr_el1 >> 14) & 0x3;
+	pr_info("\t\t Granule Size for ttbr0_el1");
+	pr_granule_ttbr0_el1(granule_ttbr0_el1);
+
+	// The region size is 2(64-T0SZ) bytes.
+	t0sz = tcr_el1 & 0x1F;
+	pr_info("\t\t The region size for ttbr0_el1 is 2^%d", (64 - t0sz));
 }
 

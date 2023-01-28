@@ -10,4 +10,8 @@
 
 void mm_print_aa64mmfr0_el1_reg(void);
 
+void mm_print_sctlr_el1_reg(void);
+
+void mm_print_tcr_el1_reg(void);
+
 #endif // ARM64_MM_H_

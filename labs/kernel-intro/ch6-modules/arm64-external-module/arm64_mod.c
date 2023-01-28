@@ -23,8 +23,10 @@ static int __init arm64_conf_info_init(void)
 {
 	pr_info("Loading module");
 
-	mm_print_aa64mmfr0_el1_reg();
 	cache_print_clidr_el1();
+	mm_print_aa64mmfr0_el1_reg();
+	mm_print_sctlr_el1_reg();
+	mm_print_tcr_el1_reg();
 
 	return 0;
 }

@@ -114,7 +114,7 @@ void cache_print_clidr_el1(void)
 
 	asm volatile ("mrs %0, clidr_el1" : "=r" (clidr_el1));
 
-	pr_info("CLIDR_EL1=0x%llx\n", clidr_el1);
+	pr_info("clidr_el1=0x%llx\n", clidr_el1);
 
 	// The 21st LSBs contain the 7 cache levels information. 3 bits per level.
 	// An ARMv8 CPU could have 7 cache levels.
