@@ -22,15 +22,27 @@ In the Raspberry Pi execute:
 $ ssh pi@192.168.2.2
 $ gcc -o lab_handler_userspace lab_handler_userspace.c
 $ ./lab_handler_userspace
-Process 1063 has installed the handler for signal 2
+Process 1032 has installed the handler for signal 2
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
+^CProcess 1032 received signal 2
+Waiting to be modified by lab_handler module.
+^CProcess 1032 received signal 2
+Waiting to be modified by lab_handler module.
+^CProcess 1032 received signal 2
+Waiting to be modified by lab_handler module.
+^CProcess 1032 received signal 2
+Waiting to be modified by lab_handler module.
+^CProcess 1032 received signal 2
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
+Waiting to be modified by lab_handler module.
 waiting to be modified by lab_handler module.
-waiting to be modified by lab_handler module.
-^C
-^C
-^C
-^C
-waiting to be modified by lab_handler module.
-^C
 waiting to be modified by lab_handler module.
 waiting to be modified by lab_handler module.
 waiting to be modified by lab_handler module.
@@ -41,7 +53,7 @@ In another console execute:
 
 ```shell
 $ ssh pi@192.168.2.2
-$ sudo insmod lab_handler.ko pid=1063 signo=2
+$ sudo insmod lab_handler.ko pid=1032 signo=2
 $ dmesg
 [ 1462.728890] lab_handler: loading out-of-tree module taints kernel.
 [ 1462.729829] Resetting process lab_handler_use[1063] signal handler for 2 to SIG_DFL

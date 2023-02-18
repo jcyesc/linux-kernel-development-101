@@ -33,7 +33,7 @@
  * the same for all signals, registering them with the sigaction()
  * interface.
  *
- * The the program should send every possible signal to itself multiple
+ * Then the program should send every possible signal to itself multiple
  * times, using the raise() function.
  *
  * Signal processing should be resumed, once again using sigprocmask).
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Now, use sigaction to create references to local signal
-	 * handlers * and raise the signal to myself
+	 * handlers and raise the signal to myself
 	 */
 
 	printf

@@ -2,7 +2,7 @@
 /*
  * Module that shows how to use:
  *
- * - list in include/linux/list.hand
+ * - list in include/linux/list.h
  * - kmalloc/kfree in include/linux/slab.h
  */
 

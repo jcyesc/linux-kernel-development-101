@@ -28,7 +28,7 @@
 
 void sig_han(int signo)
 {
-	printf("We have received signal %d.\n", signo);
+	printf("Process %d received signal %d\n", getpid(), signo);
 }
 
 int main(int argc, char *argv[])

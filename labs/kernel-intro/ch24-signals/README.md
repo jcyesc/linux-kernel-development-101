@@ -135,7 +135,7 @@ int sigismember (const sigset_t *set, int signum);
 sigaction is a data structure and function that replaces `signal()`. It provides
 more functionality than `signal()`.
 
-## Singals and threads
+## Signals and threads
 
 The threads shared the same signal handlers, however, each thread can configure
 the signals that will listen. To do that, it will use the functions:
