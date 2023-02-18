@@ -297,3 +297,22 @@ moment.
 A high `voluntary context switch` count usually implies heavy I/O, whereas a
 hign-non `voluntary context switch` count could mean the thread is CPU bound.
 
+
+## cgroups
+
+cgroups is a Linux facility that allows to group threads that will have same
+cpu affinity, memory usage, block io config, etc.
+
+The table below shows the control group types:
+
+
+| Controller   |   Mount Point |  Policy |
+|:----------|:-------------|:------|
+| block i/O | /dev/blkio | Block device I/O limits |
+| cpu  | /dev/cpuset | Thread/core affinity |
+| cpuset | /acc | CPU accounting statistics |
+| cpuctl | /dev/cpuctl | CPU timing shares  |
+| freezer | /dev/freezer | Group freeze/thaw |
+| memory | /dev/memcg | Memory utilization |
+| sched tuning | /dev/stune | Task prioritization |
+
