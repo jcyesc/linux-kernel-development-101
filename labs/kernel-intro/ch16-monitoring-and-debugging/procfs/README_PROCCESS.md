@@ -1,5 +1,5 @@
 
-# /proc pseudo file system
+# /proc pseudo file system (processes)
 
 The /proc pseudo file system contains information about the processes, such as
 
