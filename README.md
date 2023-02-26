@@ -202,3 +202,14 @@ $ arm-linux-gnueabi-gcc app.c -o app.bin
 perl $HOME/Development/linux-kernel-development-101/linux/scripts/checkpatch.pl -f my_module.c
 ```
 
+## Ubuntu version
+
+```shell
+$ lsb_release  -a
+No LSB modules are available.
+Distributor ID:	Ubuntu
+Description:	Ubuntu 16.04.7 LTS
+Release:	16.04
+Codename:	xenial
+```
+
