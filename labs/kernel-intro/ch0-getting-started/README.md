@@ -102,7 +102,6 @@ After we got the src, we can configure `buildroot` with the options below:
     Toolchain type (External toolchain)
          *** Toolchain External Options ***
          Toolchain (Linaro AArch64 2018.05)
-         Toolchain type (External toolchain)
          Toolchain origin (Toolchain to be downloaded and installed)
 
     System Configuration
@@ -116,7 +115,8 @@ After we got the src, we can configure `buildroot` with the options below:
 
          Development tools
              [*] grep
-             [*]  tree
+             [*] sed
+             [*] tree
 
          Networking applications
              [*] dhcpcd
