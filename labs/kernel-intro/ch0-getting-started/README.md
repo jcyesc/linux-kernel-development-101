@@ -2,7 +2,8 @@
 # Chapter 0 - Getting Started
 
 In this chapter we will show how to get started with the `Linux Kernel` using
-`qemu`, `builtroot` and `gcc-aarch64-linux-gnu` cross compiler.
+`qemu`, `builtroot` and `gcc-aarch64-linux-gnu` cross compiler. On top
+of this, we'll show how to build and add a basic module to the rootfs.
 
 
 ## Install libraries and cross compilers
@@ -158,15 +159,7 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
  $ sudo vim etc/profile
 ```
 
-### Generate Ext2 filesystem
-
-```shell
- $ sudo genext2fs -b 65536 -d /<path to rootfs> -U newrootfs.ext2
- $ file newrootfs.ext2
- newrootfs.ext2: Linux rev 0.0 ext2 filesystem data, UUID=00000000-0000-0000-0000-000000000000
-```
-
-### Generate a Ext4 filesystem
+### Generate a `ext4` filesystem
 
 ```shell
  $ sudo mkfs.ext4 -d ./newrootfs -r 1 -N 0 -m 5 -L "rootfs" -I 256 -O ^64bit ./newrootfs.ext4 "100M"
@@ -185,6 +178,14 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
  $ file newrootfs.ext4
  newrootfs.ext4: Linux rev 1.0 ext4 filesystem data, UUID=756ef8e1-04a8-4c6e-9d34-3e401d9f56ee,
     volume name "rootfs" (extents)  (large files) (huge files)
+```
+
+### Generate a `ext2` filesystem
+
+```shell
+ $ sudo genext2fs -b 65536 -d /<path to rootfs> -U newrootfs.ext2
+ $ file newrootfs.ext2
+ newrootfs.ext2: Linux rev 0.0 ext2 filesystem data, UUID=00000000-0000-0000-0000-000000000000
 ```
 
 ## How to start `qemu`
@@ -222,3 +223,60 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
 ```
 
 To leave qemu, execute `Ctrl + Alt and x`.
+
+
+## How to build and add a module to the rootfs
+
+Once that you have your module, it is necessary to compile it using the kernel
+where it is going to be deployed. To compile the module, run the command below
+where the module is located:
+
+```shell
+ $ KERNEL_DIR=$(HOME)/linux-stable \
+     make -C $(KERNEL_DIR) \
+         ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+         M=$(PWD) modules
+ $ ls
+hello_world_mod.c   hello_world_mod.mod    hello_world_mod.mod.o
+hello_world_mod.ko  hello_world_mod.mod.c  hello_world_mod.o
+Module.symvers Makefile modules.order
+```
+
+Once that is compiled, we can include it in the rootfs.
+
+```shell
+ $ sudo tar -C /destination/of/extraction -xf output/images/rootfs.tar
+ $ mkdir -p /destination/of/extraction/lib/modules
+ $ cp hello_world_mod.ko /destination/of/extraction/lib/modules
+
+ # Create the rootfs
+ $ sudo mkfs.ext4 -d ./newrootfs -r 1 -N 0 -m 5 -L "rootfs" \
+                     -I 256 -O ^64bit ./newrootfs.ext4 "100M"
+```
+
+Start qemu with the new rootfs:
+
+```shell
+ $ sudo qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt \
+       -nographic -smp 1   -hda <path rootfs>/newrootfs.ext4 \
+       -kernel <path kernel>/linux-stable/arch/arm64/boot/Image \
+       -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial"
+```
+
+Load the module
+
+```shell
+root $ insmod /lib/modules/hello_world_mod.ko
+[   16.598020] hello_world_mod: loading out-of-tree module taints kernel.
+[   16.607746] hello_world_mod: hello_init() Init Hello World!
+
+root $ lsmod
+Module                  Size  Used by    Tainted: G
+hello_world_mod        16384  0
+
+root $ rmmod hello_world_mod.ko
+[  196.477130] hello_world_mod: hello_exit() Exit Hello World!
+
+root $ lsmod
+Module                  Size  Used by    Tainted: G
+```
