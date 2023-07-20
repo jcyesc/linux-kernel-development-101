@@ -183,6 +183,16 @@ pi@raspberrypi:~ $ file /sbin/init
 /sbin/init: symbolic link to /lib/systemd/systemd
 pi@raspberrypi:~ $ file /lib/systemd/systemd
 /lib/systemd/systemd: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 3.2.0, BuildID[sha1]=125fb1f7bd746a32b6d763ad9a91d30ddc03a96c, stripped
+
+# Check ELF header
+pi@raspberrypi:/bin $ readelf -h /bin/dpkg
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
 ```
 
 ## Compiling user space applications

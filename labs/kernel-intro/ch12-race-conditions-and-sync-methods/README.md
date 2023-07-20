@@ -406,6 +406,14 @@ rcu_read_lock();
 rcu_read_unlock();
 ```
 
+For more information see:
+
+- [Paul McKenney's Journal](https://paulmck.livejournal.com/)
+- [Perfbook](https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
+- https://lwn.net/Articles/262464/#Maintain%20Multiple%20Versions%20of%20Recently%20Updated%20Objects
+- https://lwn.net/Kernel/Index/#Read-copy-update
+- https://lwn.net/Articles/777036/
+
 ## Reference counts
 
 When we want to count references, we use the `kref` API, defined in
