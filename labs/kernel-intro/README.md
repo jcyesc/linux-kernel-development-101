@@ -8,9 +8,14 @@ The chapters for the Linux Kernel intro are below:
 
 ```
 tree labs/kernel-intro/
+├── ch1-introcution
+├── ch2-preliminaries
+├── ch3-how-to-work-on-oss-projects
+├── ch4-kernel-architecture-l
 ├── ch5-kernel-programming-preview
 ├── ch6-modules
 ├── ch7-kernel-architecture-ll
+├── ch8-kernel-initialization
 ├── ch9-kernel-configuration-and-compilation
 ├── ch10-system-calls
 ├── ch11-kernel-style-general-considerations
