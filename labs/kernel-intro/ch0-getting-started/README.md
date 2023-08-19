@@ -26,9 +26,6 @@ of this, we'll show how to build and add a basic module to the rootfs.
 ### Install qemu
 
 ```shell
- # Install qemu with ARM support
- $ sudo apt install qemu-system
-
  # Install qemu with mips support
  $ sudo apt install qemu-system-mips
 
@@ -222,8 +219,51 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
  tmpfs                   988.8M     24.0K    988.8M   0% /run
 ```
 
-To leave qemu, execute `Ctrl + Alt and x`.
+`Note:` that `/dev/vda`  and `/` refers to the same filesystem `/dev/root`:
 
+```shell
+ $ cat /etc/fstab
+# <file system>	<mount pt>	<type>	<options>	<dump>	<pass>
+/dev/root	/		ext2	rw,noauto	0	1
+proc		/proc		proc	defaults	0	0
+devpts		/dev/pts	devpts	defaults,gid=5,mode=620,ptmxmode=0666	0	0
+tmpfs		/dev/shm	tmpfs	mode=0777	0	0
+tmpfs		/tmp		tmpfs	mode=1777	0	0
+tmpfs		/run		tmpfs	mode=0755,nosuid,nodev	0	0
+sysfs		/sys		sysfs	defaults	0	0
+
+ $ df /dev/vda
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/root                91864     45272     39424  53% /
+
+root $ df /
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/root                91864     45272     39424  53% /
+```
+
+The configuraton files can be found in `/etc`.
+
+```shell
+ $ ls /etc/
+dhcpcd.conf    init.d         network        profile.d      shells
+fstab          inittab        nsswitch.conf  protocols      ssh
+group          inputrc        os-release     resolv.conf    ssl
+group-         iproute2       passwd         services
+hostname       issue          passwd-        shadow
+hosts          mtab           profile        shadow-
+
+ $ ls /etc/init.d/
+S01syslogd  S02sysctl   S40network  S50sshd     rcS
+S02klogd    S20seedrng  S41dhcpcd   rcK
+```
+
+After the kernel boots, `/sbin/init` is called and it starts executing the
+scripts defined in:
+
+- /etc/inittab
+- /etc/init.d/
+
+To leave qemu, execute `Ctrl + Alt and x`.
 
 ## How to build and add a module to the rootfs
 
