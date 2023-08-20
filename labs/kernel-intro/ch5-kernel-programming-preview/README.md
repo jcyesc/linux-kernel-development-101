@@ -73,7 +73,7 @@ int main(void)
 
 ## Task structure
 
-Every process in Linux is represented by the `struct task_struct` define
+Every process in Linux is represented by the `struct task_struct` defined
 in `include/linux/sched.h`.
 
 There is a special pointer called `current` that points to the current running
@@ -132,12 +132,12 @@ bytes_transferred = nbytes - copy_to_user (ubuf, kbuf, nbytes);
 
 ## Linked list
 
-The Linux kernel has its own implematation of list call `list_head` that is found
+The Linux kernel has its own implementation of list call `list_head` that is found
 in `include/linux/list.h`
 
 ```c
 struct list_head {
-struct list_head *next, *prev;
+    struct list_head *next, *prev;
 };
 ```
 
@@ -219,7 +219,6 @@ CONFIG_NO_HZ=y
 # CONFIG_HZ_300 is not set
 CONFIG_HZ_1000=y
 CONFIG_HZ=1000
-$ cat .config | grep HZ
 ```
 
 ## stress utility
