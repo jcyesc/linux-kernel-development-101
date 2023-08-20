@@ -1,7 +1,7 @@
 
-# Chapter 0 - Getting Started
+# Getting Started
 
-In this chapter we will show how to get started with the `Linux Kernel` using
+In this section we will show to get started with the `Linux Kernel` using
 `qemu`, `builtroot` and `gcc-aarch64-linux-gnu` cross compiler. On top
 of this, we'll show how to build and add a basic module to the rootfs.
 
