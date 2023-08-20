@@ -63,8 +63,7 @@ The list of available tasks are in:
 */
 #define SIGPWR		30
 #define SIGSYS		31
-#define	SIGUNUSED	31
-
+#define	 SIGUNUSED	31
 ```
 
 The different signals are represented in this data structure:
@@ -112,7 +111,7 @@ int kill (pid_t pid, int sig);
 int raise (int sig);
 void (*signal (int signum, void (*sighandler)(int)))(int);
 int sigaction (int signum, const struct sigaction *act,
-struct sigaction *oldact);
+               struct sigaction *oldact);
 
 int sigprocmask (int how, const sigset_t *set, sigset_t *oldset);
 int sigpending (sigset_t *set);
@@ -123,6 +122,7 @@ and
 
 ```c
 #include <signal.h>
+
 int sigemptyset (sigset_t *set);
 int sigfillset (sigset_t *set);
 int sigaddset (sigset_t *set, int signum);
@@ -149,7 +149,7 @@ int sigwait(const sigset_t *set, int *sig);
 
 ## How the kernel install signal handlers
 
-Inside `struct task` there are several fields dedicated to signals. The
+Inside `task_struct` there are several fields dedicated to signals. The
 `struct sighand_struct` data structure contains the handlers for the different
 signals and it is this field that has to be updated.
 

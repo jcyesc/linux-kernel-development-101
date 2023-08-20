@@ -3,7 +3,6 @@
 
 The steps to compile and execute are:
 
-
 In the desktop, execute:
 
 ```shell
@@ -60,7 +59,7 @@ $ dmesg
 ..
 ```
 
-After the console is loaded, if you type Ctrl-c in the user's space program, the
+After the module is loaded, if you type Ctrl-c in the user's space program, the
 program should finish.
 
 

@@ -4,29 +4,43 @@
  *
  * To run, execute the commands below:
  *
- *  $ ./a.out
- *  Sleep 5 seconds, try Ctrl-c
- *  ^CContinue execution
- *  $ ./a.out
- *  Sleep 5 seconds, try Ctrl-c
- *  Continue execution
- *  This is a greeting.
- *  This is a greeting.
- *  This is a greeting.
- *  ^C
+ *    $ gcc block_signals.c
+ *    $ ./a.out
+ *    Sleep 5 seconds, try Ctrl-c
+ *    ^CContinue execution
+ *
+ *    $ ./a.out
+ *    Sleep 5 seconds, try Ctrl-c
+ *    Continue execution
+ *    This is a greeting.
+ *    This is a greeting.
+ *    This is a greeting.
  *
  *  In another shell you can run the comand below to examine the masks of
  *  pending, blocked, ignored and caught signals for processes on your system:
  *
- *  $ id
- *  uid=1000(parallels) gid=1000(parallels) groups=1000(parallels),20(dialout),27(sudo)
- *  $ ps axs
+ *    $ id
+ *    uid=1000(parallels) gid=1000(parallels) groups=1000(parallels),20(dialout),27(sudo)
+ *
+ *    # No pending signal
+ *    $ ps axs
+ *    UID     PID          PENDING          BLOCKED          IGNORED           CAUGHT STAT TTY        TIME COMMAND
+ *    ...
+ *    1000   59434 0000000000000000 fffffffe7ffbfeff 0000000000000000 0000000000000000 S+   pts/1      0:00 ./a.out
+ *
+ *    # Pending signal
+ *    $ ps axs
+ *    UID     PID          PENDING          BLOCKED          IGNORED           CAUGHT STAT TTY        TIME COMMAND
+ *    ...
+ *    1000   59456 0000000000000002 fffffffe7ffbfeff 0000000000000000 0000000000000000 S+   pts/1      0:00 ./a.out
+ *
  */
 
-#include <stdio.h>
-#include <unistd.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 
 int main(int argc, char *argv[]) {
 	int rc;
@@ -47,6 +61,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	printf("Sleep 5 seconds, try Ctrl-c\n");
+	/* Ctrl+c won't work while the mask is set.*/
 	sleep(5);
 	printf("Continue execution\n");
 
