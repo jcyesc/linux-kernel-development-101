@@ -41,6 +41,7 @@ static struct usertype *rb_search_user(unsigned int id)
 	struct rb_node *n = root.rb_node;
 
 	while (n) {
+		// Perform binary search.
 		struct usertype *user = rb_entry(n, struct usertype, user_rb);
 
 		if (id < user->id)

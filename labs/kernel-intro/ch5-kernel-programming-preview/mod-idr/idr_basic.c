@@ -58,6 +58,14 @@ static int __init idr_mod_init(void)
 
 	// Populating the map.
 	for (i = 0; i < NUM_USERS; i++) {
+		/*
+		 * idr_alloc() - Allocate an ID.
+		 * @idr: IDR handle.
+		 * @ptr: Pointer to be associated with the new ID.
+		 * @start: The minimum ID (inclusive).
+		 * @end: The maximum ID (exclusive).
+		 * @gfp: Memory allocation flags.
+		 */
 		ret = idr_alloc(&usermap, &users[i], start, end, GFP_KERNEL);
 		if (ret == -ENOMEM || ret == -ENOSPC)
 			return ret;

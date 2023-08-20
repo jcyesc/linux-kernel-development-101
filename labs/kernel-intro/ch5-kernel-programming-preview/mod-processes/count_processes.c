@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/**
+/*
  * Module to count the number of processes.
  *
  * This module prints the processes that are in the system when the module is
@@ -41,8 +41,8 @@ static int count_number_processes(void)
 	for_each_process(task)
 	{
 		//
-		//	if (tsk)
-		//		get_task_struct(tsk);  // Increase ref counter.
+		//	if (task)
+		//		get_task_struct(task);  // Increase ref counter.
 		counter++;
 		pr_info("%s\t\t%d\t\t%d", task->comm, task->tgid, task->pid);
 	}
