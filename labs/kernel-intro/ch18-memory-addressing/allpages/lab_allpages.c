@@ -18,7 +18,7 @@
  * There is a struct page for every physical page on the system, with
  * the exported symbol mem_map pointing to the page with PFN = 0;
  * there are num_physpages pages in total.
-
+ *
  * Write a module that works through the entire array and gathers
  * statistics on memory usage, reporting quantities such as free
  * pages, those used in slab caches, etc.

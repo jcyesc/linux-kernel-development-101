@@ -107,7 +107,7 @@ of size `PAGE_SIZE`.
 ```
 
 The page size in x86 and arm systems is usually 4KB or `PAGE_SHIFT` equals to 12.
-We can find the page size by calling the function `getpagesize()`.
+We can find the page size in user space by calling the function `getpagesize()`.
 
 
 ## Page tables
@@ -126,7 +126,7 @@ are called:
 
 There are certain situations in which several pages of memory shared the same
 content. For example, when several virtual machines are running the same code.
-For this cases, the Linux kernel offers `Kernel Samepage Merging (KSM``.
+For this cases, the Linux kernel offers `Kernel Samepage Merging (KSM)`.
 
 With KSM, the kernel uses copy-on-write when the program will write on memory,
 otherwise, several programs, virtual machines can share the same page of memory.
@@ -136,5 +136,9 @@ This functionality has to be configured with the flag `CONFIG_KSM`.
 
 ```shell
 $ cat /boot/config-$(uname -r)  | grep KSM
+CONFIG_KSM=y
+
+# We can also use
+ $ zcat /proc/config.gz  | grep CONFIG_KSM
 CONFIG_KSM=y
 ```
