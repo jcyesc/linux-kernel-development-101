@@ -289,7 +289,7 @@ Once that is compiled, we can include it in the rootfs.
  $ mkdir -p /destination/of/extraction/lib/modules
  $ cp hello_world_mod.ko /destination/of/extraction/lib/modules
 
- # Create the rootfs
+ # Create the rootfs (/destination/of/extraction is newrootfs dir).
  $ sudo mkfs.ext4 -d ./newrootfs -r 1 -N 0 -m 5 -L "rootfs" \
                      -I 256 -O ^64bit ./newrootfs.ext4 "100M"
 ```

@@ -16,8 +16,8 @@ $ more .config | grep CONFIG_IKCONFIG_PROC
 CONFIG_IKCONFIG_PROC=y
 ```
 
-> Note: The `CONFIG_IKCONFIG_PROC=y` option will allow us to see the `.config` selection
-> in `/proc/config.gz`.
+> Note: The `CONFIG_IKCONFIG_PROC=y` option will allow us to see the `.config`
+> selection in `/proc/config.gz`.
 
 After the Kernel has been installed, run:
 
@@ -35,6 +35,7 @@ $ cat .config | grep CONFIG_IKCONFIG
 CONFIG_IKCONFIG=m
 CONFIG_IKCONFIG_PROC=y
 
+# Start the module
 pi@raspberrypi:~ $ sudo modprobe configs
 pi@raspberrypi:~ $ zcat /proc/config.gz
 ```
@@ -48,7 +49,6 @@ kernel. The usage is:
 if (IS_ENABLED(CONFIG_OF_FLATTREE)) {
 	do something here
 }
-
 ```
 
 The functionality is similar to:
@@ -58,12 +58,10 @@ $ cat .config | grep CONFIG_OF_FLATTREE
 CONFIG_OF_FLATTREE=y
 ```
 
-
 - https://elixir.bootlin.com/linux/v5.17.4/source/include/linux/kconfig.h#L73
 
 
 ## Kernel browsers
-
 
 There are a lot of kernel browsers, two popular ones are:
 
@@ -84,6 +82,7 @@ $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- COMPILED_SOURCE=1 cscope
 
 
 # Start searching using cscope. To exit type Ctrl + d
+# To try another Find option Ctrl + f
 $ cscope
 
 
