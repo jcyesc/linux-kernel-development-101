@@ -46,7 +46,7 @@ static u32 year = (u32) 2021;
 static char input_string[MAX_LENGTH_INPUT];
 
 /*
- * Reads the value in {@code magic_num_file}.
+ * Reads the value in {@code magic_num_file} and write it to the user's buffer.
  */
 static ssize_t custom_read(
 		struct file *file, char __user *buf, size_t lbuf, loff_t *ppos)
@@ -60,9 +60,8 @@ static ssize_t custom_read(
 	return simple_read_from_buffer(buf, lbuf, ppos, input_string, num_bytes);
 }
 
-
 /*
- * Writes the user's given value to  {@code magic_num_file}.
+ * Writes the user's given value to {@code magic_num_file}.
  */
 static ssize_t custom_write(
 		struct file *file, const char __user *buf, size_t lbuf, loff_t *ppos)

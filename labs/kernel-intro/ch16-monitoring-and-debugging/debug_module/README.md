@@ -135,7 +135,6 @@ when the address 0xbeef is being deferenced.
 
 
 ```shell
-unt>
   10:	d297dde2 	mov	x2, #0xbeef                	// #48879
   14:	90000000 	adrp	x0, 0 <init_module>
   18:	91000000 	add	x0, x0, #0x0

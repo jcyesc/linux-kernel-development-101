@@ -1,3 +1,6 @@
+
+# In order to translate the address to line with aarch64-linux-gnu-addr2line,
+# it is necessary to set these flags:
 EXTRA_CFLAGS = -Wall -g
 
 obj-m += module_with_errors.o
