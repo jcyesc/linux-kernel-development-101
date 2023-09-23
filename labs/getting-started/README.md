@@ -195,7 +195,9 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
      -nographic -smp 1 \
      -hda <path to rootfs>/output/images/rootfs.ext2 \
      -kernel <path to kernel>/linux-stable/arch/arm64/boot/Image \
-     -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial"
+     -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
+     -device virtio-net-pci,netdev=eth0 \
+     -netdev user,id=eth0,hostfwd=tcp::8022-:22
 
  $ uname -a
  Linux buildroot 6.3.13 #1 SMP PREEMPT Sat Jul 15 12:59:22 PDT 2023 aarch64 GNU/Linux
@@ -265,6 +267,55 @@ scripts defined in:
 
 To leave qemu, execute `Ctrl + Alt and x`.
 
+
+## How to add network support
+
+To configure the network in qemu, add these 2 lines to `qemu-system-aarch64`:
+
+```shell
+host $ sudo qemu-system-aarch64
+
+        ...
+
+       -device virtio-net-pci,netdev=eth0 \
+       -netdev user,id=eth0,hostfwd=tcp::8022-:22
+```
+
+Generate a public ssh key in the host:
+
+```shell
+host $  ssh-keygen
+host $  ls ~/.ssh/
+id_rsa.pub
+
+# Copy the content of id_rsa.pub
+host $ cat ~/.ssh/id_rsa.pub
+```
+
+Paste the content of `id_rsa.pub` in `authorized_keys`.
+
+```shell
+# In qemu, execute
+root $ mkdir ~/.ssh
+
+# Paste the content of id_rsa.pub
+root $ vim .ssh/authorized_keys
+```
+
+Connect to qemu using ssh:
+
+```shell
+host $ ssh root@127.0.0.1 -p 8022
+
+root $
+```
+
+To upload files via `scp` use:
+
+```shell
+host $ scp -P 8022 libshared.so  root@127.0.0.1:~
+```
+
 ## How to build and add a module to the rootfs
 
 Once that you have your module, it is necessary to compile it using the kernel
@@ -300,7 +351,9 @@ Start qemu with the new rootfs:
  $ sudo qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt \
        -nographic -smp 1   -hda <path rootfs>/newrootfs.ext4 \
        -kernel <path kernel>/linux-stable/arch/arm64/boot/Image \
-       -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial"
+       -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
+       -device virtio-net-pci,netdev=eth0 \
+       -netdev user,id=eth0,hostfwd=tcp::8022-:22
 ```
 
 Load the module
