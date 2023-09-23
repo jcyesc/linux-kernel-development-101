@@ -187,7 +187,7 @@ VmSize = VmRSS + VmFileMapped + VmSwap + VmLazy
 backed in the RAM.
 - `VmFileMapped`: It refers to the pages that mmap a file.
 - `VmSwap` it refers to the `anonymous` memory that has been swapped to disk
-or in Android sysstem to `ZRAM` (compressed memory).
+or in Android system to `ZRAM` (compressed memory).
 - `VmLazy`: it refers to the pages that a process might need but that haven't
 been allocated yet by Linux due the process is not using them yet.
 

@@ -103,7 +103,7 @@ dr-xr-xr-x 3 parallels parallels 0 Feb 17 17:12 task
 -r--r--r-- 1 parallels parallels 0 Feb 17 17:12 wchan
 ```
 
-### /proc/pid/cmdline
+### /proc/<pid>/cmdline
 
 
 ```shell
@@ -111,7 +111,7 @@ $ cat /proc/1765/cmdline
 ./mem_request$
 ```
 
-### /proc/pid/limits
+### /proc/<pid>/limits
 
 
 ```shell
@@ -135,7 +135,7 @@ Max realtime priority     0                    0
 Max realtime timeout      unlimited            unlimited            us
 ```
 
-### /proc/pid/task
+### /proc/<pid>/task
 
 To check the threads created by the process, we can use:
 
@@ -145,7 +145,7 @@ total 0
 dr-xr-xr-x 7 parallels parallels 0 Feb 17 18:13 1765
 ```
 
-### /proc/pid/environ
+### /proc/<pid>/environ
 
 To find out the environment variables available to the process, we can execute:
 
@@ -246,7 +246,6 @@ mnt_id:	25
 
 To stop and resume a process, we can run in another terminal:
 
-
 ```shell
 # Stop a process
 $ kill -STOP 1765
@@ -278,7 +277,7 @@ The different states a thread can be found in `/include/linux/sched.h`.
 - TASK_UNINTERRUPTIBLE
 - TASK_STOPPED
 - TASK_TRACED
-- EXIT_ZOMPBIE
+- EXIT_ZOMBIE
 - EXIT_DEAD
 
 A thread will continue running till is `preempted` or go to `sleep/wait`.
