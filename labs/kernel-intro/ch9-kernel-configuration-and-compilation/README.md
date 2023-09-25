@@ -4,7 +4,7 @@
 
 To configure different options in the Linux kernel, we can use `menuconfig`:
 
-```
+```shell
 $ cd linux/
 $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig
 # In the graphical interface, use escape and / to search for the feature
@@ -17,7 +17,7 @@ CONFIG_IKCONFIG_PROC=y
 ```
 
 > Note: The `CONFIG_IKCONFIG_PROC=y` option will allow us to see the `.config`
-> selection in `/proc/config.gz`.
+> file in `/proc/config.gz`.
 
 After the Kernel has been installed, run:
 
@@ -61,6 +61,12 @@ CONFIG_OF_FLATTREE=y
 - https://elixir.bootlin.com/linux/v5.17.4/source/include/linux/kconfig.h#L73
 
 
+## dump_stack()
+
+When you want to know the call stack of one kernel function, we can use
+the function `dump_stack()`.
+
+
 ## Kernel browsers
 
 There are a lot of kernel browsers, two popular ones are:
@@ -98,9 +104,3 @@ Find files #including this file:
 Find assignments to this symbol:
 
 ```
-
-## dump_stack()
-
-When you want to know the call stack of one kernel function, we can use
-the function `dump_stack()`.
-

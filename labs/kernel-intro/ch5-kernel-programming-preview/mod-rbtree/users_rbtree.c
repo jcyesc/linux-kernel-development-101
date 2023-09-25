@@ -58,7 +58,7 @@ static struct usertype *rb_search_user(unsigned int id)
 /*
  * Inserts a node in the red black tree.
  *
- * Returns a pointer to struct user if it is already in the tree, otherwise it
+ * Returns a pointer to struct usertype if it is already in the tree, otherwise it
  * returns NULL.
  */
 static struct usertype *rb_insert_user(struct usertype *newuser)

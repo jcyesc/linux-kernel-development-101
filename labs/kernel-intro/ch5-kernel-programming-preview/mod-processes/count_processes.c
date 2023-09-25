@@ -31,7 +31,7 @@ static int count_number_processes(void)
 
 	pr_info("Name\t\ttgid\t\tpid");
 
-	//	When the a task_struct it is used, the lasklist_lock should be used. The
+	//	When the task_struct is used, the tasklist_lock should be used. The
 	//	tasklist_lock hasn't been exported in the Kernel because it is not recommended
 	//	to use it in modules. Below it is how it is supposed to be used outside modules.
 	//	tasklist_lock is defined in https://elixir.bootlin.com/linux/v5.18.3/source/kernel/fork.c#L142

@@ -50,7 +50,7 @@ static inline void peek(void)
 	pr_info("Value read from kfifo %d\n", val);
 }
 
-/**
+/*
  * Return 0 on success, otherwise it returns a negative number.
  */
 static inline int dequeue(void)

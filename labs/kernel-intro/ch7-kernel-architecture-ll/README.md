@@ -28,7 +28,6 @@ To find out in which context the kernel is, use the functions in
 Code running in user space can be preempted any time by the kernel. The kernel
 can decide when it is time to assign the processor to another task.
 
-
 A kernel that is not preemptible does not mean that it can't be interrupted. A
 Not preemptible kernel can be interrupted in these cases:
 

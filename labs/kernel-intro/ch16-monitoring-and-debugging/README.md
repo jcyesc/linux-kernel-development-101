@@ -80,6 +80,12 @@ $ echo 1 > /proc/sys/kernel/panic_on_oops
 $ cat /proc/sys/kernel/panic_on_oops
 $ sysctl kernel.panic_on_oops
 ```
+
+## dump_stack()
+
+When you want to know the call stack of one kernel function, we can use
+the function `dump_stack()`.
+
 ## Kernel debuggers
 
 There are several kernel debuggers:
@@ -90,7 +96,6 @@ There are several kernel debuggers:
 - eBPF (extended Berkeley Packet Filter):
 http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
 - debugfs: Alternative filesystem to `/proc`.
-
 
 ### Debugfs
 

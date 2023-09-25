@@ -96,7 +96,7 @@ void kfree (const void *addr);
 unsigned long __get_free_pages (GFP_KERNEL, unsigned long order);
 void free_pages (unsigned long addr, unsigned long order);
 
-#include <linux/vmalloc.h
+#include <linux/vmalloc.h>
 void *vmalloc(unsigned long size) __alloc_size(1);
 void vfree(const void *addr);
 ```
