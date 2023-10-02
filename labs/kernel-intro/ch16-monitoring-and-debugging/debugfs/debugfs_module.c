@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Using debugfs.
  *
@@ -24,7 +25,6 @@
  *    sudo sh -c 'echo 2022 >  /sys/kernel/debug/custom_magic_dir/year'
  */
 
-
 #include <linux/debugfs.h>
 #include <linux/fs.h>
 #include <linux/init.h>
@@ -32,7 +32,6 @@
 #include <linux/printk.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
-
 
 /*
  * Define the parent directory.

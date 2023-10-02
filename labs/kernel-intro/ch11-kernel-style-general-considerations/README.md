@@ -53,8 +53,6 @@ $ less list_add.txt
 
 ## Generate patches
 
-
-
 To create a patch, you can use these comands:
 
 - `patch`
@@ -90,7 +88,7 @@ using:
 $ git diff
 ```
 
-To get all commits since you branched off of the master’ branch, each produced
+To get all commits since you branched off of the master branch, each produced
 as a separate sequential patch, run:
 
 ```shell
