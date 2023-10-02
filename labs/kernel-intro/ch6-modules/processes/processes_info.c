@@ -35,6 +35,7 @@ static int __init processes_info_init(void)
 	count = 0;
 	for_each_process_thread(process, task)
 	{
+		count++;
 		pr_info("tgid=%d, pid=%d, comm=%s",
 			task->tgid, task->pid, task->comm);
 	}

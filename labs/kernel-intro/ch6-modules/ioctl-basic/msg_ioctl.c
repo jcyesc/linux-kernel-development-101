@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
-/**
+/*
  * Driver that set/get greeting message and prints the message in the logs. It
  * uses the ioctl file operation to achieve this.
  *
  * To install the module use:
  *
  * sudo insmod msg_ioctl.ko
- * sudo chmod 755 /dev/msgdev
+ * sudo chmod 755 /dev/messagedev
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": %s() " fmt, __func__
@@ -53,7 +53,7 @@ static long msg_driver_unlocked_ioctl(
 	return 0;
 }
 
-/**
+/*
  * When the Raspberry Pi kernel is compiled for ARM64, the compact_ioctl()
  * function has to be used instead of unlocked_ioctl().
  */

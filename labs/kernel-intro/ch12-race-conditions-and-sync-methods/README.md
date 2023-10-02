@@ -251,12 +251,11 @@ And example of how to use it is below:
 ```c
 unsigned int seq;
 do {
-seq = read_seqbegin (&my_seqlock);
+  seq = read_seqbegin (&my_seqlock);
 
-// Perform changes using the protected code.
+  // Perform changes using the protected code.
 
 } while (read_seqretry (&my_seqlock, seq));
-
 ```
 
 The while loop will proceed under these 2 circunstances:

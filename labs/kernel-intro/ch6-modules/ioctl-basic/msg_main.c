@@ -1,4 +1,4 @@
-/**
+/*
  * This program sets messages using the ioctl() system call on the device
  * node /dev/messagedev.
  *
