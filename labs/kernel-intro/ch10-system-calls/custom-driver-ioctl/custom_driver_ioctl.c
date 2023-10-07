@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/**
+/*
  * Driver to define the file operations for a custom ioctl() call.
  *
  * In order to use the ioctl() system call, it is necessary to define
@@ -8,7 +8,7 @@
  * To install the module use:
  *
  * sudo insmod custom_driver_ioctl.ko
- * chmod 755 /dev/customdev
+ * sudo chmod 755 /dev/customdev
  *
  * Note:
  * - unlocked_ioctl() - Use it for ARM64 user space.
@@ -42,7 +42,7 @@ static long  custom_driver_unlocked_ioctl(
 	return 0;
 }
 
-/**
+/*
  * When the Raspberry Pi kernel is compiled for ARM64, the compact_ioctl()
  * function has to be used instead of unlocked_ioctl().
  */
@@ -67,7 +67,6 @@ static struct miscdevice misc_custom_device = {
 		.name = CUSTOM_DEV_IOCTL,
 		.fops = &custom_driver_fops,
 };
-
 
 static int __init custom_driver_init(void)
 {

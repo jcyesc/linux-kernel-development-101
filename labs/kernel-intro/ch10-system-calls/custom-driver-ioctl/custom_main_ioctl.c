@@ -1,8 +1,8 @@
-/**
+/*
  * This program uses ioctl() to invoke a custom device driver functionality.
  * To do that, it first opens a device node file and then calls ioctl().
  *
- * This files has to be compiled in the target device, in this case the RPi 3
+ * This file has to be compiled in the target device, in this case the RPi 3
  * or crosscompile using arm32 option.
  *
  * To compile and run:
