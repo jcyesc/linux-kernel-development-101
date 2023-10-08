@@ -48,7 +48,7 @@ of this, we'll show how to build and add a basic module to the rootfs.
  d1047d75f77a (HEAD -> linux-6.3.y, tag: v6.3.13, origin/linux-6.3.y) Linux 6.3.13
 ```
 
-### Ccnfigure and Build
+### Configure and Build
 
 ```shell
  # Configure
