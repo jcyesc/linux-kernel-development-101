@@ -95,7 +95,7 @@ After we got the src, we can configure `buildroot` with the options below:
 
     Target options
          Target Architecture (AArch64 (little endian))
-         Target Architecture Variant (cortex-A73)
+         Target Architecture Variant (cortex-A72)
 
     Toolchain type (External toolchain)
          *** Toolchain External Options ***
@@ -190,7 +190,7 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
 ```shell
  $ sudo qemu-system-aarch64 \
      -m 2048 \
-     -cpu cortex-a73 \
+     -cpu cortex-a72 \
      -machine virt \
      -nographic -smp 1 \
      -hda <path to rootfs>/output/images/rootfs.ext2 \
@@ -348,7 +348,7 @@ Once that is compiled, we can include it in the rootfs.
 Start qemu with the new rootfs:
 
 ```shell
- $ sudo qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt \
+ $ sudo qemu-system-aarch64 -m 2048 -cpu cortex-a72 -machine virt \
        -nographic -smp 1   -hda <path rootfs>/newrootfs.ext4 \
        -kernel <path kernel>/linux-stable/arch/arm64/boot/Image \
        -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
