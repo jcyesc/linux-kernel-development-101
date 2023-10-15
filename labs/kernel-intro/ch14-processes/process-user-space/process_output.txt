@@ -1,0 +1,140 @@
+# ./process
+Printing Process information
+
+---------------------------------------
+Print /proc/298/maps
+---------------------------------------
+aaaaadcf0000-aaaaadcf4000 r-xp 00000000 fe:00 23621                      /root/process
+aaaaadd03000-aaaaadd04000 r--p 00003000 fe:00 23621                      /root/process
+aaaaadd04000-aaaaadd05000 rw-p 00004000 fe:00 23621                      /root/process
+aaaab1c9f000-aaaab1cc0000 rw-p 00000000 00:00 0                          [heap]
+ffff9d3d0000-ffff9d451000 r-xp 00000000 fe:00 175                        /lib/libm.so.6
+ffff9d451000-ffff9d46f000 ---p 00081000 fe:00 175                        /lib/libm.so.6
+ffff9d46f000-ffff9d470000 r--p 0008f000 fe:00 175                        /lib/libm.so.6
+ffff9d470000-ffff9d471000 rw-p 00090000 fe:00 175                        /lib/libm.so.6
+ffff9d480000-ffff9d600000 r-xp 00000000 fe:00 167                        /lib/libc.so.6
+ffff9d600000-ffff9d60c000 ---p 00180000 fe:00 167                        /lib/libc.so.6
+ffff9d60c000-ffff9d610000 r--p 0018c000 fe:00 167                        /lib/libc.so.6
+ffff9d610000-ffff9d612000 rw-p 00190000 fe:00 167                        /lib/libc.so.6
+ffff9d612000-ffff9d61f000 rw-p 00000000 00:00 0 
+ffff9d620000-ffff9d634000 r-xp 00000000 fe:00 170                        /lib/libgcc_s.so.1
+ffff9d634000-ffff9d64f000 ---p 00014000 fe:00 170                        /lib/libgcc_s.so.1
+ffff9d64f000-ffff9d650000 r--p 0001f000 fe:00 170                        /lib/libgcc_s.so.1
+ffff9d650000-ffff9d651000 rw-p 00020000 fe:00 170                        /lib/libgcc_s.so.1
+ffff9d660000-ffff9d864000 r-xp 00000000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffff9d864000-ffff9d875000 ---p 00204000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffff9d875000-ffff9d880000 r--p 00205000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffff9d880000-ffff9d883000 rw-p 00210000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffff9d883000-ffff9d886000 rw-p 00000000 00:00 0 
+ffff9d88e000-ffff9d8b4000 r-xp 00000000 fe:00 163                        /lib/ld-linux-aarch64.so.1
+ffff9d8c3000-ffff9d8c9000 rw-p 00000000 00:00 0 
+ffff9d8c9000-ffff9d8cb000 r--p 00000000 00:00 0                          [vvar]
+ffff9d8cb000-ffff9d8cc000 r-xp 00000000 00:00 0                          [vdso]
+ffff9d8cc000-ffff9d8ce000 r--p 0002e000 fe:00 163                        /lib/ld-linux-aarch64.so.1
+ffff9d8ce000-ffff9d8d0000 rw-p 00030000 fe:00 163                        /lib/ld-linux-aarch64.so.1
+fffffa58a000-fffffa5ab000 rw-p 00000000 00:00 0                          [stack]
+
+---------------------------------------
+Print /proc/298/status
+---------------------------------------
+Name:	process
+Umask:	0022
+State:	R (running)
+Tgid:	298
+Ngid:	0
+Pid:	298
+PPid:	120
+TracerPid:	0
+Uid:	0	0	0	0
+Gid:	0	0	0	0
+FDSize:	64
+Groups:	0 10 
+NStgid:	298
+NSpid:	298
+NSpgid:	298
+NSsid:	120
+VmPeak:	    5192 kB
+VmSize:	    5192 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	    2688 kB
+VmRSS:	    2688 kB
+RssAnon:	     128 kB
+RssFile:	    2560 kB
+RssShmem:	       0 kB
+VmData:	     260 kB
+VmStk:	     132 kB
+VmExe:	      16 kB
+VmLib:	    4352 kB
+VmPTE:	      48 kB
+VmSwap:	       0 kB
+HugetlbPages:	       0 kB
+CoreDumping:	0
+THP_enabled:	1
+Threads:	1
+SigQ:	0/7749
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000000000
+SigCgt:	0000000000000000
+CapInh:	0000000000000000
+CapPrm:	000001ffffffffff
+CapEff:	000001ffffffffff
+CapBnd:	000001ffffffffff
+CapAmb:	0000000000000000
+NoNewPrivs:	0
+Seccomp:	0
+Seccomp_filters:	0
+Speculation_Store_Bypass:	vulnerable
+SpeculationIndirectBranch:	unknown
+Cpus_allowed:	1
+Cpus_allowed_list:	0
+Mems_allowed:	0001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	1
+nonvoluntary_ctxt_switches:	27
+
+---------------------------------------
+Print /proc/298/limits
+---------------------------------------
+Limit                     Soft Limit           Hard Limit           Units     
+Max cpu time              unlimited            unlimited            seconds   
+Max file size             unlimited            unlimited            bytes     
+Max data size             unlimited            unlimited            bytes     
+Max stack size            8388608              unlimited            bytes     
+Max core file size        0                    unlimited            bytes     
+Max resident set          unlimited            unlimited            bytes     
+Max processes             7749                 7749                 processes 
+Max open files            1024                 4096                 files     
+Max locked memory         8388608              8388608              bytes     
+Max address space         unlimited            unlimited            bytes     
+Max file locks            unlimited            unlimited            locks     
+Max pending signals       7749                 7749                 signals   
+Max msgqueue size         819200               819200               bytes     
+Max nice priority         0                    0                    
+Max realtime priority     0                    0                    
+Max realtime timeout      unlimited            unlimited            us        
+
+---------------------------------------
+Print /proc/298/cmdline
+---------------------------------------
+./process
+
+---------------------------------------
+Print /proc/298/mounts
+---------------------------------------
+/dev/root / ext4 rw,relatime 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=991988k,nr_inodes=247997,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+devpts /dev/pts devpts rw,relatime,gid=5,mode=620,ptmxmode=666 0 0
+tmpfs /dev/shm tmpfs rw,relatime,mode=777 0 0
+tmpfs /tmp tmpfs rw,relatime 0 0
+tmpfs /run tmpfs rw,nosuid,nodev,relatime,mode=755 0 0
+sysfs /sys sysfs rw,relatime 0 0
+
+---------------------------------------
+Print /proc/298/environ
+---------------------------------------
+USER=rootSHLVL=1HOME=/rootPS1=# LOGNAME=rootTERM=vt100PATH=/bin:/sbin:/usr/bin:/usr/sbinSHELL=/bin/shPWD=/rootEDITOR=/bin/vi
+
