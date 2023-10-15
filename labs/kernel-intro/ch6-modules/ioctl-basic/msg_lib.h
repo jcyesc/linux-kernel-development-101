@@ -10,7 +10,11 @@
 
 // https://www.kernel.org/doc/html/latest/staging/index.html
 // https://elixir.bootlin.com/linux/v5.16.5/source/include/uapi/asm-generic/ioctl.h#L85
-// _IO ioctl with no parameters
+//
+//
+// NOTE: _IO ioctl with no parameters
+//       _IOW means userland is writing and kernel is reading.
+//       _IOR means userland is reading and kernel is writing.
 #define MSG_PRINT_IOC _IO(MSG_IOC_MAGIC, 1)
 // _IOW ioctl with write parameters (copy_from_user)
 #define MSG_SET_IOC   _IOW(MSG_IOC_MAGIC, 2, struct content)
