@@ -14,7 +14,7 @@
  *
  * Compare your results with the results of uname -a.
  */
-J
+
 #define pr_fmt(fmt) KBUILD_MODNAME ": %s() " fmt, __func__
 
 #include <linux/init.h>

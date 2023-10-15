@@ -17,7 +17,7 @@ config TTY_PRINTK_LEVEL
 ```
 
 - tristate: It can have the values `Y`, `N` and `M`. The `Y` and `N` values
-        means the same as in `boot`. `M` means that the module will be compiled
+        means the same as in `bool`. `M` means that the module will be compiled
         but it won't be part of the kernel binary. The module can be uploaded
         using `insmod`.
 

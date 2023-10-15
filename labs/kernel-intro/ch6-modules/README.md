@@ -5,7 +5,6 @@ A `module` is a kernel component that can be loaded or unloaded. The module help
 to extend the kernel functionality and it has access to kernel libraries. When
 the kernel module is loaded, it becomes part of the big monolitic Linux kernel.
 
-
 A module:
 
 - has to have the `MODULE_LICENSE()` macro to avoid tainting the kernel.

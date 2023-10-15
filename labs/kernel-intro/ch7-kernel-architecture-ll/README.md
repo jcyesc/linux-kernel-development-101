@@ -10,7 +10,6 @@ mappings, open files, signal handlers, etc.
 A `thread` is a light way process in the sense that it shares the resources
 of other processes (memory, open files, etc).
 
-
 The kernel can be in different contexts:
 
 - Process context: executing code on behalf of the process.
@@ -82,7 +81,6 @@ BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
 ```
 
 The `kernel configuration` can be found in:
-
 
 ```shell
 # Go to the location where the kernel was compiled.
