@@ -1,0 +1,30 @@
+# cat /proc/245/maps
+aaaabc740000-aaaabc742000 r-xp 00000000 fe:00 23622                      /root/vm_anon_name
+aaaabc751000-aaaabc752000 r--p 00001000 fe:00 23622                      /root/vm_anon_name
+aaaabc752000-aaaabc753000 rw-p 00002000 fe:00 23622                      /root/vm_anon_name
+aaaad65bf000-aaaad65e0000 rw-p 00000000 00:00 0                          [heap]
+ffffad600000-ffffad614000 r-xp 00000000 fe:00 170                        /lib/libgcc_s.so.1
+ffffad614000-ffffad62f000 ---p 00014000 fe:00 170                        /lib/libgcc_s.so.1
+ffffad62f000-ffffad630000 r--p 0001f000 fe:00 170                        /lib/libgcc_s.so.1
+ffffad630000-ffffad631000 rw-p 00020000 fe:00 170                        /lib/libgcc_s.so.1
+ffffad640000-ffffad6c1000 r-xp 00000000 fe:00 175                        /lib/libm.so.6
+ffffad6c1000-ffffad6df000 ---p 00081000 fe:00 175                        /lib/libm.so.6
+ffffad6df000-ffffad6e0000 r--p 0008f000 fe:00 175                        /lib/libm.so.6
+ffffad6e0000-ffffad6e1000 rw-p 00090000 fe:00 175                        /lib/libm.so.6
+ffffad6f0000-ffffad870000 r-xp 00000000 fe:00 167                        /lib/libc.so.6
+ffffad870000-ffffad87c000 ---p 00180000 fe:00 167                        /lib/libc.so.6
+ffffad87c000-ffffad880000 r--p 0018c000 fe:00 167                        /lib/libc.so.6
+ffffad880000-ffffad882000 rw-p 00190000 fe:00 167                        /lib/libc.so.6
+ffffad882000-ffffad88f000 rw-p 00000000 00:00 0 
+ffffad890000-ffffada94000 r-xp 00000000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffffada94000-ffffadaa5000 ---p 00204000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffffadaa5000-ffffadab0000 r--p 00205000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffffadab0000-ffffadab3000 rw-p 00210000 fe:00 183                        /lib/libstdc++.so.6.0.30
+ffffadab3000-ffffadab6000 rw-p 00000000 00:00 0 
+ffffadac1000-ffffadae7000 r-xp 00000000 fe:00 163                        /lib/ld-linux-aarch64.so.1
+ffffadaf6000-ffffadafc000 rw-p 00000000 00:00 0 
+ffffadafc000-ffffadafe000 r--p 00000000 00:00 0                          [vvar]
+ffffadafe000-ffffadaff000 r-xp 00000000 00:00 0                          [vdso]
+ffffadaff000-ffffadb01000 r--p 0002e000 fe:00 163                        /lib/ld-linux-aarch64.so.1
+ffffadb01000-ffffadb03000 rw-p 00030000 fe:00 163                        /lib/ld-linux-aarch64.so.1
+ffffedb6e000-ffffedb8f000 rw-p 00000000 00:00 0                          [stack]
