@@ -1,4 +1,3 @@
-
 /*
  * Launching User Mode Processes: (Example: wall or cp)
  *
@@ -89,7 +88,6 @@ static int launch_usermode_dev_release(struct inode *inode, struct file *file)
  * @ppos The present position pointer.  It is assumed that it starts in ZERO.
  * @return The number of characters that were read.
  */
-
 static ssize_t launch_usermode_dev_read(
 		struct file *file, char __user *buf, size_t lbuf, loff_t *ppos)
 {

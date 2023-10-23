@@ -1,4 +1,3 @@
-
 /*
  * Macros constructions
  *

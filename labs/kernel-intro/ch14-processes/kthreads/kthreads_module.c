@@ -15,7 +15,7 @@
 /*
  * Creating Per Cpu Threads
  *
- * Create a kernel thread on each cpu during your intialization, and
+ * Create a kernel thread on each cpu during your initialization, and
  * have it go to sleep, to be woken up and killed during your exit
  * function.
  *
@@ -88,7 +88,7 @@ static int __init my_init(void)
 		kthread_bind(tsk[i], i);
 		pr_info("About to wake up and run the thread for cpu=%d\n", i);
 		wake_up_process(tsk[i]);
-		pr_info("Staring thread for cpu %d", i);
+		pr_info("Starting thread for cpu %d", i);
 		print_cpu("on");
 	}
 	return 0;

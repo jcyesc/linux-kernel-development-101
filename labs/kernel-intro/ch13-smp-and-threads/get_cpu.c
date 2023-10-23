@@ -21,7 +21,7 @@
  */
 
 
-/**
+/*
  * This define is necessary to avoid the warning below:
  *
  * get_cpu.c: In function ‘main’:
