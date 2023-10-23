@@ -63,7 +63,10 @@ of this, we'll show how to build and add a basic module to the rootfs.
   OBJCOPY arch/arm64/boot/Image
   GZIP    arch/arm64/boot/Image.gz
 
- # Clean configuration and binaries
+ # Keep the .config file and remove binaries.
+ $ make -j40 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- clean
+
+ # Remove the .config file and remove binaries
  $ make -j40 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- mrproper
 ```
 
