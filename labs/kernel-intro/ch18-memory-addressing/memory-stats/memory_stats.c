@@ -7,24 +7,28 @@
  * $ sudo insmod memory_stats.ko
  * $ sudo mknod -m 666 /dev/memorystats c 501 0
  * $ cat /dev/memorystats
- *   --------------- Memory Stats ---------------
- *   Examining 242688 pages (num_phys_pages) = 948 MB
- *   Pages with valid PFN's=242688, = 948 MB
+ * --------------- Memory Stats ---------------
  *
- *                        Pages         KB       MB
+ * sizeof(struct mm_struct) = 1064
+ * sizeof(struct vm_area_struct) = 152
  *
- *   free           =    148510     594040      580
- *   locked         =         0          0        0
- *   reserved       =      9429      37716       36
- *   swapcache      =         0          0        0
- *   referenced     =     19123      76492       74
- *   slab           =     12898      51592       50
- *   private        =     10087      40348       39
- *   uptodate       =     56180     224720      219
- *   dirty          =      1661       6644        6
- *   active         =     21771      87084       85
- *   writeback      =         0          0        0
- *   mappedtodisk   =     36214     144856      141
+ * Examining 524288 pages (num_phys_pages) = 2048 MB
+ * Pages with valid PFN's=262144, = 1024 MB
+ *
+ *                      Pages         KB       MB
+ *
+ * free           =    248344     993376      970
+ * locked         =         0          0        0
+ * reserved       =      7995      31980       31
+ * swapcache      =         0          0        0
+ * referenced     =      1991       7964        7
+ * slab           =      1624       6496        6
+ * private        =       243        972        0
+ * uptodate       =      3071      12284       11
+ * dirty          =        18         72        0
+ * active         =      1967       7868        7
+ * writeback      =         0          0        0
+ * mappedtodisk   =      2569      10276       10
  */
 
 #include <linux/cdev.h>
@@ -116,7 +120,15 @@ static int populate_memory_stats(void)
 	bytes_written = 0;
 	bytes_written += snprintf(ramdisk + bytes_written,
 		RAMDISK_SIZE - bytes_written,
-		"--------------- Memory Stats ---------------\n");
+		"--------------- Memory Stats ---------------\n\n");
+	bytes_written += snprintf(ramdisk + bytes_written,
+		RAMDISK_SIZE - bytes_written,
+		"sizeof(struct mm_struct) = %ld\n"
+		"sizeof(struct vm_area_struct) = %ld\n\n",
+		sizeof(struct mm_struct),
+		sizeof(struct vm_area_struct));
+
+
 
 	bytes_written += snprintf(ramdisk + bytes_written,
 		RAMDISK_SIZE - bytes_written,
