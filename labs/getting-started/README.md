@@ -85,8 +85,21 @@ We can also use `git` to check out the code.
  3c66f65a6a (HEAD -> master, origin/master, origin/HEAD) package/libopenssl: bump version to 3.0.9
  d3db2e61ce .checkpackageignore: remove entry to tovid patch
 
+ # Note: it is important that you pick a Linux kernel which headers are
+ # compatible with the ones defined in Build root.
  $ git branch -va
  remotes/origin/2023.05.x c32b8b57eb {linux, linux-headers}: bump 4.{14, 19}.x / 5.{4, 10, 15}.x / 6.{1, 3}.x series
+```
+
+To check the linux headers supported in `buildroot`, run:
+
+```shell
+ $ git log --oneline | grep linux-headers | head -5
+b8c92f7d48 {linux, linux-headers}: bump 4.{14, 19}.x / 5.{4, 10, 15}.x / 6.{1, 5, 6}.x series
+4eb9c5d451 {linux, linux-headers}: bump 6.{1, 5}.x series
+f3a81cc068 {toolchain, linux-headers}: add support for 6.6 headers
+96298d3b54 {linux, linux-headers}: bump 4.{14, 19}.x / 5.{4, 10, 15}.x / 6.{1, 5}.x series
+d8bcff69fc {linux, linux-headers}: bump 5.15.x / 6.{1, 5}.x series
 ```
 
 After we got the src, we can configure `buildroot` with the options below:
