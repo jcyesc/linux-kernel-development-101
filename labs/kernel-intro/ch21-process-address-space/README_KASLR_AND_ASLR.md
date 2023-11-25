@@ -34,7 +34,7 @@ the `kernel command line`. For example:
 ## Userspace Address Space Layout Randomization (ASLR)
 
 In the userpace, we can also randomize the address space layout. The pseudo file
-that controls it is `/proc/sys/kernel/randomize_va_space`. randomize_va_space
+that controls it is `/proc/sys/kernel/randomize_va_space`. `randomize_va_space`
 can have 3 possible values
 
 - 0 Turn off ASLR
