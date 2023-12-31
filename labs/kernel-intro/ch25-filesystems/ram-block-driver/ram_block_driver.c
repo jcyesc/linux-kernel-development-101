@@ -5,9 +5,10 @@
  * This driver stores the filesystem information in memory. It performs the
  * following tasks:
  *
- *  - Register a block I/O device
- *  - Create and initialize a gendisk
+ *  - Register a block I/O device.
+ *  - Create and initialize a gendisk.
  *  - Process struct request_queue.
+ *  - Allocates memory to store the data using vmalloc.
  */
 #define pr_fmt(fmt)  "%s: %s: " fmt, KBUILD_MODNAME, __func__
 
@@ -18,10 +19,13 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/numa.h>
+#include <linux/spinlock.h>
 #include <linux/sprintf.h>
+#include <linux/types.h>
+#include <linux/vmalloc.h>
 
-#define NR_SECTORS				1024
-#define KERNEL_SECTOR_SIZE		512
+#define NR_SECTORS				256
+#define RAMDISK_SECTOR_SIZE		512
 
 #define RAM_BLKDEV_MAJOR		240
 #define RAM_BLKDEV_MINOR		1
@@ -29,9 +33,12 @@
 #define GENDISK_NAME			"genramdisk"
 
 static struct ram_block_dev {
+	spinlock_t lock;
 	struct gendisk *gd;
 	struct blk_mq_tag_set tag_set;
 	struct request_queue *queue;
+	uint8_t *ramdisk;
+	size_t size;
 } ram_blk_dev;
 
 inline void pr_request(struct request *rq)
@@ -45,21 +52,69 @@ inline void pr_request(struct request *rq)
 		break;
 	};
 
-	pr_info("__sector =  %llu\n", blk_rq_pos(rq));
-	pr_info("__data_len = %d\n", blk_rq_bytes(rq));
-	pr_info("blk_rq_cur_bytes = %d\n", blk_rq_cur_bytes(rq));
+	pr_info("\tblk_rq_pos = __sector =  %llu\n", blk_rq_pos(rq));
+	pr_info("\tblk_rq_bytes = __data_len = %d\n", blk_rq_bytes(rq));
+	pr_info("\tblk_rq_cur_bytes = %d\n", blk_rq_cur_bytes(rq));
 
 	switch (rq->state) {
 	case MQ_RQ_IDLE:
-		pr_info("mq_rq_state = MQ_RQ_IDLE");
+		pr_info("\tmq_rq_state = MQ_RQ_IDLE");
 		break;
 	case MQ_RQ_IN_FLIGHT:
-		pr_info("mq_rq_state = MQ_RQ_IN_FLIGHT");
+		pr_info("\tmq_rq_state = MQ_RQ_IN_FLIGHT");
 		break;
 	case MQ_RQ_COMPLETE:
-		pr_info("mq_rq_state = MQ_RQ_COMPLETE");
+		pr_info("\tmq_rq_state = MQ_RQ_COMPLETE");
 		break;
 	};
+}
+
+static int exec_request(struct request *rq)
+{
+	struct bio_vec bvec;
+	struct req_iterator iter;
+	int i = 0;
+
+	pr_info("Processing segments in bio");
+
+	rq_for_each_segment(bvec, rq, iter) {
+		sector_t sector = iter.iter.bi_sector;
+		unsigned long bv_offset = bvec.bv_offset;
+		unsigned long offset = (sector * RAMDISK_SECTOR_SIZE) + bv_offset;
+		size_t len = bvec.bv_len;
+		char *buffer = kmap_local_page(bvec.bv_page);
+		int dir = bio_data_dir(iter.bio);
+		unsigned long flags;
+
+		pr_info("Segment %d", i++);
+		pr_info("   sector:    %lld", sector);
+		pr_info("   bv_offset: %ld", bv_offset);
+		pr_info("   offset:    %ld", offset);
+		pr_info("   len:       %ld", len);
+
+		if ((offset + len) > ram_blk_dev.size) {
+			pr_err("Ramdisk = %ld, offset = %ld, len = %ld",
+				ram_blk_dev.size, offset, len);
+			return BLK_STS_IOERR;
+		}
+
+		spin_lock_irqsave(&ram_blk_dev.lock, flags);
+
+		switch (dir) {
+		case READ:
+			memcpy(buffer, ram_blk_dev.ramdisk + offset, len);
+			break;
+		case WRITE:
+			memcpy(ram_blk_dev.ramdisk + offset, buffer, len);
+			break;
+		};
+
+		spin_unlock_irqrestore(&ram_blk_dev.lock, flags);
+
+		kunmap_local(buffer);
+	}
+
+	return BLK_STS_OK;
 }
 
 /**
@@ -76,6 +131,7 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 {
 	struct request *rq = bd->rq;
 	struct ram_block_dev *dev = hctx->queue->queuedata;
+	int status;
 
 	pr_info("Queuing request\n");
 
@@ -96,10 +152,8 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 		goto out;
 	}
 
-	// TODO: Process request.
-
-	// Request completed.
-	blk_mq_end_request(rq, BLK_STS_OK);
+	status = exec_request(rq);
+	blk_mq_end_request(rq, status);
 
 out:
 	return BLK_STS_OK;
@@ -157,8 +211,8 @@ inline int init_request_queue(struct ram_block_dev *dev)
 		return PTR_ERR(dev->queue);
 
 	pr_info("Before blk_queue_physical_block_size()");
-	blk_queue_physical_block_size(dev->queue, KERNEL_SECTOR_SIZE);
-	blk_queue_logical_block_size(dev->queue, KERNEL_SECTOR_SIZE);
+	blk_queue_physical_block_size(dev->queue, RAMDISK_SECTOR_SIZE);
+	blk_queue_logical_block_size(dev->queue, RAMDISK_SECTOR_SIZE);
 
 	// Assign private data to queue structure.
 	dev->queue->queuedata = dev;
@@ -183,7 +237,7 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	dev->gd->queue = dev->queue;
 	dev->gd->private_data = dev;
 
-	// The capacity of the block device is NR_SECTORS * KERNEL_SECTOR_SIZE
+	// The capacity of the block device is NR_SECTORS * RAMDISK_SECTOR_SIZE
 	pr_info("Before set_capacity()");
 	set_capacity(dev->gd, NR_SECTORS);
 
@@ -194,13 +248,29 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	return 0;
 }
 
+static int init_ramdisk(struct ram_block_dev *dev)
+{
+	dev->size = NR_SECTORS * RAMDISK_SECTOR_SIZE;
+	dev->ramdisk = vmalloc(dev->size);
+	if (dev->ramdisk == NULL)
+		return -ENOMEM;
+
+	return 0;
+}
+
 static int setup_block_dev(struct ram_block_dev *dev)
 {
 	int status;
 
-	status = init_blk_mq_tag_set(&dev->tag_set);
+	spin_lock_init(&dev->lock);
+
+	status = init_ramdisk(dev);
 	if (status < 0)
 		return status;
+
+	status = init_blk_mq_tag_set(&dev->tag_set);
+	if (status < 0)
+		goto err_blk_mq_tag;
 
 	status = init_request_queue(dev);
 	if (status < 0)
@@ -219,6 +289,9 @@ static int setup_block_dev(struct ram_block_dev *dev)
 
 err_blk_init:
 	blk_mq_free_tag_set(&dev->tag_set);
+err_blk_mq_tag:
+	vfree(dev->ramdisk);
+
 	return status;
 }
 
@@ -250,6 +323,9 @@ static void release_block_device(struct ram_block_dev *dev)
 {
 	// Note: There could be race condition when the block device is released.
 
+	// Put refcount
+	// blk_mq_destroy_queue(dev->queue);
+
 	if (dev->gd) {
 		del_gendisk(dev->gd);
 		// put_disk(dev->gd);
@@ -257,6 +333,8 @@ static void release_block_device(struct ram_block_dev *dev)
 
 	pr_info("Unregistering block I/O device");
 	unregister_blkdev(RAM_BLKDEV_MAJOR, RAM_BLKDEV_NAME);
+
+	vfree(dev->ramdisk);
 
 	// pr_info("Freeing tag_set");
 	// blk_mq_free_tag_set(&dev->tag_set);

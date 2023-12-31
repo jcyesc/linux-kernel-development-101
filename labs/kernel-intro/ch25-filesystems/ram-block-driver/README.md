@@ -214,3 +214,43 @@ none
        0        0
 ```
 
+## Send a write request to the block device
+
+To send a write request to the device, we redirect the output of `echo` to
+the device node. Note that before the `write` request is executed, a `read` request
+is performed first.
+
+```
+# echo "abcd" > /dev/ramdiskblockdev
+[   99.757646] ram_block_driver: ram_block_init:     mknod /dev/ramdiskblockdev b 240 0
+[ 1349.996623] ram_block_driver: ram_block_open: Open disk genramdisk
+[ 1350.005442] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request
+[ 1350.006118] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
+[ 1350.006219] ram_block_driver: pr_request: READ direction request
+[ 1350.008944] ram_block_driver: pr_request: __sector =  0
+[ 1350.012521] ram_block_driver: pr_request: __data_len = 4096
+[ 1350.013085] ram_block_driver: pr_request: blk_rq_cur_bytes = 4096
+[ 1350.013558] ram_block_driver: pr_request: mq_rq_state = MQ_RQ_IDLE
+[ 1350.021859] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request
+[ 1350.025615] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
+[ 1350.029780] ram_block_driver: pr_request: WRITE direction request
+[ 1350.032189] ram_block_driver: pr_request: __sector =  0
+[ 1350.034723] ram_block_driver: pr_request: __data_len = 4096
+[ 1350.035877] ram_block_driver: pr_request: blk_rq_cur_bytes = 4096
+[ 1350.036836] ram_block_driver: pr_request: mq_rq_state = MQ_RQ_IDLE
+[ 1350.047609] ram_block_driver: ram_block_release: Release disk genramdisk
+```
+
+
+
+
+```
+ $ for i in $(seq 1 12345); do echo $i >> numbers.txt ; done
+ $ dd if=/dev/ramdiskblockdev bs=1 count=4096
+
+ $ dd if=./numbers.txt   of=/dev/ramdiskblockdev bs=1 count=63307
+
+ $ dd if=/dev/ramdiskblockdev bs=1 count=4096
+
+
+```
