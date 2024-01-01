@@ -17,6 +17,7 @@
 #include <linux/err.h>
 #include <linux/fs.h>
 #include <linux/init.h>
+#include <linux/kref.h>
 #include <linux/module.h>
 #include <linux/numa.h>
 #include <linux/spinlock.h>
@@ -33,12 +34,17 @@
 #define GENDISK_NAME			"genramdisk"
 
 static struct ram_block_dev {
-	spinlock_t lock;
 	struct gendisk *gd;
 	struct blk_mq_tag_set tag_set;
 	struct request_queue *queue;
+
+	// Fields that are part of the ramdisk.
 	uint8_t *ramdisk;
 	size_t size;
+	spinlock_t lock;
+
+	// Fields to protect access to ramdisk
+	struct kref refcount;
 } ram_blk_dev;
 
 inline void pr_request(struct request *rq)
@@ -86,7 +92,7 @@ static int exec_request(struct request *rq)
 		int dir = bio_data_dir(iter.bio);
 		unsigned long flags;
 
-		pr_info("Segment %d", i++);
+		pr_info("%s Segment %d", (dir == READ ? "READ" : "WRITE"), i++);
 		pr_info("   sector:    %lld", sector);
 		pr_info("   bv_offset: %ld", bv_offset);
 		pr_info("   offset:    %ld", offset);
@@ -117,6 +123,27 @@ static int exec_request(struct request *rq)
 	return BLK_STS_OK;
 }
 
+static void release_block_device(struct kref *ref)
+{
+	// Note: There could be race condition when the block device is released.
+	struct ram_block_dev *dev = container_of(ref, struct ram_block_dev, refcount);
+
+	pr_info("Unregistering block I/O device");
+	unregister_blkdev(RAM_BLKDEV_MAJOR, RAM_BLKDEV_NAME);
+
+	pr_info("Deleting gendisk");
+	del_gendisk(dev->gd);
+
+	pr_info("Destroying queue");
+	blk_mq_destroy_queue(dev->queue);
+
+	pr_info("Freeing tag_set");
+	blk_mq_free_tag_set(&dev->tag_set);
+
+	pr_info("Freeing ramdisk");
+	vfree(dev->ramdisk);
+}
+
 /**
  * Queue a new request from block IO.
  * To process the request, use these methods:
@@ -134,6 +161,9 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 	int status;
 
 	pr_info("Queuing request\n");
+
+	// Incrementing the kref counter.
+	kref_get(&ram_blk_dev.refcount);
 
 	if (dev && dev->gd && dev->gd->disk_name)
 		pr_info("Disk name %s", dev->gd->disk_name);
@@ -156,6 +186,8 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 	blk_mq_end_request(rq, status);
 
 out:
+	// Decrementing the kref counter.
+	kref_put(&ram_blk_dev.refcount, release_block_device);
 	return BLK_STS_OK;
 }
 
@@ -243,7 +275,7 @@ inline int init_gendisk(struct ram_block_dev *dev)
 
 	// This block device is not rotations and it is synchronous.
 	blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->gd->queue);
-	blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, dev->gd->queue);
+	//blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, dev->gd->queue);
 
 	return 0;
 }
@@ -263,6 +295,8 @@ static int setup_block_dev(struct ram_block_dev *dev)
 	int status;
 
 	spin_lock_init(&dev->lock);
+	// Initializes the kref and set the counter to 1.
+	kref_init(&dev->refcount);
 
 	status = init_ramdisk(dev);
 	if (status < 0)
@@ -319,38 +353,16 @@ static int __init ram_block_init(void)
 	return 0;
 }
 
-static void release_block_device(struct ram_block_dev *dev)
-{
-	// Note: There could be race condition when the block device is released.
-
-	// Put refcount
-	// blk_mq_destroy_queue(dev->queue);
-
-	if (dev->gd) {
-		del_gendisk(dev->gd);
-		// put_disk(dev->gd);
-	}
-
-	pr_info("Unregistering block I/O device");
-	unregister_blkdev(RAM_BLKDEV_MAJOR, RAM_BLKDEV_NAME);
-
-	vfree(dev->ramdisk);
-
-	// pr_info("Freeing tag_set");
-	// blk_mq_free_tag_set(&dev->tag_set);
-
-	// [  452.329271] Call trace:
-	// [  452.329750]  __asan_load4+0x44/0xc0
-	// [  452.330452]  blk_mq_queue_tag_busy_iter+0x2d8/0x878
-	// [  452.331466]  blk_mq_timeout_work+0x144/0x2e8
-	// [  452.332427]  process_scheduled_works+0x330/0x508
-}
-
 static void __exit ram_block_exit(void)
 {
+	unsigned int countrefs;
+
 	pr_info("Exiting ram block driver");
 
-	release_block_device(&ram_blk_dev);
+	countrefs = kref_read(&ram_blk_dev.refcount);
+		pr_info("ram_blk_dev has [%d] references(s)!", countrefs);
+
+	kref_put(&ram_blk_dev.refcount, release_block_device);
 }
 
 module_init(ram_block_init);
