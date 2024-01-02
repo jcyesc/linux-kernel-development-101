@@ -465,7 +465,7 @@ Hello World658
 
 ## Remove the block device
 
-To remvoe the block device, run:
+To remove the block device, run:
 
 ```
 # rmmod ram_block_driver

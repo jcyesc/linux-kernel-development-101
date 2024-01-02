@@ -69,7 +69,7 @@ static int __init krefs_module_init(void)
 	thunder_cat_init(panthro, "Panthro", 30);
 	thunder_cat_print(panthro);
 
-	// Incrememting the kref counter.
+	// Incrementing the kref counter.
 	kref_get(&panthro->refcount);
 	task = kthread_run(thunder_cat_handler, panthro, "thunder_cat_handler");
 	if (task == ERR_PTR(-ENOMEM)) {
