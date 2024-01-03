@@ -4,6 +4,7 @@
 This page describes how to build the block driver,
 deploy it and test it.
 
+The block driver was tested in the Linux kernel version `6.6.2`.
 
 ## Build and deploy the block driver
 
