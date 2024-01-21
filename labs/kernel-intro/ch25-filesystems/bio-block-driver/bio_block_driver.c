@@ -39,6 +39,8 @@ static int send_bio_request(struct block_device *bdev, blk_opf_t opf)
 	struct page *page;
 	char *buf;
 	unsigned int offset = 0;
+	int vec_entry_len;
+	int ret = 0;
 
 	page = alloc_page(GFP_NOIO);
 	if (page == NULL) {
@@ -49,34 +51,47 @@ static int send_bio_request(struct block_device *bdev, blk_opf_t opf)
 
 	// Sector to read or write.
 	bio->bi_iter.bi_sector = 0;
-	int vec_entry_len = bio_add_page(bio, page, BLK_SECTOR_SIZE, offset);
+	vec_entry_len = bio_add_page(bio, page, BLK_SECTOR_SIZE, offset);
 	pr_info("vec_entry_len = %d", vec_entry_len);
 
-	switch (opf) {
-	case REQ_OP_READ:
-		// Print only 20 bytes.
-		for (int i = 0; i < 20; i++)
-			pr_info("%c ", buf[i]);
-		break;
-	case REQ_OP_WRITE:
-		// The write request will replace all the content of the page, even
+	if (opf == REQ_OP_WRITE) {
+		// Write to the buffer before the request is submitted.
+		//
+		// The write request will replace all the content of the sector, even
 		// if we write 10 chars. If we want to avoid this behavior, it is
-		// necessary to read the original content of the block device in the
+		// necessary to read the desire sector first in the
 		// page and then write the new content in the page and submit another
 		// bio request.
+		//
+		// for (int i = 0; i < 20; i++)
+		//	pr_info("Before Write: %c ", buf[i]);
 		memcpy(buf, CUSTOM_MESSAGE, strlen(CUSTOM_MESSAGE));
-		break;
 	}
 
-	pr_info("\nSubmitting bio request");
-	submit_bio_wait(bio);
+	pr_info("Submitting bio %s request", (opf == REQ_OP_READ ? "READ" : "WRITE"));
 
+	ret = submit_bio_wait(bio);
+	if (ret) {
+		pr_err("Failed submitting bio request %d", ret);
+		goto out_err;
+	}
+
+	if (opf == REQ_OP_READ) {
+		// Read the buffer after the request was submitted.
+		// Print only 20 bytes.
+		for (int i = 0; i < 20; i++)
+			pr_info("READ: %c ", buf[i]);
+	}
+
+out_err:
 	// Releasing resources.
+	pr_info("Releasing resources for bio %s request",
+		(opf == REQ_OP_READ ? "READ" : "WRITE"));
 	kunmap_local(buf);
 	bio_put(bio);
 	__free_page(page);
 
-	return 0;
+	return ret;
 }
 
 static int __init bio_block_init(void)
@@ -92,10 +107,12 @@ static int __init bio_block_init(void)
 			NULL /* const struct blk_holder_ops *hops */);
 
 	if (IS_ERR(ram_blk_dev)) {
-		pr_err("Failed to open block device %s\n", BLKDEV_NAME);
+		pr_err("Failed to open block device %s", BLKDEV_NAME);
 		return -EINVAL;
 	}
 
+	// If the write request comes before the read request, the previous
+	// content of the whole sector will be overridden.
 	ret = send_bio_request(ram_blk_dev, REQ_OP_WRITE);
 	if (ret)
 		return ret;
