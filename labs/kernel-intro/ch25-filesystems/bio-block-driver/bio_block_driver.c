@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Driver to send read/write request using a struct bio.
+ *
+ * This driver will send:
+ *
+ * - write bio request with 4 segments of 512 bytes.
+ * - read bio request with 1 segment of 2024 bytes.
  */
 #define pr_fmt(fmt)  "%s: %s: " fmt, KBUILD_MODNAME, __func__
 
@@ -22,73 +27,131 @@
 #define BLKDEV_NAME	"/dev/ramdiskblockdev"
 #define BLK_SECTOR_SIZE	512
 
-#define CUSTOM_MESSAGE	"Writing to the File System :)"
-
+#define MSG_SEG_1 "This is the first message :)"
+#define MSG_SEG_2 "Second segment"
+#define MSG_SEG_3 "The 3rd segment!"
+#define MSG_SEG_4 "This is the last segment or the fourth one :)"
 
 static struct block_device *ram_blk_dev;
 
 /*
- * @opf flags and operation.
+ * Creates a struct bio object that contains 4 segments to be written to
+ * the block device.
  */
-static int send_bio_request(struct block_device *bdev, blk_opf_t opf)
+int submit_write_request(struct block_device *bdev)
 {
-	struct bio *bio = bio_alloc(bdev,
-				    1 /* number of bvecs to pre-allocate */,
-				    opf /* operation and flags */,
-				    GFP_NOIO);
-	struct page *page;
+	int segments = 4;
+	struct page *pages;
 	char *buf;
 	unsigned int offset = 0;
 	int vec_entry_len;
-	int ret = 0;
+	int order = 2; /* 2 ^ 2 = 4 pages */
+	int ret;
+	struct bio *bio;
+	static const char * const msgs[] = {
+		MSG_SEG_1,
+		MSG_SEG_2,
+		MSG_SEG_3,
+		MSG_SEG_4,
+	};
 
-	page = alloc_page(GFP_NOIO);
-	if (page == NULL) {
-		pr_info("Failed to allocate a page");
+	pages = alloc_pages(GFP_NOIO, order);
+	if (pages == NULL) {
+		pr_info("Failed to allocate pages");
 		return -ENOMEM;
 	}
-	buf = kmap_local_page(page);
 
-	// Sector to read or write.
-	bio->bi_iter.bi_sector = 0;
-	vec_entry_len = bio_add_page(bio, page, BLK_SECTOR_SIZE, offset);
-	pr_info("vec_entry_len = %d", vec_entry_len);
-
-	if (opf == REQ_OP_WRITE) {
-		// Write to the buffer before the request is submitted.
-		//
-		// The write request will replace all the content of the sector, even
-		// if we write 10 chars. If we want to avoid this behavior, it is
-		// necessary to read the desire sector first in the
-		// page and then write the new content in the page and submit another
-		// bio request.
-		//
-		// for (int i = 0; i < 20; i++)
-		//	pr_info("Before Write: %c ", buf[i]);
-		memcpy(buf, CUSTOM_MESSAGE, strlen(CUSTOM_MESSAGE));
+	bio = bio_alloc(bdev,
+				segments /* number of bvecs to pre-allocate */,
+				REQ_OP_WRITE /* operation and flags */,
+				GFP_NOIO);
+	if (bio == NULL) {
+		pr_info("Failed to allocate bio");
+		ret = -ENOMEM;
+		goto out_pages;
 	}
 
-	pr_info("Submitting bio %s request", (opf == REQ_OP_READ ? "READ" : "WRITE"));
+	bio->bi_iter.bi_sector = 0;
+	for (int i = 0; i < segments; i++) {
+		vec_entry_len = bio_add_page(bio, pages + i, BLK_SECTOR_SIZE, offset);
+		buf = kmap_local_page(pages + i);
+		memcpy(buf, msgs[i], strlen(msgs[i]));
+		kunmap_local(buf);
+		pr_info("segment = %d, vec_entry_len = %d", i, vec_entry_len);
+	}
 
 	ret = submit_bio_wait(bio);
 	if (ret) {
 		pr_err("Failed submitting bio request %d", ret);
-		goto out_err;
+		goto out_bio;
 	}
 
-	if (opf == REQ_OP_READ) {
-		// Read the buffer after the request was submitted.
-		// Print only 20 bytes.
-		for (int i = 0; i < 20; i++)
-			pr_info("READ: %c ", buf[i]);
-	}
-
-out_err:
-	// Releasing resources.
-	pr_info("Releasing resources for bio %s request",
-		(opf == REQ_OP_READ ? "READ" : "WRITE"));
-	kunmap_local(buf);
+out_bio:
 	bio_put(bio);
+out_pages:
+	__free_pages(pages, order);
+
+	return ret;
+}
+
+/*
+ * Creates a struct bio object that request 4 sectors and creates only 1 segment.
+ */
+int submit_read_request(struct block_device *bdev)
+{
+	int segments = 1;
+	struct page *page;
+	char *buf;
+	unsigned int offset = 0;
+	int vec_entry_len;
+	int ret;
+	struct bio *bio;
+
+	page = alloc_page(GFP_NOIO);
+	if (page == NULL) {
+		pr_info("Failed to allocate page");
+		return -ENOMEM;
+	}
+
+	bio = bio_alloc(bdev,
+				segments /* number of bvecs to pre-allocate */,
+				REQ_OP_READ /* operation and flags */,
+				GFP_NOIO);
+	if (bio == NULL) {
+		pr_info("Failed to allocate bio");
+		ret = -ENOMEM;
+		goto out_page;
+	}
+
+	bio->bi_iter.bi_sector = 0;
+
+	// Request to read 4 sectors.
+	int nr_bytes = BLK_SECTOR_SIZE * 4;
+
+	vec_entry_len = bio_add_page(bio, page, nr_bytes, offset);
+	pr_info("segment = %d, vec_entry_len = %d", 1, vec_entry_len);
+
+	ret = submit_bio_wait(bio);
+	if (ret) {
+		pr_err("Failed submitting bio request %d", ret);
+		goto out_bio;
+	}
+
+	buf = kmap_local_page(page);
+	// Print the first 5 bytes of each message.
+	for (int i = 0; i < 4; i++) {
+		pr_info("%c %c %c %c %c",
+				buf[i * 512],
+				buf[1 + i * 512],
+				buf[2 + i * 512],
+				buf[3 + i * 512],
+				buf[4 + i * 512]);
+	}
+	kunmap_local(buf);
+
+out_bio:
+	bio_put(bio);
+out_page:
 	__free_page(page);
 
 	return ret;
@@ -113,11 +176,11 @@ static int __init bio_block_init(void)
 
 	// If the write request comes before the read request, the previous
 	// content of the whole sector will be overridden.
-	ret = send_bio_request(ram_blk_dev, REQ_OP_WRITE);
+	ret = submit_write_request(ram_blk_dev);
 	if (ret)
 		return ret;
 
-	ret = send_bio_request(ram_blk_dev, REQ_OP_READ);
+	ret = submit_read_request(ram_blk_dev);
 	if (ret)
 		return ret;
 
