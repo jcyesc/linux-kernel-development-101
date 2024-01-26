@@ -2,7 +2,7 @@
 /*
  * Ram Block Driver
  *
- * This driver stores the filesystem information in memory. It performs the
+ * This block device driver stores the data in memory. It performs the
  * following tasks:
  *
  *  - Register a block I/O device.
@@ -25,7 +25,7 @@
 #include <linux/types.h>
 #include <linux/vmalloc.h>
 
-#define NR_SECTORS				256
+#define NR_SECTORS				131072
 #define RAMDISK_SECTOR_SIZE		512
 
 #define RAM_BLKDEV_MAJOR		240
@@ -86,7 +86,7 @@ static int exec_request(struct request *rq)
 	rq_for_each_segment(bvec, rq, iter) {
 		sector_t sector = iter.iter.bi_sector;
 		unsigned long bv_offset = bvec.bv_offset;
-		unsigned long offset = (sector * RAMDISK_SECTOR_SIZE) + bv_offset;
+		unsigned long offset = (sector * RAMDISK_SECTOR_SIZE);
 		size_t len = bvec.bv_len;
 		char *buffer = kmap_local_page(bvec.bv_page);
 		int dir = bio_data_dir(iter.bio);
@@ -108,10 +108,10 @@ static int exec_request(struct request *rq)
 
 		switch (dir) {
 		case READ:
-			memcpy(buffer, ram_blk_dev.ramdisk + offset, len);
+			memcpy(buffer + bv_offset, ram_blk_dev.ramdisk + offset, len);
 			break;
 		case WRITE:
-			memcpy(ram_blk_dev.ramdisk + offset, buffer, len);
+			memcpy(ram_blk_dev.ramdisk + offset, buffer + bv_offset, len);
 			break;
 		};
 

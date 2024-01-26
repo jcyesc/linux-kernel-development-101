@@ -224,6 +224,62 @@ none
        0        0
 ```
 
+## Format the block device and mount a file system
+
+1. Format the block device with ext4
+
+```
+# mke2fs  /dev/ramdiskblockdev
+Filesystem label=
+OS type: Linux
+Block size=1024 (log=0)
+Fragment size=1024 (log=0)
+16384 inodes, 65536 blocks
+3276 blocks (5%) reserved for the super user
+First data block=1
+Maximum filesystem blocks=262144
+8 block groups
+8192 blocks per group, 8192 fragments per group
+2048 inodes per group
+Superblock backups stored on blocks:
+	8193, 24577, 40961, 57345
+
+# file -s /dev/ramdiskblockdev
+/dev/ramdiskblockdev: Linux rev 1.0 ext2 filesystem data, UUID=429564ef-6529-4021-985a-43ffc4ea8067
+```
+
+2. Mount the block device
+
+```
+# mount -t ext4 /dev/ramdiskblockdev /mnt/
+# mount
+/dev/root on / type ext4 (rw,relatime)
+devtmpfs on /dev type devtmpfs (rw,relatime,size=790360k,nr_inodes=197590,mode=755)
+proc on /proc type proc (rw,relatime)
+devpts on /dev/pts type devpts (rw,relatime,gid=5,mode=620,ptmxmode=666)
+tmpfs on /dev/shm type tmpfs (rw,relatime,mode=777)
+tmpfs on /tmp type tmpfs (rw,relatime)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
+sysfs on /sys type sysfs (rw,relatime)
+/dev/ramdiskblockdev on /mnt type ext4 (rw,relatime)
+
+# cd /mnt/
+# echo "hello file system" > data.txt
+# ls
+data.txt    lost+found
+```
+
+3. Unmount and mount the block device to verify that the data is still there
+
+```
+# cd /
+# umount /mnt
+
+# mount -t ext4 /dev/ramdiskblockdev /mnt/
+# cat /mnt/data.txt
+hello file system
+```
+
 ## Send a write and read requests to the block device
 
 To send a write request to the device, we redirect the output of `echo` to
