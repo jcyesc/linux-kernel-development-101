@@ -212,6 +212,8 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
      -hda <path to rootfs>/output/images/rootfs.ext2 \
      -kernel <path to kernel>/linux-stable/arch/arm64/boot/Image \
      -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
+     -object rng-random,filename=/dev/urandom,id=rng0 \
+     -device virtio-rng-pci,rng=rng0 \
      -device virtio-net-pci,netdev=eth0 \
      -netdev user,id=eth0,hostfwd=tcp::8022-:22
 
@@ -293,8 +295,10 @@ host $ sudo qemu-system-aarch64
 
         ...
 
-       -device virtio-net-pci,netdev=eth0 \
-       -netdev user,id=eth0,hostfwd=tcp::8022-:22
+     -object rng-random,filename=/dev/urandom,id=rng0 \
+     -device virtio-rng-pci,rng=rng0 \
+     -device virtio-net-pci,netdev=eth0 \
+     -netdev user,id=eth0,hostfwd=tcp::8022-:22
 ```
 
 Generate a public ssh key in the host:
@@ -383,6 +387,8 @@ Start qemu with the new rootfs:
        -nographic -smp 1   -hda <path rootfs>/newrootfs.ext4 \
        -kernel <path kernel>/linux-stable/arch/arm64/boot/Image \
        -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
+       -object rng-random,filename=/dev/urandom,id=rng0 \
+       -device virtio-rng-pci,rng=rng0 \
        -device virtio-net-pci,netdev=eth0 \
        -netdev user,id=eth0,hostfwd=tcp::8022-:22
 ```
