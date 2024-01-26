@@ -157,16 +157,12 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 									const struct blk_mq_queue_data *bd)
 {
 	struct request *rq = bd->rq;
-	struct ram_block_dev *dev = hctx->queue->queuedata;
 	int status;
 
 	pr_info("Queuing request\n");
 
 	// Incrementing the kref counter.
 	kref_get(&ram_blk_dev.refcount);
-
-	if (dev && dev->gd && dev->gd->disk_name)
-		pr_info("Disk name %s", dev->gd->disk_name);
 
 	if (bd->last)
 		pr_info("This is the 'last' request in the queue");
@@ -246,8 +242,8 @@ inline int init_request_queue(struct ram_block_dev *dev)
 	blk_queue_physical_block_size(dev->queue, RAMDISK_SECTOR_SIZE);
 	blk_queue_logical_block_size(dev->queue, RAMDISK_SECTOR_SIZE);
 
-	// Assign private data to queue structure.
-	dev->queue->queuedata = dev;
+	// https://elixir.bootlin.com/linux/v6.6.2/source/block/blk-settings.c#L284
+	blk_queue_max_segment_size(dev->queue, 512);
 
 	return 0;
 }
@@ -264,7 +260,7 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	dev->gd->major = RAM_BLKDEV_MAJOR;
 	dev->gd->first_minor = 0;
 	dev->gd->minors = 1;
-	// dev->gd->flags |= GENHD_FL_NO_PART;
+	dev->gd->flags |= GENHD_FL_NO_PART;
 	dev->gd->fops = &ram_block_ops;
 	dev->gd->queue = dev->queue;
 	dev->gd->private_data = dev;
