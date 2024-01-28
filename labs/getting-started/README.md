@@ -398,9 +398,11 @@ Once that is compiled, we can include it in the rootfs.
 Start qemu with the new rootfs:
 
 ```shell
+ $ hda=<path to rootfs/newrootfs.ext4>
+ $ kernel=<path kernel/linux-stable/arch/arm64/boot/Image>
  $ sudo qemu-system-aarch64 -m 2048 -cpu cortex-a72 -machine virt \
-       -nographic -smp 1   -hda <path rootfs>/newrootfs.ext4 \
-       -kernel <path kernel>/linux-stable/arch/arm64/boot/Image \
+       -nographic -smp 1  -hda $hda \
+       -kernel $kernel  \
        -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
        -object rng-random,filename=/dev/urandom,id=rng0 \
        -device virtio-rng-pci,rng=rng0 \
