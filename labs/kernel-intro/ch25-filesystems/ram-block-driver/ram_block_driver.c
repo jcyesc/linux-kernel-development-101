@@ -14,12 +14,6 @@
  */
 #define pr_fmt(fmt)  "%s: %s: " fmt, KBUILD_MODNAME, __func__
 
-/*
- * Set to 1 the kernel version that is used.
- */
-#define KERNEL_VERSION_6_6_2 0
-#define KERNEL_VERSION_5_15_139 1
-
 #include <linux/blkdev.h>
 #include <linux/blk-mq.h>
 #include <linux/err.h>

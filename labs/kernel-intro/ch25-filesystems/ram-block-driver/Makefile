@@ -1,6 +1,14 @@
 
 obj-m += ram_block_driver.o
 
+# Defines the kernel version that the module will be compiled for.
+#
+# make KERNEL_DIR=$PATH_LINUX/linux-stable KERNEL_VERSION_6_6_2=1
+KERNEL_VERSION_6_6_2 ?= 0
+KERNEL_VERSION_5_15_139 ?= 0
+
+ccflags-y := -DKERNEL_VERSION_6_6_2=$(KERNEL_VERSION_6_6_2)
+ccflags-y += -DKERNEL_VERSION_5_15_139=$(KERNEL_VERSION_5_15_139)
 
 # Assumes that the Linux Kernel source code is in:
 KERNEL_DIR ?= $(HOME)/Development/linux-kernel-development-101/linux
