@@ -9,8 +9,16 @@
  *  - Create and initialize a gendisk.
  *  - Process struct request_queue.
  *  - Allocates memory to store the data using vmalloc.
+ *
+ * This driver works in 5.15.139 and 6.6.2 kernels.
  */
 #define pr_fmt(fmt)  "%s: %s: " fmt, KBUILD_MODNAME, __func__
+
+/*
+ * Set to 1 the kernel version that is used.
+ */
+#define KERNEL_VERSION_6_6_2 0
+#define KERNEL_VERSION_5_15_139 1
 
 #include <linux/blkdev.h>
 #include <linux/blk-mq.h>
@@ -21,7 +29,11 @@
 #include <linux/module.h>
 #include <linux/numa.h>
 #include <linux/spinlock.h>
+
+#if KERNEL_VERSION_6_6_2
 #include <linux/sprintf.h>
+#endif
+
 #include <linux/types.h>
 #include <linux/vmalloc.h>
 
@@ -135,7 +147,11 @@ static void release_block_device(struct kref *ref)
 	del_gendisk(dev->gd);
 
 	pr_info("Destroying queue");
+#if KERNEL_VERSION_6_6_2
 	blk_mq_destroy_queue(dev->queue);
+#elif KERNEL_VERSION_5_15_139
+	blk_cleanup_queue(dev->queue);
+#endif
 
 	pr_info("Freeing tag_set");
 	blk_mq_free_tag_set(&dev->tag_set);
@@ -194,6 +210,8 @@ static const struct blk_mq_ops ram_mq_queue_ops = {
 	.queue_rq = blk_mq_ops_ram_queue_rq,
 };
 
+
+#if KERNEL_VERSION_6_6_2
 /**
  * When the file system is mounted, this method is called.
  */
@@ -211,6 +229,20 @@ static void ram_block_release(struct gendisk *disk)
 {
 	pr_info("Release disk %s\n", disk->disk_name);
 }
+
+#elif KERNEL_VERSION_5_15_139
+
+static int ram_block_open(struct block_device *blk, fmode_t mode)
+{
+	pr_info("Open block device\n");
+	return 0;
+}
+
+static void ram_block_release(struct gendisk *disk, fmode_t mode)
+{
+	pr_info("Release disk %s\n", disk->disk_name);
+}
+#endif
 
 static const struct block_device_operations ram_block_ops = {
 	.owner = THIS_MODULE,
