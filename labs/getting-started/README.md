@@ -104,6 +104,8 @@ d8bcff69fc {linux, linux-headers}: bump 5.15.x / 6.{1, 5}.x series
 
 After we got the src, we can configure `buildroot` with the options below:
 
+> The file `buildroot_config` in this directory contains a default configuration.
+
 ```shell
 
  # Select the options in the buildroot menu
@@ -111,11 +113,12 @@ After we got the src, we can configure `buildroot` with the options below:
 
     Target options
          Target Architecture (AArch64 (little endian))
-         Target Architecture Variant (cortex-A72)
+         Target Architecture Variant (cortex-A76)
+         MMU Page Size (4KB)  --->
 
     Toolchain type (External toolchain)
          *** Toolchain External Options ***
-         Toolchain (Linaro AArch64 2018.05)
+         Toolchain (Arm AArch64 13.2.rel1)
          Toolchain origin (Toolchain to be downloaded and installed)
 
     System Configuration
@@ -132,9 +135,19 @@ After we got the src, we can configure `buildroot` with the options below:
              [*] sed
              [*] tree
 
+         Filesystem and flash utilities
+             -*- e2fsprogs  --->
+             [*] e2tools
+             [*] erofs-utils
+             [*]   lz4 support
+             [*]   erofsfuse support
+             [*] f2fs-tools
+             [*] genext2fs
+
          Networking applications
              [*] dhcpcd
              [*] iproute2
+             [*] iptables
              [*] openssh
 
          Shell and Utilities
@@ -145,9 +158,11 @@ After we got the src, we can configure `buildroot` with the options below:
              [*] vim
 
     Filesystem images
+         [*] erofs root filesystem
          [*] ext2/3/4 root filesystem
              ext2/3/4 variant (ext4)
          [*] tar the root filesystem
+         (600M) exact size
 
  # Build build root.
  $ make
