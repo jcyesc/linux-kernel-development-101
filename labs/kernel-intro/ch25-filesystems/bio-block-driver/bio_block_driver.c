@@ -6,6 +6,8 @@
  *
  * - write bio request with 4 segments of 512 bytes.
  * - read bio request with 1 segment of 2024 bytes.
+ *
+ * This driver works in 5.15.139 and 6.6.2 kernels.
  */
 #define pr_fmt(fmt)  "%s: %s: " fmt, KBUILD_MODNAME, __func__
 
