@@ -49,10 +49,20 @@ qemu $ insmod ram_block_driver.ko
 [   82.095423] ram_block_driver: ram_block_init: Make sure to create the node:
 ```
 
-## Verify that the block device and ramdisk are created
+## Verify that the block device, partition and ramdisk are created
 
-To verify that the block device and ramdisk were created,
-run:
+To verify that the partition was created, run:
+
+```
+ $ cat /proc/partitions
+major minor  #blocks  name
+
+ 254        0     614400 vda
+  31        0     131072 mtdblock0
+ 240        0      65536 genramdisk
+```
+
+To verify that the block device and ramdisk were created, run:
 
 ```
  $ cat /proc/devices | grep ramdiskblockdev
