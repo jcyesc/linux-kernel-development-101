@@ -7,8 +7,14 @@
  *  - Register the file system.
  *  - Fill the super block.
  *  - Define the superblock operations.
+ *  - Define inode operations for regular files and directories.
+ *  - Define file operations for regular files and directories.
  *
- * This driver works in 5.15.139 and 6.6.14 kernels.
+ * This driver works in 5.15.139 and 6.6.y kernels.
+ *
+ * For another example, see:
+ *
+ * https://elixir.bootlin.com/linux/v6.6.16/source/fs/ramfs/inode.c
  */
 #define pr_fmt(fmt) "%s: %s: " fmt, KBUILD_MODNAME, __func__
 
@@ -21,6 +27,7 @@
 #if KERNEL_VERSION_6_6_2
 #include <linux/pagemap.h>
 #include <linux/mnt_idmapping.h>
+#include <linux/types.h>
 #elif KERNEL_VERSION_5_15_139
 #include <linux/user_namespace.h>
 #endif
@@ -42,7 +49,8 @@ static int basic_fs_mknod(struct mnt_idmap *idmap, struct inode *dir,
 		struct dentry *dentry, umode_t mode, dev_t dev);
 static int basic_fs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
 		struct dentry *dentry, umode_t mode);
-
+static int basic_fs_symlink(struct mnt_idmap *idmap, struct inode *dir,
+		struct dentry *dentry, const char *symname);
 #elif KERNEL_VERSION_5_15_139
 
 static int basic_fs_create(struct user_namespace *user_ns, struct inode *dir,
@@ -51,8 +59,9 @@ static int basic_fs_mknod(struct user_namespace *user_ns, struct inode *dir,
 		struct dentry *dentry, umode_t mode, dev_t dev);
 static int basic_fs_mkdir(struct user_namespace *user_ns, struct inode *dir,
 		struct dentry *dentry, umode_t mode);
+static int basic_fs_symlink(struct user_namespace *user_ns, struct inode *dir,
+		struct dentry *dentry, const char *symname);
 #endif
-
 
 static const struct inode_operations basic_fs_dir_inode_operations = {
 	.create = basic_fs_create,
@@ -63,6 +72,7 @@ static const struct inode_operations basic_fs_dir_inode_operations = {
 	.lookup = simple_lookup,
 	.link = simple_link,
 	.unlink = simple_unlink,
+	.symlink = basic_fs_symlink,
 };
 
 static const struct file_operations *basic_fs_dir_file_operations =
@@ -72,6 +82,10 @@ static const struct inode_operations basic_fs_file_inode_operations = {
 	.setattr = simple_setattr,
 	.getattr = simple_getattr,
 };
+
+static const struct inode_operations *basic_fs_link_inode_operations =
+	&page_symlink_inode_operations;
+
 
 #if KERNEL_VERSION_6_6_2
 
@@ -135,6 +149,10 @@ struct inode *basic_fs_create_inode(struct super_block *sb,
 		pr_info("set inode and file operations for regular file");
 		inode->i_op = &basic_fs_file_inode_operations;
 		inode->i_fop = &basic_fs_file_operations;
+	} else if (S_ISLNK(mode)) {
+		pr_info("set inode and file operations for link file");
+		inode->i_op = basic_fs_link_inode_operations;
+		inode_nohighmem(inode);
 	} else {
 		pr_err("Type of file not supported");
 	}
@@ -149,7 +167,6 @@ struct inode *basic_fs_create_inode(struct super_block *sb,
 static int basic_fs_create(struct mnt_idmap *idmap, struct inode *dir_inode,
 		struct dentry *dentry, umode_t mode, bool excl)
 {
-	pr_info("Creating node");
 	return basic_fs_mknod(idmap, dir_inode, dentry, mode | S_IFREG, 0);
 }
 
@@ -158,12 +175,9 @@ static int basic_fs_mkdir(struct mnt_idmap *idmap, struct inode *dir_inode,
 {
 	int ret;
 
-	pr_info("Making dir");
 	ret = basic_fs_mknod(idmap, dir_inode, dentry, mode | S_IFDIR, 0);
 	if (ret != 0)
 		return ret;
-
-	// inc_nlink(dir_inode);
 
 	return 0;
 }
@@ -174,7 +188,6 @@ static int basic_fs_mknod(struct mnt_idmap *idmap, struct inode *dir_inode,
 	struct inode *inode = basic_fs_create_inode(dir_inode->i_sb, dir_inode, mode);
 	struct timespec64 curr_time;
 
-	pr_info("Making node");
 	if (inode == NULL)
 		return -ENOSPC;
 
@@ -187,12 +200,36 @@ static int basic_fs_mknod(struct mnt_idmap *idmap, struct inode *dir_inode,
 	return 0;
 }
 
+static int basic_fs_symlink(struct mnt_idmap *idmap, struct inode *dir_inode,
+		 struct dentry *dentry, const char *symname)
+{
+	struct inode *inode;
+	int error = -ENOSPC;
+	struct timespec64 curr_time;
+	int len;
+
+	pr_info("Creating symlink %s", symname);
+	inode = basic_fs_create_inode(dir_inode->i_sb, dir_inode, S_IFLNK|S_IRWXUGO);
+	if (inode) {
+		len = strlen(symname) + 1;
+		error = page_symlink(inode, symname, len);
+		if (!error) {
+			d_instantiate(dentry, inode);
+			dget(dentry);
+			curr_time = current_time(inode);
+			dir_inode->i_mtime = curr_time;
+			inode_set_ctime_to_ts(dir_inode, curr_time);
+		} else
+			iput(inode);
+	}
+	return error;
+}
+
 #elif KERNEL_VERSION_5_15_139
 
 static int basic_fs_create(struct user_namespace *user_ns, struct inode *dir_inode,
 		struct dentry *dentry, umode_t mode, bool excl)
 {
-	pr_info("Creating node");
 	return basic_fs_mknod(user_ns, dir_inode, dentry, mode | S_IFREG, 0);
 }
 
@@ -201,7 +238,6 @@ static int basic_fs_mkdir(struct user_namespace *user_ns, struct inode *dir_inod
 {
 	int ret;
 
-	pr_info("Making dir");
 	ret = basic_fs_mknod(user_ns, dir_inode, dentry, mode | S_IFDIR, 0);
 	if (ret != 0)
 		return ret;
@@ -217,8 +253,6 @@ static int basic_fs_mknod(struct user_namespace *user_ns, struct inode *dir_inod
 	struct inode *inode = basic_fs_create_inode(dir_inode->i_sb, dir_inode, mode);
 	struct timespec64 curr_time;
 
-	pr_info("Making node")
-;
 	if (inode == NULL)
 		return -ENOSPC;
 
@@ -229,6 +263,28 @@ static int basic_fs_mknod(struct user_namespace *user_ns, struct inode *dir_inod
 	dir_inode->i_ctime = curr_time;
 
 	return 0;
+}
+
+static int basic_fs_symlink(struct user_namespace *user_ns, struct inode *dir_inode,
+			 struct dentry *dentry, const char *symname)
+{
+	struct inode *inode;
+	int error = -ENOSPC;
+	int len;
+
+	pr_info("Creating symlink %s", symname);
+	inode = basic_fs_create_inode(dir_inode->i_sb, dir_inode, S_IFLNK|S_IRWXUGO);
+	if (inode) {
+		len = strlen(symname) + 1;
+		error = page_symlink(inode, symname, len);
+		if (!error) {
+			d_instantiate(dentry, inode);
+			dget(dentry);
+			dir_inode->i_mtime = dir_inode->i_ctime = current_time(dir_inode);
+		} else
+			iput(inode);
+	}
+	return error;
 }
 
 #endif

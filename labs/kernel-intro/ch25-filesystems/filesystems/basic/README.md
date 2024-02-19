@@ -45,27 +45,33 @@ $ ls -i /mnt/
     703 basic
 $ ls -i /mnt/basic/
     706 private           704 regfile.txt       705 regfile2.txt
+# ln -s /mnt/basic/regfile.txt /mnt/basic/regfile-link.txt
+# ls -li /mnt/basic/
+total 8
+    710 drwxr-xr-x    2 root     root             0 Feb 19 06:51 private
+    715 lrwxrwxrwx    1 root     root            22 Feb 19 06:52 regfile-link.txt -> /mnt/basic/regfile.txt
+    708 -rw-r--r--    1 root     root            16 Feb 19 06:50 regfile.txt
+    709 -rw-r--r--    1 root     root            18 Feb 19 06:50 regfile2.txt
+# cat /mnt/basic/regfile-link.txt
+Creating a file
 ```
 
 The output of `dmesg` is:
 
 ```
-[   35.985137] basic_fs: loading out-of-tree module taints kernel.
-[   35.994636] basic_fs: basic_fs_init: Init the basic filesystem module
-[   71.052061] basic_fs: basic_fs_mount: mounting file system
-[   71.052536] basic_fs: basic_fs_fill_super: Filling super block
-[   71.052923] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
-[   71.055252] basic_fs: basic_fs_create_inode: inode->i_ino = 703, inode->i_nlink = 2
-[   71.055889] basic_fs: basic_fs_fill_super: root_inode->i_nlink = 2
-[   80.395678] basic_fs: basic_fs_create: Creating node
-[   80.396257] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
-[   80.396644] basic_fs: basic_fs_create_inode: inode->i_ino = 704, inode->i_nlink = 1
-[   80.398876] basic_fs: basic_fs_mknod: Making node
-[   88.210933] basic_fs: basic_fs_create: Creating node
-[   88.211326] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
-[   88.211585] basic_fs: basic_fs_create_inode: inode->i_ino = 705, inode->i_nlink = 1
-[   88.212110] basic_fs: basic_fs_mknod: Making node
-[  108.684869] basic_fs: basic_fs_mkdir: Making dir
-[  108.685202] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
-[  108.686794] basic_fs: basic_fs_create_inode: inode->i_ino = 706, inode->i_nlink = 2
+[ 2611.055337] basic_fs: loading out-of-tree module taints kernel.
+[ 2611.061991] basic_fs: basic_fs_init: Init the basic filesystem module
+[ 2659.448264] basic_fs: basic_fs_mount: mounting file system
+[ 2659.449103] basic_fs: basic_fs_fill_super: Filling super block
+[ 2659.449480] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
+[ 2659.449727] basic_fs: basic_fs_create_inode: inode->i_ino = 641, inode->i_nlink = 2
+[ 2659.449911] basic_fs: basic_fs_fill_super: root_inode->i_nlink = 2
+[ 2675.288911] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
+[ 2675.289199] basic_fs: basic_fs_create_inode: inode->i_ino = 642, inode->i_nlink = 1
+[ 2682.611551] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
+[ 2682.611962] basic_fs: basic_fs_create_inode: inode->i_ino = 643, inode->i_nlink = 1
+[ 2696.553278] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
+[ 2696.553773] basic_fs: basic_fs_create_inode: inode->i_ino = 644, inode->i_nlink = 2
+[ 2726.974286] basic_fs: basic_fs_symlink: Creating symlink /mnt/basic/regfile.txt
+[ 2726.974812] basic_fs: basic_fs_create_inode: set inode and file operations for link file
 ```
