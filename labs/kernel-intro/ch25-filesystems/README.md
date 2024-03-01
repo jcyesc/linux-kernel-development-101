@@ -10,6 +10,7 @@ driver uses hardware queues to send the request to the block device.
 
 The main data structures used in the block layer are:
 
+- [struct address_space](https://elixir.bootlin.com/linux/v6.6.15/source/include/linux/fs.h#L470)
 - [struct block_device_operations](https://elixir.bootlin.com/linux/v6.6.2/source/include/linux/blkdev.h#L1375)
 - [struct blk_mq_tag_set](https://elixir.bootlin.com/linux/v6.6.2/source/include/linux/blk-mq.h#L498)
 - [struct request_queue](https://elixir.bootlin.com/linux/v6.6.2/source/include/linux/blkdev.h#L378)
@@ -208,3 +209,8 @@ struct req_iterator {
 	struct bio *bio;
 };
 ```
+
+## struct address_space
+
+It is used to translate file offsets to block offsets.
+
