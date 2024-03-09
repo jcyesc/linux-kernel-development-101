@@ -1,0 +1,723 @@
+/dts-v1/;
+
+/ {
+	model = "V2P-CA9";
+	arm,hbi = <0x191>;
+	arm,vexpress,site = <0x0f>;
+	compatible = "arm,vexpress,v2p-ca9\0arm,vexpress";
+	interrupt-parent = <0x01>;
+	#address-cells = <0x01>;
+	#size-cells = <0x01>;
+
+	bus@40000000 {
+		compatible = "simple-bus";
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges = <0x40000000 0x40000000 0x10000000 0x10000000 0x10000000 0x20000>;
+		#interrupt-cells = <0x01>;
+		interrupt-map-mask = <0x00 0x3f>;
+		interrupt-map = <0x00 0x00 0x01 0x00 0x00 0x04 0x00 0x01 0x01 0x00 0x01 0x04 0x00 0x02 0x01 0x00 0x02 0x04 0x00 0x03 0x01 0x00 0x03 0x04 0x00 0x04 0x01 0x00 0x04 0x04 0x00 0x05 0x01 0x00 0x05 0x04 0x00 0x06 0x01 0x00 0x06 0x04 0x00 0x07 0x01 0x00 0x07 0x04 0x00 0x08 0x01 0x00 0x08 0x04 0x00 0x09 0x01 0x00 0x09 0x04 0x00 0x0a 0x01 0x00 0x0a 0x04 0x00 0x0b 0x01 0x00 0x0b 0x04 0x00 0x0c 0x01 0x00 0x0c 0x04 0x00 0x0d 0x01 0x00 0x0d 0x04 0x00 0x0e 0x01 0x00 0x0e 0x04 0x00 0x0f 0x01 0x00 0x0f 0x04 0x00 0x10 0x01 0x00 0x10 0x04 0x00 0x11 0x01 0x00 0x11 0x04 0x00 0x12 0x01 0x00 0x12 0x04 0x00 0x13 0x01 0x00 0x13 0x04 0x00 0x14 0x01 0x00 0x14 0x04 0x00 0x15 0x01 0x00 0x15 0x04 0x00 0x16 0x01 0x00 0x16 0x04 0x00 0x17 0x01 0x00 0x17 0x04 0x00 0x18 0x01 0x00 0x18 0x04 0x00 0x19 0x01 0x00 0x19 0x04 0x00 0x1a 0x01 0x00 0x1a 0x04 0x00 0x1b 0x01 0x00 0x1b 0x04 0x00 0x1c 0x01 0x00 0x1c 0x04 0x00 0x1d 0x01 0x00 0x1d 0x04 0x00 0x1e 0x01 0x00 0x1e 0x04 0x00 0x1f 0x01 0x00 0x1f 0x04 0x00 0x20 0x01 0x00 0x20 0x04 0x00 0x21 0x01 0x00 0x21 0x04 0x00 0x22 0x01 0x00 0x22 0x04 0x00 0x23 0x01 0x00 0x23 0x04 0x00 0x24 0x01 0x00 0x24 0x04 0x00 0x25 0x01 0x00 0x25 0x04 0x00 0x26 0x01 0x00 0x26 0x04 0x00 0x27 0x01 0x00 0x27 0x04 0x00 0x28 0x01 0x00 0x28 0x04 0x00 0x29 0x01 0x00 0x29 0x04 0x00 0x2a 0x01 0x00 0x2a 0x04>;
+
+		motherboard-bus@40000000 {
+			arm,hbi = <0x190>;
+			arm,vexpress,site = <0x00>;
+			compatible = "arm,vexpress,v2m-p1\0simple-bus";
+			#address-cells = <0x02>;
+			#size-cells = <0x01>;
+			ranges = <0x00 0x00 0x40000000 0x4000000 0x01 0x00 0x44000000 0x4000000 0x02 0x00 0x48000000 0x4000000 0x03 0x00 0x4c000000 0x4000000 0x07 0x00 0x10000000 0x20000>;
+
+			flash@0,00000000 {
+				compatible = "arm,vexpress-flash\0cfi-flash";
+				reg = <0x00 0x00 0x4000000 0x01 0x00 0x4000000>;
+				bank-width = <0x04>;
+
+				partitions {
+					compatible = "arm,arm-firmware-suite";
+				};
+			};
+
+			psram@2,00000000 {
+				compatible = "arm,vexpress-psram\0mtd-ram";
+				reg = <0x02 0x00 0x2000000>;
+				bank-width = <0x04>;
+			};
+
+			ethernet@3,02000000 {
+				compatible = "smsc,lan9118\0smsc,lan9115";
+				reg = <0x03 0x2000000 0x10000>;
+				interrupts = <0x0f>;
+				phy-mode = "mii";
+				reg-io-width = <0x04>;
+				smsc,irq-active-high;
+				smsc,irq-push-pull;
+				vdd33a-supply = <0x02>;
+				vddvario-supply = <0x02>;
+			};
+
+			usb@3,03000000 {
+				compatible = "nxp,usb-isp1761";
+				reg = <0x03 0x3000000 0x20000>;
+				interrupts = <0x10>;
+				dr_mode = "peripheral";
+			};
+
+			iofpga@7,00000000 {
+				compatible = "simple-bus";
+				#address-cells = <0x01>;
+				#size-cells = <0x01>;
+				ranges = <0x00 0x07 0x00 0x20000>;
+
+				sysreg@0 {
+					compatible = "arm,vexpress-sysreg";
+					reg = <0x00 0x1000>;
+					#address-cells = <0x01>;
+					#size-cells = <0x01>;
+					ranges = <0x00 0x00 0x1000>;
+					phandle = <0x10>;
+
+					gpio@8 {
+						compatible = "arm,vexpress-sysreg,sys_led";
+						reg = <0x08 0x04>;
+						gpio-controller;
+						#gpio-cells = <0x02>;
+						phandle = <0x0f>;
+					};
+
+					gpio@48 {
+						compatible = "arm,vexpress-sysreg,sys_mci";
+						reg = <0x48 0x04>;
+						gpio-controller;
+						#gpio-cells = <0x02>;
+						phandle = <0x07>;
+					};
+
+					gpio@4c {
+						compatible = "arm,vexpress-sysreg,sys_flash";
+						reg = <0x4c 0x04>;
+						gpio-controller;
+						#gpio-cells = <0x02>;
+					};
+				};
+
+				sysctl@1000 {
+					compatible = "arm,sp810\0arm,primecell";
+					reg = <0x1000 0x1000>;
+					clocks = <0x03 0x04 0x05>;
+					clock-names = "refclk\0timclk\0apb_pclk";
+					#clock-cells = <0x01>;
+					clock-output-names = "timerclken0\0timerclken1\0timerclken2\0timerclken3";
+					assigned-clocks = <0x06 0x00 0x06 0x01 0x06 0x03 0x06 0x03>;
+					assigned-clock-parents = <0x04 0x04 0x04 0x04>;
+					phandle = <0x06>;
+				};
+
+				i2c@2000 {
+					compatible = "arm,versatile-i2c";
+					reg = <0x2000 0x1000>;
+					#address-cells = <0x01>;
+					#size-cells = <0x00>;
+
+					pcie-switch@60 {
+						compatible = "idt,89hpes32h8";
+						reg = <0x60>;
+					};
+				};
+
+				aaci@4000 {
+					compatible = "arm,pl041\0arm,primecell";
+					reg = <0x4000 0x1000>;
+					interrupts = <0x0b>;
+					clocks = <0x05>;
+					clock-names = "apb_pclk";
+				};
+
+				mmci@5000 {
+					compatible = "arm,pl180\0arm,primecell";
+					reg = <0x5000 0x1000>;
+					interrupts = <0x09 0x0a>;
+					cd-gpios = <0x07 0x00 0x00>;
+					wp-gpios = <0x07 0x01 0x00>;
+					max-frequency = <0xb71b00>;
+					vmmc-supply = <0x02>;
+					clocks = <0x08 0x05>;
+					clock-names = "mclk\0apb_pclk";
+				};
+
+				kmi@6000 {
+					compatible = "arm,pl050\0arm,primecell";
+					reg = <0x6000 0x1000>;
+					interrupts = <0x0c>;
+					clocks = <0x08 0x05>;
+					clock-names = "KMIREFCLK\0apb_pclk";
+				};
+
+				kmi@7000 {
+					compatible = "arm,pl050\0arm,primecell";
+					reg = <0x7000 0x1000>;
+					interrupts = <0x0d>;
+					clocks = <0x08 0x05>;
+					clock-names = "KMIREFCLK\0apb_pclk";
+				};
+
+				serial@9000 {
+					compatible = "arm,pl011\0arm,primecell";
+					reg = <0x9000 0x1000>;
+					interrupts = <0x05>;
+					clocks = <0x09 0x05>;
+					clock-names = "uartclk\0apb_pclk";
+				};
+
+				serial@a000 {
+					compatible = "arm,pl011\0arm,primecell";
+					reg = <0xa000 0x1000>;
+					interrupts = <0x06>;
+					clocks = <0x09 0x05>;
+					clock-names = "uartclk\0apb_pclk";
+				};
+
+				serial@b000 {
+					compatible = "arm,pl011\0arm,primecell";
+					reg = <0xb000 0x1000>;
+					interrupts = <0x07>;
+					clocks = <0x09 0x05>;
+					clock-names = "uartclk\0apb_pclk";
+				};
+
+				serial@c000 {
+					compatible = "arm,pl011\0arm,primecell";
+					reg = <0xc000 0x1000>;
+					interrupts = <0x08>;
+					clocks = <0x09 0x05>;
+					clock-names = "uartclk\0apb_pclk";
+				};
+
+				wdt@f000 {
+					compatible = "arm,sp805\0arm,primecell";
+					reg = <0xf000 0x1000>;
+					interrupts = <0x00>;
+					clocks = <0x03 0x05>;
+					clock-names = "wdog_clk\0apb_pclk";
+				};
+
+				timer@11000 {
+					compatible = "arm,sp804\0arm,primecell";
+					reg = <0x11000 0x1000>;
+					interrupts = <0x02>;
+					clocks = <0x06 0x00 0x06 0x01 0x05>;
+					clock-names = "timclken1\0timclken2\0apb_pclk";
+				};
+
+				timer@12000 {
+					compatible = "arm,sp804\0arm,primecell";
+					reg = <0x12000 0x1000>;
+					interrupts = <0x03>;
+					clocks = <0x06 0x02 0x06 0x03 0x05>;
+					clock-names = "timclken1\0timclken2\0apb_pclk";
+				};
+
+				i2c@16000 {
+					compatible = "arm,versatile-i2c";
+					reg = <0x16000 0x1000>;
+					#address-cells = <0x01>;
+					#size-cells = <0x00>;
+
+					dvi-transmitter@39 {
+						compatible = "sil,sii9022-tpi\0sil,sii9022";
+						reg = <0x39>;
+
+						ports {
+							#address-cells = <0x01>;
+							#size-cells = <0x00>;
+
+							port@0 {
+								reg = <0x00>;
+
+								endpoint {
+									remote-endpoint = <0x0a>;
+									phandle = <0x13>;
+								};
+							};
+
+							port@1 {
+								reg = <0x01>;
+
+								endpoint {
+									remote-endpoint = <0x0b>;
+									phandle = <0x0e>;
+								};
+							};
+						};
+					};
+
+					dvi-transmitter@60 {
+						compatible = "sil,sii9022-cpi\0sil,sii9022";
+						reg = <0x60>;
+					};
+				};
+
+				rtc@17000 {
+					compatible = "arm,pl031\0arm,primecell";
+					reg = <0x17000 0x1000>;
+					interrupts = <0x04>;
+					clocks = <0x05>;
+					clock-names = "apb_pclk";
+				};
+
+				compact-flash@1a000 {
+					compatible = "arm,vexpress-cf\0ata-generic";
+					reg = <0x1a000 0x100 0x1a100 0xf00>;
+					reg-shift = <0x02>;
+				};
+
+				clcd@1f000 {
+					compatible = "arm,pl111\0arm,primecell";
+					reg = <0x1f000 0x1000>;
+					interrupt-names = "combined";
+					interrupts = <0x0e>;
+					clocks = <0x0c 0x05>;
+					clock-names = "clcdclk\0apb_pclk";
+					max-memory-bandwidth = <0x337f980>;
+					memory-region = <0x0d>;
+
+					port {
+
+						endpoint {
+							remote-endpoint = <0x0e>;
+							arm,pl11x,tft-r0g0b0-pads = <0x00 0x08 0x10>;
+							phandle = <0x0b>;
+						};
+					};
+				};
+			};
+
+			fixed-regulator-0 {
+				compatible = "regulator-fixed";
+				regulator-name = "3V3";
+				regulator-min-microvolt = <0x325aa0>;
+				regulator-max-microvolt = <0x325aa0>;
+				regulator-always-on;
+				phandle = <0x02>;
+			};
+
+			clk24mhz {
+				compatible = "fixed-clock";
+				#clock-cells = <0x00>;
+				clock-frequency = <0x16e3600>;
+				clock-output-names = "v2m:clk24mhz";
+				phandle = <0x08>;
+			};
+
+			refclk1mhz {
+				compatible = "fixed-clock";
+				#clock-cells = <0x00>;
+				clock-frequency = <0xf4240>;
+				clock-output-names = "v2m:refclk1mhz";
+				phandle = <0x04>;
+			};
+
+			refclk32khz {
+				compatible = "fixed-clock";
+				#clock-cells = <0x00>;
+				clock-frequency = <0x8000>;
+				clock-output-names = "v2m:refclk32khz";
+				phandle = <0x03>;
+			};
+
+			leds {
+				compatible = "gpio-leds";
+
+				led-user1 {
+					label = "v2m:green:user1";
+					gpios = <0x0f 0x00 0x00>;
+					linux,default-trigger = "heartbeat";
+				};
+
+				led-user2 {
+					label = "v2m:green:user2";
+					gpios = <0x0f 0x01 0x00>;
+					linux,default-trigger = "mmc0";
+				};
+
+				led-user3 {
+					label = "v2m:green:user3";
+					gpios = <0x0f 0x02 0x00>;
+					linux,default-trigger = "cpu0";
+				};
+
+				led-user4 {
+					label = "v2m:green:user4";
+					gpios = <0x0f 0x03 0x00>;
+					linux,default-trigger = "cpu1";
+				};
+
+				led-user5 {
+					label = "v2m:green:user5";
+					gpios = <0x0f 0x04 0x00>;
+					linux,default-trigger = "cpu2";
+				};
+
+				led-user6 {
+					label = "v2m:green:user6";
+					gpios = <0x0f 0x05 0x00>;
+					linux,default-trigger = "cpu3";
+				};
+
+				led-user7 {
+					label = "v2m:green:user7";
+					gpios = <0x0f 0x06 0x00>;
+					linux,default-trigger = "cpu4";
+				};
+
+				led-user8 {
+					label = "v2m:green:user8";
+					gpios = <0x0f 0x07 0x00>;
+					linux,default-trigger = "cpu5";
+				};
+			};
+
+			mcc {
+				compatible = "arm,vexpress,config-bus";
+				arm,vexpress,config-bridge = <0x10>;
+
+				oscclk0 {
+					compatible = "arm,vexpress-osc";
+					arm,vexpress-sysreg,func = <0x01 0x00>;
+					freq-range = <0x17d7840 0x3938700>;
+					#clock-cells = <0x00>;
+					clock-output-names = "v2m:oscclk0";
+				};
+
+				oscclk1 {
+					compatible = "arm,vexpress-osc";
+					arm,vexpress-sysreg,func = <0x01 0x01>;
+					freq-range = <0x16a6570 0x3dfd240>;
+					#clock-cells = <0x00>;
+					clock-output-names = "v2m:oscclk1";
+					phandle = <0x0c>;
+				};
+
+				oscclk2 {
+					compatible = "arm,vexpress-osc";
+					arm,vexpress-sysreg,func = <0x01 0x02>;
+					freq-range = <0x16e3600 0x16e3600>;
+					#clock-cells = <0x00>;
+					clock-output-names = "v2m:oscclk2";
+					phandle = <0x09>;
+				};
+
+				volt-vio {
+					compatible = "arm,vexpress-volt";
+					arm,vexpress-sysreg,func = <0x02 0x00>;
+					regulator-name = "VIO";
+					regulator-always-on;
+					label = "VIO";
+				};
+
+				temp-mcc {
+					compatible = "arm,vexpress-temp";
+					arm,vexpress-sysreg,func = <0x04 0x00>;
+					label = "MCC";
+				};
+
+				reset {
+					compatible = "arm,vexpress-reset";
+					arm,vexpress-sysreg,func = <0x05 0x00>;
+				};
+
+				muxfpga {
+					compatible = "arm,vexpress-muxfpga";
+					arm,vexpress-sysreg,func = <0x07 0x00>;
+				};
+
+				shutdown {
+					compatible = "arm,vexpress-shutdown";
+					arm,vexpress-sysreg,func = <0x08 0x00>;
+				};
+
+				reboot {
+					compatible = "arm,vexpress-reboot";
+					arm,vexpress-sysreg,func = <0x09 0x00>;
+				};
+
+				dvimode {
+					compatible = "arm,vexpress-dvimode";
+					arm,vexpress-sysreg,func = <0x0b 0x00>;
+				};
+			};
+		};
+	};
+
+	chosen {
+	};
+
+	aliases {
+		serial0 = "/bus@40000000/motherboard-bus@40000000/iofpga@7,00000000/serial@9000";
+		serial1 = "/bus@40000000/motherboard-bus@40000000/iofpga@7,00000000/serial@a000";
+		serial2 = "/bus@40000000/motherboard-bus@40000000/iofpga@7,00000000/serial@b000";
+		serial3 = "/bus@40000000/motherboard-bus@40000000/iofpga@7,00000000/serial@c000";
+		i2c0 = "/bus@40000000/motherboard-bus@40000000/iofpga@7,00000000/i2c@16000";
+		i2c1 = "/bus@40000000/motherboard-bus@40000000/iofpga@7,00000000/i2c@2000";
+	};
+
+	cpus {
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <0x00>;
+			next-level-cache = <0x11>;
+			phandle = <0x14>;
+		};
+
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <0x01>;
+			next-level-cache = <0x11>;
+			phandle = <0x15>;
+		};
+
+		cpu@2 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <0x02>;
+			next-level-cache = <0x11>;
+			phandle = <0x16>;
+		};
+
+		cpu@3 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <0x03>;
+			next-level-cache = <0x11>;
+			phandle = <0x17>;
+		};
+	};
+
+	memory@60000000 {
+		device_type = "memory";
+		reg = <0x60000000 0x40000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges;
+
+		vram@4c000000 {
+			compatible = "shared-dma-pool";
+			reg = <0x4c000000 0x800000>;
+			no-map;
+			phandle = <0x0d>;
+		};
+	};
+
+	clcd@10020000 {
+		compatible = "arm,pl111\0arm,primecell";
+		reg = <0x10020000 0x1000>;
+		interrupt-names = "combined";
+		interrupts = <0x00 0x2c 0x04>;
+		clocks = <0x12 0x05>;
+		clock-names = "clcdclk\0apb_pclk";
+		max-memory-bandwidth = <0x5a995c0>;
+
+		port {
+
+			endpoint {
+				remote-endpoint = <0x13>;
+				arm,pl11x,tft-r0g0b0-pads = <0x00 0x08 0x10>;
+				phandle = <0x0a>;
+			};
+		};
+	};
+
+	memory-controller@100e0000 {
+		compatible = "arm,pl341\0arm,primecell";
+		reg = <0x100e0000 0x1000>;
+		clocks = <0x05>;
+		clock-names = "apb_pclk";
+	};
+
+	memory-controller@100e1000 {
+		compatible = "arm,pl354\0arm,primecell";
+		reg = <0x100e1000 0x1000>;
+		interrupts = <0x00 0x2d 0x04 0x00 0x2e 0x04>;
+		clocks = <0x05>;
+		clock-names = "apb_pclk";
+	};
+
+	timer@100e4000 {
+		compatible = "arm,sp804\0arm,primecell";
+		reg = <0x100e4000 0x1000>;
+		interrupts = <0x00 0x30 0x04 0x00 0x31 0x04>;
+		clocks = <0x05 0x05 0x05>;
+		clock-names = "timer0clk\0timer1clk\0apb_pclk";
+		status = "disabled";
+	};
+
+	watchdog@100e5000 {
+		compatible = "arm,sp805\0arm,primecell";
+		reg = <0x100e5000 0x1000>;
+		interrupts = <0x00 0x33 0x04>;
+		clocks = <0x05 0x05>;
+		clock-names = "wdog_clk\0apb_pclk";
+	};
+
+	scu@1e000000 {
+		compatible = "arm,cortex-a9-scu";
+		reg = <0x1e000000 0x58>;
+	};
+
+	timer@1e000600 {
+		compatible = "arm,cortex-a9-twd-timer";
+		reg = <0x1e000600 0x20>;
+		interrupts = <0x01 0x0d 0xf04>;
+	};
+
+	watchdog@1e000620 {
+		compatible = "arm,cortex-a9-twd-wdt";
+		reg = <0x1e000620 0x20>;
+		interrupts = <0x01 0x0e 0xf04>;
+	};
+
+	interrupt-controller@1e001000 {
+		compatible = "arm,cortex-a9-gic";
+		#interrupt-cells = <0x03>;
+		#address-cells = <0x00>;
+		interrupt-controller;
+		reg = <0x1e001000 0x1000 0x1e000100 0x100>;
+		phandle = <0x01>;
+	};
+
+	cache-controller@1e00a000 {
+		compatible = "arm,pl310-cache";
+		reg = <0x1e00a000 0x1000>;
+		interrupts = <0x00 0x2b 0x04>;
+		cache-unified;
+		cache-level = <0x02>;
+		arm,data-latency = <0x01 0x01 0x01>;
+		arm,tag-latency = <0x01 0x01 0x01>;
+		phandle = <0x11>;
+	};
+
+	pmu {
+		compatible = "arm,cortex-a9-pmu";
+		interrupts = <0x00 0x3c 0x04 0x00 0x3d 0x04 0x00 0x3e 0x04 0x00 0x3f 0x04>;
+		interrupt-affinity = <0x14 0x15 0x16 0x17>;
+	};
+
+	dcc {
+		compatible = "arm,vexpress,config-bus";
+		arm,vexpress,config-bridge = <0x10>;
+
+		extsaxiclk {
+			compatible = "arm,vexpress-osc";
+			arm,vexpress-sysreg,func = <0x01 0x00>;
+			freq-range = <0x1c9c380 0x2faf080>;
+			#clock-cells = <0x00>;
+			clock-output-names = "extsaxiclk";
+		};
+
+		clcdclk {
+			compatible = "arm,vexpress-osc";
+			arm,vexpress-sysreg,func = <0x01 0x01>;
+			freq-range = <0x989680 0x4c4b400>;
+			#clock-cells = <0x00>;
+			clock-output-names = "clcdclk";
+			phandle = <0x12>;
+		};
+
+		tcrefclk {
+			compatible = "arm,vexpress-osc";
+			arm,vexpress-sysreg,func = <0x01 0x02>;
+			freq-range = <0x1f78a40 0x5f5e100>;
+			#clock-cells = <0x00>;
+			clock-output-names = "tcrefclk";
+			phandle = <0x05>;
+		};
+
+		volt-vd10 {
+			compatible = "arm,vexpress-volt";
+			arm,vexpress-sysreg,func = <0x02 0x00>;
+			regulator-name = "VD10";
+			regulator-always-on;
+			label = "VD10";
+		};
+
+		volt-vd10-s2 {
+			compatible = "arm,vexpress-volt";
+			arm,vexpress-sysreg,func = <0x02 0x01>;
+			regulator-name = "VD10_S2";
+			regulator-always-on;
+			label = "VD10_S2";
+		};
+
+		volt-vd10-s3 {
+			compatible = "arm,vexpress-volt";
+			arm,vexpress-sysreg,func = <0x02 0x02>;
+			regulator-name = "VD10_S3";
+			regulator-always-on;
+			label = "VD10_S3";
+		};
+
+		volt-vcc1v8 {
+			compatible = "arm,vexpress-volt";
+			arm,vexpress-sysreg,func = <0x02 0x03>;
+			regulator-name = "VCC1V8";
+			regulator-always-on;
+			label = "VCC1V8";
+		};
+
+		volt-ddr2vtt {
+			compatible = "arm,vexpress-volt";
+			arm,vexpress-sysreg,func = <0x02 0x04>;
+			regulator-name = "DDR2VTT";
+			regulator-always-on;
+			label = "DDR2VTT";
+		};
+
+		volt-vcc3v3 {
+			arm,vexpress-sysreg,func = <0x02 0x05>;
+			compatible = "arm,vexpress-volt";
+			regulator-name = "VCC3V3";
+			regulator-always-on;
+			label = "VCC3V3";
+		};
+
+		amp-vd10-s2 {
+			compatible = "arm,vexpress-amp";
+			arm,vexpress-sysreg,func = <0x03 0x00>;
+			label = "VD10_S2";
+		};
+
+		amp-vd10-s3 {
+			compatible = "arm,vexpress-amp";
+			arm,vexpress-sysreg,func = <0x03 0x01>;
+			label = "VD10_S3";
+		};
+
+		power-vd10-s2 {
+			compatible = "arm,vexpress-power";
+			arm,vexpress-sysreg,func = <0x0c 0x00>;
+			label = "PVD10_S2";
+		};
+
+		power-vd10-s3 {
+			compatible = "arm,vexpress-power";
+			arm,vexpress-sysreg,func = <0x0c 0x01>;
+			label = "PVD10_S3";
+		};
+	};
+
+	hsb@e0000000 {
+		compatible = "simple-bus";
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges = <0x00 0xe0000000 0x20000000>;
+		#interrupt-cells = <0x01>;
+		interrupt-map-mask = <0x00 0x03>;
+		interrupt-map = <0x00 0x00 0x01 0x00 0x24 0x04 0x00 0x01 0x01 0x00 0x25 0x04 0x00 0x02 0x01 0x00 0x26 0x04 0x00 0x03 0x01 0x00 0x27 0x04>;
+	};
+};

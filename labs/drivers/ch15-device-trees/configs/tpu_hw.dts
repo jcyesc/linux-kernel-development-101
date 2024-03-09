@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0
+
+/ {
+	tpu_hw_dummy {
+		compatible = "tpu_hw,dummy", "tpu_hw,board";
+
+		algos-props = "logistic regression,random forests";
+		iterations = <44>;
+		default-state = "off";
+	};
+};
