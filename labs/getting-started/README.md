@@ -366,6 +366,65 @@ To upload files via `scp` use:
 host $ scp -P 8022 libshared.so  root@127.0.0.1:~
 ```
 
+### Debugging Network issues
+
+After configuring the network and ssh, you might have some troubles connecting
+to qemu. There are many things that could go wrong. One of the most common
+is to pass the wrong CPU to qemu.
+
+An indicator of this issue is the message `Starting sshd: Illegal instruction`
+in the kernel logs.
+
+```
+Illegal instruction
+Starting sshd: Illegal instruction
+```
+
+To fix the issue, make sure that the qemu parameter `-cpu` matches what it was
+configured in `buildroot`. If the buildroot configuration is using
+`BR2-cortex_a76=y`, then qemu has to use `-cpu cortex-a76` as parameter:
+
+```
+ $ cd buildroot
+ $ cat .config | grep cortex
+BR2_GCC_TARGET_CPU="cortex-a9"
+# BR2_cortex_a5 is not set
+# BR2_cortex_a7 is not set
+# BR2_cortex_a8 is not set
+# BR2_cortex_a9 is not set
+# BR2_cortex_a12 is not set
+# BR2_cortex_a15 is not set
+# BR2_cortex_a15_a7 is not set
+# BR2_cortex_a17 is not set
+# BR2_cortex_a17_a7 is not set
+# BR2_cortex_m3 is not set
+# BR2_cortex_m4 is not set
+# BR2_cortex_m7 is not set
+# BR2_cortex_a32 is not set
+# BR2_cortex_a35 is not set
+# BR2_cortex_a53 is not set
+# BR2_cortex_a57 is not set
+# BR2_cortex_a57_a53 is not set
+# BR2_cortex_a72 is not set
+# BR2_cortex_a72_a53 is not set
+# BR2_cortex_a73 is not set
+# BR2_cortex_a73_a35 is not set
+# BR2_cortex_a73_a53 is not set
+BR2_cortex_a76=y
+# BR2_cortex_a76_a55 is not set
+```
+
+After passing the right parameter to qemu, in this case `-cpu cortex-a76`,
+we should see in the logs that `sshd` started successfully.
+
+```
+eth0: adding default route via 10.0.2.2
+forked to background, child pid 99
+[   13.186904] audit: type=1326 audit(1710616597.236:2): auid=4294967295 uid=100 gid=101 ses=4294967295 pid=99 comm="dhcpcd" exe="/sbin/dhcpcd" sig=31 arch=c00000b7 syscall=24 compat=0 ip=0xffffa53d928c code=0x0
+dhcpcd_fork_cb: truncated read 0 (expected 4)
+Starting sshd: OK
+```
+
 ## How to build and add a module to the rootfs
 
 Once that you have your module, it is necessary to compile it using the kernel
