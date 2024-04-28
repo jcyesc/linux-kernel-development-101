@@ -32,6 +32,7 @@ static const struct platform_device_id tpu_hw_id_table[] = {
 };
 MODULE_DEVICE_TABLE(platform, tpu_hw_id_table);
 
+// Identifies the node in the device tree.
 static const struct of_device_id tpu_dt_ids[] = {
 	{ .compatible = "tpu_hw,dummy" },
 	{}, // Needs to finish with a NULL entry.
