@@ -256,12 +256,53 @@ Superblock backups stored on blocks:
 
 # file -s /dev/ramdiskblockdev
 /dev/ramdiskblockdev: Linux rev 1.0 ext2 filesystem data, UUID=429564ef-6529-4021-985a-43ffc4ea8067
+
+# file -s /dev/genramdisk
+/dev/genramdisk: Linux rev 1.0 ext2 filesystem data, UUID=517a7e2c-6eea-420f-b104-8ea87c84173a (large files)
 ```
+
+Alternatively, you could also format `/dev/genramdisk` instead.
+
+
+```
+# mke2fs /dev/genramdisk
+mke2fs 1.47.0 (5-Feb-2023)
+Creating filesystem with 65536 1k blocks and 16384 inodes
+Filesystem UUID: 517a7e2c-6eea-420f-b104-8ea87c84173a
+Superblock backups stored on blocks:
+	8193, 24577, 40961, 57345
+
+Allocating group tables: done
+Writing inode tables: done
+Writing superblocks and filesystem accounting information: done
+
+
+# file -s /dev/ramdiskblockdev
+/dev/ramdiskblockdev: Linux rev 1.0 ext2 filesystem data, UUID=517a7e2c-6eea-420f-b104-8ea87c84173a (large files)
+# file -s /dev/genramdisk
+/dev/genramdisk: Linux rev 1.0 ext2 filesystem data, UUID=517a7e2c-6eea-420f-b104-8ea87c84173a (large files)
+```
+
+> IMPORTANT: In this example /dev/ramdiskblockdev and /dev/genramdisk refers
+> to the same partition. However, if we would have more partitions, the structure
+> would be:
+>
+>    /dev/ramdiskblockdev
+>    /dev/genramdisk0
+>    /dev/genramdisk1
+>    /dev/genramdisk2
+>
+> Similar to:
+>
+>    /dev/sda
+>    /dev/sda1
+>    /dev/sda2
+>    /dev/sda3
 
 2. Mount the block device
 
 ```
-# mount -t ext4 /dev/ramdiskblockdev /mnt/
+# mount -t ext4 /dev/genramdisk /mnt/
 # mount
 /dev/root on / type ext4 (rw,relatime)
 devtmpfs on /dev type devtmpfs (rw,relatime,size=790360k,nr_inodes=197590,mode=755)
@@ -285,7 +326,7 @@ data.txt    lost+found
 # cd /
 # umount /mnt
 
-# mount -t ext4 /dev/ramdiskblockdev /mnt/
+# mount -t ext4 /dev/genramdisk /mnt/
 # cat /mnt/data.txt
 hello file system
 ```
