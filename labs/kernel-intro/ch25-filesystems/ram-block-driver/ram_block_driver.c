@@ -94,7 +94,7 @@ static int exec_request(struct request *rq)
 		unsigned long bv_offset = bvec.bv_offset;
 		unsigned long offset = (sector * RAMDISK_SECTOR_SIZE);
 		size_t len = bvec.bv_len;
-		char *buffer = kmap_local_page(bvec.bv_page);
+		char *buffer;
 		int dir = bio_data_dir(iter.bio);
 		unsigned long flags;
 
@@ -109,6 +109,8 @@ static int exec_request(struct request *rq)
 				ram_blk_dev.size, offset, len);
 			return BLK_STS_IOERR;
 		}
+
+		buffer = kmap_local_page(bvec.bv_page);
 
 		spin_lock_irqsave(&ram_blk_dev.lock, flags);
 
@@ -281,6 +283,7 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	if (IS_ERR(dev->gd))
 		return PTR_ERR(dev->gd);
 
+	// TODO: Identify the disk during the processing of the request.
 	dev->queue->disk = dev->gd;
 	snprintf(dev->gd->disk_name, DISK_NAME_LEN, GENDISK_NAME);
 	dev->gd->major = RAM_BLKDEV_MAJOR;
