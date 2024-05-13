@@ -21,32 +21,19 @@ To build the driver in the host and deploy it in the target, run:
 Once the driver is in the target, install the driver:
 
 ```
-qemu $ mknod /dev/ramdiskblockdev b 240 0
+qemu $ mknod /dev/rdbd b 240 0
 qemu $ insmod ram_block_driver.ko
-[   82.022617] ram_block_driver: loading out-of-tree module taints kernel.
-[   82.040027] ram_block_driver: ram_block_init: Before register_blkdev()
-[   82.040852] ram_block_driver: init_blk_mq_tag_set: Before blk_mq_alloc_tag_set()
-[   82.041709] ram_block_driver: init_request_queue: Before blk_mq_init_queue()
-[   82.042553] ram_block_driver: init_request_queue: Before blk_queue_physical_block_size()
-[   82.043051] ram_block_driver: init_gendisk: Before blk_mq_alloc_disk()
-[   82.046716] ram_block_driver: init_gendisk: Before set_capacity()
-[   82.047345] ram_block_driver: setup_block_dev: Before add_disk()
-[   82.069836] ram_block_driver: ram_block_open: Open disk genramdisk
-[   82.074355] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request
-[   82.074896] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
-[   82.074986] ram_block_driver: pr_request: READ direction request
-[   82.075492] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  0
-[   82.080463] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 4096
-[   82.081221] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 4096
-[   82.081641] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
-[   82.081773] ram_block_driver: exec_request: Processing segments in bio
-[   82.082310] ram_block_driver: exec_request: READ Segment 0
-[   82.083012] ram_block_driver: exec_request:    sector:    0
-[   82.089588] ram_block_driver: exec_request:    bv_offset: 0
-[   82.090164] ram_block_driver: exec_request:    offset:    0
-[   82.090578] ram_block_driver: exec_request:    len:       4096
-[   82.094212] ram_block_driver: ram_block_release: Release disk genramdisk
-[   82.095423] ram_block_driver: ram_block_init: Make sure to create the node:
+[ 1537.891323] ram_block_driver: loading out-of-tree module taints kernel.
+[ 1537.896681] ram_block_driver: ram_block_init: Before register_blkdev()
+[ 1537.904347] ram_block_driver: init_blk_mq_tag_set: Before blk_mq_alloc_tag_set()
+[ 1537.904818] ram_block_driver: init_request_queue: Before blk_mq_init_queue()
+[ 1537.905192] ram_block_driver: init_request_queue: Before blk_queue_physical_block_size()
+[ 1537.905490] blk_queue_max_segment_size: set to minimum 4096
+[ 1537.906012] ram_block_driver: init_gendisk: Before blk_mq_alloc_disk()
+[ 1537.906471] ram_block_driver: init_gendisk: Before set_capacity()
+[ 1537.906792] ram_block_driver: setup_block_dev: Before add_disk()
+[ 1537.910232] ram_block_driver: ram_block_init: Make sure to create the node:
+[ 1537.910516] ram_block_driver: ram_block_init:     mknod /dev/rdbd b 240 0
 ```
 
 ## Verify that the block device, partition and ramdisk are created
@@ -59,216 +46,191 @@ major minor  #blocks  name
 
  254        0     614400 vda
   31        0     131072 mtdblock0
- 240        0      65536 genramdisk
+ 240        0      65536 rdbd1
 ```
 
-To verify that the block device and ramdisk were created, run:
+To verify that the block device and gendisk were created, run:
 
 ```
- $ cat /proc/devices | grep ramdiskblockdev
-240 ramdiskblockdev
+ # Verify that block device exists.
+ $ cat /proc/devices | grep rdbd
+240 rdbd
 
- $ ls -la /dev/genramdisk
- brw-------    1 root     root      240,   0 Dec 28 04:58 /dev/genramdisk
+ # Verify that block device and gendisk exists.
+ $ ls -la /dev/rdbd*
+brw-r--r--    1 root     root      240,   0 May 13 09:46 /dev/rdbd
+brw-------    1 root     root      240,   0 May 13 09:47 /dev/rdbd1
 ```
 
 To see the configurations of the disk:
 
 ```
- $ for f in `find /sys/block/genramdisk/ -type f`; do echo $f; cat $f; done;
-/sys/block/genramdisk/uevent
+ $ for f in `find /sys/block/rdbd1/ -type f`; do echo $f; cat $f; done;
+/sys/block/rdbd1/uevent
 MAJOR=240
 MINOR=0
-DEVNAME=genramdisk
+DEVNAME=rdbd1
 DEVTYPE=disk
 DISKSEQ=11
-/sys/block/genramdisk/ext_range
-256
-/sys/block/genramdisk/range
+/sys/block/rdbd1/ext_range
 1
-/sys/block/genramdisk/alignment_offset
+/sys/block/rdbd1/range
+1
+/sys/block/rdbd1/alignment_offset
 0
-/sys/block/genramdisk/diskseq
+/sys/block/rdbd1/diskseq
 11
-/sys/block/genramdisk/power/runtime_active_time
+/sys/block/rdbd1/power/runtime_active_time
 0
-/sys/block/genramdisk/power/runtime_status
+/sys/block/rdbd1/power/runtime_status
 unsupported
-/sys/block/genramdisk/power/autosuspend_delay_ms
+/sys/block/rdbd1/power/autosuspend_delay_ms
 cat: read error: Input/output error
-/sys/block/genramdisk/power/runtime_suspended_time
+/sys/block/rdbd1/power/runtime_suspended_time
 0
-/sys/block/genramdisk/power/control
+/sys/block/rdbd1/power/control
 auto
-/sys/block/genramdisk/dev
+/sys/block/rdbd1/dev
 240:0
-/sys/block/genramdisk/ro
+/sys/block/rdbd1/ro
 0
-/sys/block/genramdisk/mq/0/cpu_list
+/sys/block/rdbd1/mq/0/cpu_list
 0
-/sys/block/genramdisk/mq/0/nr_reserved_tags
+/sys/block/rdbd1/mq/0/nr_reserved_tags
 0
-/sys/block/genramdisk/mq/0/nr_tags
+/sys/block/rdbd1/mq/0/nr_tags
 16
-/sys/block/genramdisk/stat
-       1        0        8       17        0        0        0        0        0       20       17        0        0        0        0        0        0
-/sys/block/genramdisk/events_poll_msecs
+/sys/block/rdbd1/stat
+       0        0        0        0        0        0        0        0        0        0        0        0        0        0        0        0        0
+/sys/block/rdbd1/events_poll_msecs
 -1
-/sys/block/genramdisk/events_async
-/sys/block/genramdisk/queue/io_poll_delay
+/sys/block/rdbd1/events_async
+/sys/block/rdbd1/queue/io_poll_delay
 -1
-/sys/block/genramdisk/queue/max_integrity_segments
+/sys/block/rdbd1/queue/max_integrity_segments
 0
-/sys/block/genramdisk/queue/zoned
+/sys/block/rdbd1/queue/zoned
 none
-/sys/block/genramdisk/queue/scheduler
+/sys/block/rdbd1/queue/scheduler
 none [mq-deadline] kyber bfq
-/sys/block/genramdisk/queue/io_poll
+/sys/block/rdbd1/queue/io_poll
 0
-/sys/block/genramdisk/queue/discard_zeroes_data
+/sys/block/rdbd1/queue/discard_zeroes_data
 0
-/sys/block/genramdisk/queue/minimum_io_size
+/sys/block/rdbd1/queue/minimum_io_size
 512
-/sys/block/genramdisk/queue/nr_zones
+/sys/block/rdbd1/queue/nr_zones
 0
-/sys/block/genramdisk/queue/write_same_max_bytes
+/sys/block/rdbd1/queue/write_same_max_bytes
 0
-/sys/block/genramdisk/queue/max_segments
+/sys/block/rdbd1/queue/max_segments
 128
-/sys/block/genramdisk/queue/dax
+/sys/block/rdbd1/queue/dax
 0
-/sys/block/genramdisk/queue/dma_alignment
+/sys/block/rdbd1/queue/dma_alignment
 511
-/sys/block/genramdisk/queue/physical_block_size
+/sys/block/rdbd1/queue/physical_block_size
 512
-/sys/block/genramdisk/queue/logical_block_size
+/sys/block/rdbd1/queue/logical_block_size
 512
-/sys/block/genramdisk/queue/virt_boundary_mask
+/sys/block/rdbd1/queue/virt_boundary_mask
 0
-/sys/block/genramdisk/queue/zone_append_max_bytes
+/sys/block/rdbd1/queue/zone_append_max_bytes
 0
-/sys/block/genramdisk/queue/nr_requests
+/sys/block/rdbd1/queue/nr_requests
 32
-/sys/block/genramdisk/queue/write_cache
+/sys/block/rdbd1/queue/write_cache
 write through
-/sys/block/genramdisk/queue/stable_writes
+/sys/block/rdbd1/queue/stable_writes
 0
-/sys/block/genramdisk/queue/max_segment_size
-65536
-/sys/block/genramdisk/queue/rotational
+/sys/block/rdbd1/queue/max_segment_size
+4096
+/sys/block/rdbd1/queue/rotational
 0
-/sys/block/genramdisk/queue/discard_max_bytes
+/sys/block/rdbd1/queue/discard_max_bytes
 0
-/sys/block/genramdisk/queue/add_random
+/sys/block/rdbd1/queue/add_random
 0
-/sys/block/genramdisk/queue/discard_max_hw_bytes
+/sys/block/rdbd1/queue/discard_max_hw_bytes
 0
-/sys/block/genramdisk/queue/optimal_io_size
+/sys/block/rdbd1/queue/optimal_io_size
 0
-/sys/block/genramdisk/queue/chunk_sectors
+/sys/block/rdbd1/queue/chunk_sectors
 0
-/sys/block/genramdisk/queue/iosched/front_merges
+/sys/block/rdbd1/queue/iosched/front_merges
 1
-/sys/block/genramdisk/queue/iosched/read_expire
+/sys/block/rdbd1/queue/iosched/read_expire
 500
-/sys/block/genramdisk/queue/iosched/prio_aging_expire
+/sys/block/rdbd1/queue/iosched/prio_aging_expire
 10000
-/sys/block/genramdisk/queue/iosched/fifo_batch
+/sys/block/rdbd1/queue/iosched/fifo_batch
 16
-/sys/block/genramdisk/queue/iosched/write_expire
+/sys/block/rdbd1/queue/iosched/write_expire
 5000
-/sys/block/genramdisk/queue/iosched/writes_starved
+/sys/block/rdbd1/queue/iosched/writes_starved
 2
-/sys/block/genramdisk/queue/iosched/async_depth
+/sys/block/rdbd1/queue/iosched/async_depth
 6
-/sys/block/genramdisk/queue/read_ahead_kb
+/sys/block/rdbd1/queue/read_ahead_kb
 128
-/sys/block/genramdisk/queue/max_discard_segments
+/sys/block/rdbd1/queue/max_discard_segments
 1
-/sys/block/genramdisk/queue/write_zeroes_max_bytes
+/sys/block/rdbd1/queue/write_zeroes_max_bytes
 0
-/sys/block/genramdisk/queue/nomerges
+/sys/block/rdbd1/queue/nomerges
 0
-/sys/block/genramdisk/queue/zone_write_granularity
+/sys/block/rdbd1/queue/zone_write_granularity
 0
-/sys/block/genramdisk/queue/fua
+/sys/block/rdbd1/queue/fua
 0
-/sys/block/genramdisk/queue/discard_granularity
+/sys/block/rdbd1/queue/discard_granularity
 0
-/sys/block/genramdisk/queue/rq_affinity
+/sys/block/rdbd1/queue/rq_affinity
 1
-/sys/block/genramdisk/queue/max_sectors_kb
+/sys/block/rdbd1/queue/max_sectors_kb
 127
-/sys/block/genramdisk/queue/hw_sector_size
+/sys/block/rdbd1/queue/hw_sector_size
 512
-/sys/block/genramdisk/queue/max_hw_sectors_kb
+/sys/block/rdbd1/queue/max_hw_sectors_kb
 127
-/sys/block/genramdisk/queue/iostats
+/sys/block/rdbd1/queue/iostats
 1
-/sys/block/genramdisk/size
-256
-/sys/block/genramdisk/integrity/write_generate
+/sys/block/rdbd1/size
+131072
+/sys/block/rdbd1/integrity/write_generate
 0
-/sys/block/genramdisk/integrity/format
+/sys/block/rdbd1/integrity/format
 none
-/sys/block/genramdisk/integrity/read_verify
+/sys/block/rdbd1/integrity/read_verify
 0
-/sys/block/genramdisk/integrity/tag_size
+/sys/block/rdbd1/integrity/tag_size
 0
-/sys/block/genramdisk/integrity/protection_interval_bytes
+/sys/block/rdbd1/integrity/protection_interval_bytes
 0
-/sys/block/genramdisk/integrity/device_is_integrity_capable
+/sys/block/rdbd1/integrity/device_is_integrity_capable
 0
-/sys/block/genramdisk/discard_alignment
+/sys/block/rdbd1/discard_alignment
 0
-/sys/block/genramdisk/capability
-[   82.095503] ram_block_driver: ram_block_init:     mknod /dev/ramdiskblockdev b 240 0
-[  221.049371] block genramdisk: the capability attribute has been deprecated.
+/sys/block/rdbd1/capability
 0
-/sys/block/genramdisk/hidden
+/sys/block/rdbd1/hidden
 0
-/sys/block/genramdisk/removable
+/sys/block/rdbd1/removable
 0
-/sys/block/genramdisk/events
-/sys/block/genramdisk/inflight
+/sys/block/rdbd1/events
+/sys/block/rdbd1/inflight
        0        0
 ```
 
 ## Format the block device and mount a file system
 
-1. Format the block device with ext4
+1. Format the first generic disk with ext4
 
 ```
-# mke2fs  /dev/ramdiskblockdev
-Filesystem label=
-OS type: Linux
-Block size=1024 (log=0)
-Fragment size=1024 (log=0)
-16384 inodes, 65536 blocks
-3276 blocks (5%) reserved for the super user
-First data block=1
-Maximum filesystem blocks=262144
-8 block groups
-8192 blocks per group, 8192 fragments per group
-2048 inodes per group
-Superblock backups stored on blocks:
-	8193, 24577, 40961, 57345
-
-# file -s /dev/ramdiskblockdev
-/dev/ramdiskblockdev: Linux rev 1.0 ext2 filesystem data, UUID=429564ef-6529-4021-985a-43ffc4ea8067
-
-# file -s /dev/genramdisk
-/dev/genramdisk: Linux rev 1.0 ext2 filesystem data, UUID=517a7e2c-6eea-420f-b104-8ea87c84173a (large files)
-```
-
-Alternatively, you could also format `/dev/genramdisk` instead.
-
-
-```
-# mke2fs /dev/genramdisk
+ $ mke2fs /dev/rdbd1
 mke2fs 1.47.0 (5-Feb-2023)
 Creating filesystem with 65536 1k blocks and 16384 inodes
-Filesystem UUID: 517a7e2c-6eea-420f-b104-8ea87c84173a
+Filesystem UUID: c9f9fe75-73cc-4d3a-b044-1779ba689b3e
 Superblock backups stored on blocks:
 	8193, 24577, 40961, 57345
 
@@ -277,20 +239,21 @@ Writing inode tables: done
 Writing superblocks and filesystem accounting information: done
 
 
-# file -s /dev/ramdiskblockdev
-/dev/ramdiskblockdev: Linux rev 1.0 ext2 filesystem data, UUID=517a7e2c-6eea-420f-b104-8ea87c84173a (large files)
-# file -s /dev/genramdisk
-/dev/genramdisk: Linux rev 1.0 ext2 filesystem data, UUID=517a7e2c-6eea-420f-b104-8ea87c84173a (large files)
+ $ file -s /dev/rdbd
+/dev/rdbd: Linux rev 1.0 ext2 filesystem data, UUID=c9f9fe75-73cc-4d3a-b044-1779ba689b3e (large files)
+
+ $ file -s /dev/rdbd1
+/dev/rdbd1: Linux rev 1.0 ext2 filesystem data, UUID=c9f9fe75-73cc-4d3a-b044-1779ba689b3e (large files)
 ```
 
-> IMPORTANT: In this example /dev/ramdiskblockdev and /dev/genramdisk refers
+> IMPORTANT: In this example /dev/rdbd and /dev/rdbd1 refers
 > to the same partition. However, if we would have more partitions, the structure
 > would be:
 >
->    /dev/ramdiskblockdev
->    /dev/genramdisk0
->    /dev/genramdisk1
->    /dev/genramdisk2
+>    /dev/rdbd
+>    /dev/rdbd1
+>    /dev/rdbd2
+>    /dev/rdbd3
 >
 > Similar to:
 >
@@ -302,32 +265,32 @@ Writing superblocks and filesystem accounting information: done
 2. Mount the block device
 
 ```
-# mount -t ext4 /dev/genramdisk /mnt/
-# mount
+ $ mount -t ext4 /dev/rdbd1 /mnt/
+ $ mount
 /dev/root on / type ext4 (rw,relatime)
-devtmpfs on /dev type devtmpfs (rw,relatime,size=790360k,nr_inodes=197590,mode=755)
+devtmpfs on /dev type devtmpfs (rw,relatime,size=957816k,nr_inodes=239454,mode=755)
 proc on /proc type proc (rw,relatime)
 devpts on /dev/pts type devpts (rw,relatime,gid=5,mode=620,ptmxmode=666)
 tmpfs on /dev/shm type tmpfs (rw,relatime,mode=777)
 tmpfs on /tmp type tmpfs (rw,relatime)
 tmpfs on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
 sysfs on /sys type sysfs (rw,relatime)
-/dev/ramdiskblockdev on /mnt type ext4 (rw,relatime)
+/dev/rdbd1 on /mnt type ext4 (rw,relatime)
 
-# cd /mnt/
-# echo "hello file system" > data.txt
-# ls
+ $ cd /mnt/
+ $ echo "hello file system" > data.txt
+ $ ls
 data.txt    lost+found
 ```
 
 3. Unmount and mount the block device to verify that the data is still there
 
 ```
-# cd /
-# umount /mnt
+ $ cd /
+ $ umount /mnt
 
-# mount -t ext4 /dev/genramdisk /mnt/
-# cat /mnt/data.txt
+ $ mount -t ext4 /dev/rdbd1 /mnt/
+ $ cat /mnt/data.txt
 hello file system
 ```
 
@@ -341,41 +304,41 @@ the device node.
 > the sector without modifying the data before the offset.
 
 ```
-# echo "abcd" > /dev/ramdiskblockdev
-[  304.330699] ram_block_driver: ram_block_open: Open disk genramdisk
-[  304.338545] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request
-[  304.339256] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
-[  304.339355] ram_block_driver: pr_request: READ direction request
-[  304.342292] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  0
-[  304.343330] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 4096
-[  304.349609] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 4096
-[  304.351130] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
-[  304.351322] ram_block_driver: exec_request: Processing segments in bio
-[  304.359611] ram_block_driver: exec_request: READ Segment 0
-[  304.368838] ram_block_driver: exec_request:    sector:    0
-[  304.369567] ram_block_driver: exec_request:    bv_offset: 0
-[  304.374522] ram_block_driver: exec_request:    offset:    0
-[  304.375052] ram_block_driver: exec_request:    len:       4096
-[  304.390658] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request
-[  304.393046] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
-[  304.393178] ram_block_driver: pr_request: WRITE direction request
-[  304.394113] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  0
-[  304.395296] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 4096
-[  304.396268] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 4096
-[  304.396773] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
-[  304.396852] ram_block_driver: exec_request: Processing segments in bio
-[  304.397250] ram_block_driver: exec_request: WRITE Segment 0
-[  304.397621] ram_block_driver: exec_request:    sector:    0
-[  304.397945] ram_block_driver: exec_request:    bv_offset: 0
-[  304.398251] ram_block_driver: exec_request:    offset:    0
-[  304.398584] ram_block_driver: exec_request:    len:       4096
-[  304.406501] ram_block_driver: ram_block_release: Release disk genramdisk
+ $ echo "abcd" > /dev/rdbd1
+[ 3393.577327] ram_block_driver: exec_request:    len:       1024
+[ 3545.204951] ram_block_driver: ram_block_open: Open disk rdbd1
+[ 3545.206956] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request for disk 'rdbd1'
+[ 3545.209004] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
+[ 3545.209054] ram_block_driver: pr_request: READ direction request
+[ 3545.209529] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  0
+[ 3545.210063] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 1024
+[ 3545.210421] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 1024
+[ 3545.210704] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
+[ 3545.210737] ram_block_driver: exec_request: Processing segments in bio
+[ 3545.211107] ram_block_driver: exec_request: READ Segment 0
+[ 3545.211450] ram_block_driver: exec_request:    sector:    0
+[ 3545.213213] ram_block_driver: exec_request:    bv_offset: 0
+[ 3545.213498] ram_block_driver: exec_request:    offset:    0
+[ 3545.213779] ram_block_driver: exec_request:    len:       1024
+[ 3545.214363] ram_block_driver: ram_block_release: Release disk rdbd1
+[ 3575.830615] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request for disk 'rdbd1'
+[ 3575.831947] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
+[ 3575.831986] ram_block_driver: pr_request: WRITE direction request
+[ 3575.832568] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  0
+[ 3575.833411] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 1024
+[ 3575.834127] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 1024
+[ 3575.834556] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
+[ 3575.834588] ram_block_driver: exec_request: Processing segments in bio
+[ 3575.834929] ram_block_driver: exec_request: WRITE Segment 0
+[ 3575.836703] ram_block_driver: exec_request:    sector:    0
+[ 3575.837104] ram_block_driver: exec_request:    bv_offset: 0
+[ 3575.837549] ram_block_driver: exec_request:    offset:    0
 ```
 
 Read the data:
 
 ```
-# dd if=/dev/ramdiskblockdev bs=1 count=10
+ $ dd if=/dev/rdbd1 bs=1 count=10
 abcd
 �i
 10+0 records in
@@ -385,36 +348,36 @@ abcd
 In the kernel logs we can see:
 
 ```
-# [  473.704458] ram_block_driver: ram_block_open: Open disk genramdisk
-[  473.706091] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request
-[  473.706582] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
-[  473.706654] ram_block_driver: pr_request: READ direction request
-[  473.707205] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  0
-[  473.711209] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 16384
-[  473.716386] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 4096
-[  473.716962] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
-[  473.717062] ram_block_driver: exec_request: Processing segments in bio
-[  473.717420] ram_block_driver: exec_request: READ Segment 0
-[  473.717822] ram_block_driver: exec_request:    sector:    0
-[  473.718175] ram_block_driver: exec_request:    bv_offset: 0
-[  473.718501] ram_block_driver: exec_request:    offset:    0
-[  473.718826] ram_block_driver: exec_request:    len:       4096
-[  473.719166] ram_block_driver: exec_request: READ Segment 1
-[  473.719590] ram_block_driver: exec_request:    sector:    8
-[  473.720637] ram_block_driver: exec_request:    bv_offset: 0
-[  473.721021] ram_block_driver: exec_request:    offset:    4096
-[  473.721304] ram_block_driver: exec_request:    len:       4096
-[  473.721626] ram_block_driver: exec_request: READ Segment 2
-[  473.722045] ram_block_driver: exec_request:    sector:    16
-[  473.722314] ram_block_driver: exec_request:    bv_offset: 0
-[  473.722766] ram_block_driver: exec_request:    offset:    8192
-[  473.723093] ram_block_driver: exec_request:    len:       4096
-[  473.723537] ram_block_driver: exec_request: READ Segment 3
-[  473.729914] ram_block_driver: exec_request:    sector:    24
-[  473.730270] ram_block_driver: exec_request:    bv_offset: 0
-[  473.730637] ram_block_driver: exec_request:    offset:    12288
-[  473.730995] ram_block_driver: exec_request:    len:       4096
-[  473.747105] ram_block_driver: ram_block_release: Release disk genramdisk
+[ 3702.065518] ram_block_driver: ram_block_open: Open disk rdbd1
+[ 3702.066438] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request for disk 'rdbd1'
+[ 3702.073915] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
+[ 3702.073966] ram_block_driver: pr_request: READ direction request
+[ 3702.074294] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  0
+[ 3702.074699] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 16384
+[ 3702.074872] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 4096
+[ 3702.075193] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
+[ 3702.075224] ram_block_driver: exec_request: Processing segments in bio
+[ 3702.078207] ram_block_driver: exec_request: READ Segment 0
+[ 3702.079024] ram_block_driver: exec_request:    sector:    0
+[ 3702.081654] ram_block_driver: exec_request:    bv_offset: 0
+[ 3702.082398] ram_block_driver: exec_request:    offset:    0
+[ 3702.082736] ram_block_driver: exec_request:    len:       4096
+[ 3702.083394] ram_block_driver: exec_request: READ Segment 1
+[ 3702.085904] ram_block_driver: exec_request:    sector:    8
+[ 3702.088168] ram_block_driver: exec_request:    bv_offset: 0
+[ 3702.088686] ram_block_driver: exec_request:    offset:    4096
+[ 3702.089171] ram_block_driver: exec_request:    len:       4096
+[ 3702.089735] ram_block_driver: exec_request: READ Segment 2
+[ 3702.090242] ram_block_driver: exec_request:    sector:    16
+[ 3702.090736] ram_block_driver: exec_request:    bv_offset: 0
+[ 3702.091234] ram_block_driver: exec_request:    offset:    8192
+[ 3702.093818] ram_block_driver: exec_request:    len:       4096
+[ 3702.094148] ram_block_driver: exec_request: READ Segment 3
+[ 3702.094433] ram_block_driver: exec_request:    sector:    24
+[ 3702.094616] ram_block_driver: exec_request:    bv_offset: 0
+[ 3702.094916] ram_block_driver: exec_request:    offset:    12288
+[ 3702.095172] ram_block_driver: exec_request:    len:       4096
+[ 3702.098256] ram_block_driver: ram_block_release: Release disk rdbd1
 ```
 
 ## Read and Write in a particular offset
@@ -422,11 +385,11 @@ In the kernel logs we can see:
 First, we are going to create the `numbers.txt` file and print the 12th sector:
 
 ```
-# for i in $(seq 1 25345); do echo $i >> numbers.txt ; done
-# ls -la numbers.txt
+ $ for i in $(seq 1 25345); do echo $i >> numbers.txt ; done
+ $ ls -la numbers.txt
 -rw-r--r--    1 root     root        140964 Jan  2 05:11 numbers.txt
 
-# dd if=./numbers.txt bs=512 count=1 skip=12
+ $ dd if=./numbers.txt bs=512 count=1 skip=12
 451
 1452
 1453
@@ -441,49 +404,54 @@ First, we are going to create the `numbers.txt` file and print the 12th sector:
 1+0 records out
 ```
 
-Then, we will copy `131072` bytes to the block device, which it is the capacity
-of the device. The capacity is calculated by multiplying the number of sectors
-times the sector size.
+Then, we will copy `131072` bytes to the generic disk. The disk capacity is
+calculated by multiplying the number of sectors times the sector size.
 
 ```
-#define NR_SECTORS				256
+#define NR_SECTORS				131072
 #define RAMDISK_SECTOR_SIZE		512
 ```
 
 To copy the file, we run
 
 ```
-# dd if=numbers.txt of=/dev/ramdiskblockdev
-dd: error writing '/dev/ramdiskblockdev': No space left on device
+ $ dd if=numbers.txt of=/dev/rdbd1
+275+1 records in
+275+1 records out
+```
+
+Note: If there were not enough capacity in the generic disk, we would get:
+
+```
+dd: error writing '/dev/rdbd1': No space left on device
 257+0 records in
 256+0 records out
-
-# echo "256*512" | bc
-131072
 ```
 
-Only `256` sectors of `512` bytes were copied to `/dev/ramdiskblockdev`. To
-print all the sectors, we run:
+To print `256` sectors of `512` bytes, we run:
 
 ```
-# dd if=/dev/ramdiskblockdev bs=512 count=257
+ $ dd if=/dev/rdbd1 bs=512 count=257
 1
 2
 ..
 ..
-23695
-23696
-23
-256+0 records in
-256+0 records out
+23775
+23776
+23777
+23778
+23779
+23780
+23781
+2378
+257+0 records in
+257+0 records out
 ```
-
-Even if we tried to print `257`, there are only `256` sectors.
 
 To print the content of the `12th` sector, we run:
 
 ```
-# dd if=/dev/ramdiskblockdev bs=512 count=1 skip=12
+ $ dd if=/dev/rdbd1 bs=512 count=1 skip=12
 451
 1452
 1453
@@ -502,21 +470,21 @@ In the kernel logs, we can see that the driver starts reading from the 8th secto
 4096 bytes (8 sectors).
 
 ```
-# [ 1772.849081] ram_block_driver: ram_block_open: Open disk genramdisk
-[ 1772.851629] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request
-[ 1772.855040] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
-[ 1772.855164] ram_block_driver: pr_request: READ direction request
-[ 1772.856645] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  8
-[ 1772.857400] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 4096
-[ 1772.857867] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 4096
-[ 1772.858292] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
-[ 1772.858376] ram_block_driver: exec_request: Processing segments in bio
-[ 1772.858692] ram_block_driver: exec_request: READ Segment 0
-[ 1772.859026] ram_block_driver: exec_request:    sector:    8
-[ 1772.859371] ram_block_driver: exec_request:    bv_offset: 0
-[ 1772.864584] ram_block_driver: exec_request:    offset:    4096
-[ 1772.865310] ram_block_driver: exec_request:    len:       4096
-[ 1772.882519] ram_block_driver: ram_block_release: Release disk genramdisk
+[ 4677.454711] ram_block_driver: ram_block_open: Open disk rdbd1
+[ 4677.456886] ram_block_driver: blk_mq_ops_ram_queue_rq: Queuing request for disk 'rdbd1'
+[ 4677.457285] ram_block_driver: blk_mq_ops_ram_queue_rq: This is the 'last' request in the queue
+[ 4677.457305] ram_block_driver: pr_request: READ direction request
+[ 4677.457682] ram_block_driver: pr_request: 	blk_rq_pos = __sector =  8
+[ 4677.458233] ram_block_driver: pr_request: 	blk_rq_bytes = __data_len = 4096
+[ 4677.458515] ram_block_driver: pr_request: 	blk_rq_cur_bytes = 4096
+[ 4677.458772] ram_block_driver: pr_request: 	mq_rq_state = MQ_RQ_IDLE
+[ 4677.458800] ram_block_driver: exec_request: Processing segments in bio
+[ 4677.459110] ram_block_driver: exec_request: READ Segment 0
+[ 4677.461280] ram_block_driver: exec_request:    sector:    8
+[ 4677.461704] ram_block_driver: exec_request:    bv_offset: 0
+[ 4677.461962] ram_block_driver: exec_request:    offset:    4096
+[ 4677.462218] ram_block_driver: exec_request:    len:       4096
+[ 4677.476894] ram_block_driver: ram_block_release: Release disk rdbd1
 ```
 
 ## Compare SHAs of the block device and file
@@ -524,18 +492,18 @@ In the kernel logs, we can see that the driver starts reading from the 8th secto
 To make sure that the content of the ramdisk matches the content of the 256 sectos
 of the `numbers.txt`, we generate a new file `original.txt` that will only
 contain 256 sectors of 512 bytes each. Then, we generate the `disk.txt` file
-that will contain the data in `/dev/ramdiskblockdev`. Once we do that,
+that will contain the data in `/dev/rdbd1`. Once we do that,
 we use `md5sum` to compare SHAs.
 
 ```
-# dd if=numbers.txt of=original.txt bs=512 count=256
+ $ dd if=numbers.txt of=original.txt bs=512 count=256
 256+0 records in
 256+0 records out
 
-# dd if=/dev/ramdiskblockdev of=disk.txt bs=512 count=256
+ $ dd if=/dev/rdbd1 of=disk.txt bs=512 count=256
 256+0 records in
 256+0 records out
-# md5sum original.txt disk.txt
+ $ md5sum original.txt disk.txt
 29a54dffd9978a29f112423b08ea0894  original.txt
 29a54dffd9978a29f112423b08ea0894  disk.txt
 ```
@@ -546,18 +514,18 @@ To insert text in a specific offset in the disk, we can run the following
 commands:
 
 ```
-$ echo "Hello World" > message.txt
-$ cat message.txt
+ $ echo "Hello World" > message.txt
+ $ cat message.txt
 Hello World
 
 # To insert 11 bytes at the beginning of the 14th sector, we skip
 # 14 sectors (14 * 512 = 7168 bytes) and insert 11 bytes.
-$ dd if=message.txt of=/dev/ramdiskblockdev bs=1 seek=7168 count=11
+ $ dd if=message.txt of=/dev/rdbd1 bs=1 seek=7168 count=11
 11+0 records in
 11+0 records out
 
 # Verify the the message is in the ramdisk.
-$ dd if=/dev/ramdiskblockdev | less
+$ dd if=/dev/rdbd1 | less
 ...
 1654
 1655
@@ -576,13 +544,13 @@ Hello World658
 To remove the block device, run:
 
 ```
-# rmmod ram_block_driver
+ $ rmmod ram_block_driver.ko
 
-[ 3979.689309] ram_block_driver: ram_block_exit: Exiting ram block driver
-[ 3979.689588] ram_block_driver: ram_block_exit: ram_blk_dev has [1] references(s)!
-[ 3979.690332] ram_block_driver: release_block_device: Unregistering block I/O device
-[ 3979.690965] ram_block_driver: release_block_device: Deleting gendisk
-[ 3979.736829] ram_block_driver: release_block_device: Destroying queue
-[ 3979.737864] ram_block_driver: release_block_device: Freeing tag_set
-[ 3979.738802] ram_block_driver: release_block_device: Freeing ramdisk
+[ 5250.591042] ram_block_driver: ram_block_release: Release disk rdbd1
+[ 5268.595362] ram_block_driver: ram_block_exit: Exiting ram block driver
+[ 5268.595651] ram_block_driver: ram_block_exit: ram_blk_dev has [1] references(s)!
+[ 5268.596077] ram_block_driver: release_block_device: Unregistering block I/O device
+[ 5268.596565] ram_block_driver: release_block_device: Deleting gendisk
+[ 5268.623248] ram_block_driver: release_block_device: Destroying queue
+[ 5268.623248] ram_block_driver: release_block_device: Freeing ramdisk
 ```

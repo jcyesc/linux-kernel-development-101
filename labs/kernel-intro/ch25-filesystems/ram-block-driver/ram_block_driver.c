@@ -5,10 +5,22 @@
  * This block device driver stores the data in memory. It performs the
  * following tasks:
  *
- *  - Register a block I/O device.
+ *  - Create and initialize a blk_mq_tag_set
+ *  - Create and initialize a request_queue
  *  - Create and initialize a gendisk.
- *  - Process struct request_queue.
+ *  - Process struct request.
  *  - Allocates memory to store the data using vmalloc.
+ *  - Register a block I/O device.
+ *
+ * The block device will have this structure:
+ *
+ *   rdbd
+ *     |__rdbd1
+ *
+ * where:
+ *
+ *   -rdbd represents the block device node.
+ *   -rdbd1 represents the first generic disk.
  *
  * This driver works in 5.15.139 and 6.6.2 kernels.
  */
@@ -36,8 +48,8 @@
 
 #define RAM_BLKDEV_MAJOR		240
 #define RAM_BLKDEV_MINOR		1
-#define RAM_BLKDEV_NAME			"ramdiskblockdev"
-#define GENDISK_NAME			"genramdisk"
+#define RAM_BLKDEV_NAME		"rdbd"  // RamDisk Block Device (rdbd)
+#define GENDISK_NAME_1			"rdbd1" // Disk 1
 
 static struct ram_block_dev {
 	struct gendisk *gd;
@@ -170,8 +182,9 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 {
 	struct request *rq = bd->rq;
 	int status;
+	struct gendisk *gd = hctx->queue->disk;
 
-	pr_info("Queuing request\n");
+	pr_info("Queuing request for disk '%s'\n", gd->disk_name);
 
 	// Incrementing the kref counter.
 	kref_get(&ram_blk_dev.refcount);
@@ -283,9 +296,8 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	if (IS_ERR(dev->gd))
 		return PTR_ERR(dev->gd);
 
-	// TODO: Identify the disk during the processing of the request.
 	dev->queue->disk = dev->gd;
-	snprintf(dev->gd->disk_name, DISK_NAME_LEN, GENDISK_NAME);
+	snprintf(dev->gd->disk_name, DISK_NAME_LEN, GENDISK_NAME_1);
 	dev->gd->major = RAM_BLKDEV_MAJOR;
 	dev->gd->first_minor = 0;
 	dev->gd->minors = 1;
@@ -298,9 +310,9 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	pr_info("Before set_capacity()");
 	set_capacity(dev->gd, NR_SECTORS);
 
-	// This block device is not rotations and it is synchronous.
+	// This block device is not rotational and it is synchronous.
 	blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->gd->queue);
-	//blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, dev->gd->queue);
+	blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, dev->gd->queue);
 
 	return 0;
 }
@@ -373,7 +385,7 @@ static int __init ram_block_init(void)
 	}
 
 	pr_info("Make sure to create the node:");
-	pr_info("    mknod /dev/ramdiskblockdev b 240 0");
+	pr_info("    mknod /dev/rdbd b 240 0");
 
 	return 0;
 }
@@ -394,6 +406,6 @@ module_init(ram_block_init);
 module_exit(ram_block_exit);
 
 MODULE_AUTHOR("Juan Yescas");
-MODULE_DESCRIPTION("Ram Block Driver");
+MODULE_DESCRIPTION("Ram Disk Block Driver (rdbd)");
 MODULE_LICENSE("GPL v2");
 
