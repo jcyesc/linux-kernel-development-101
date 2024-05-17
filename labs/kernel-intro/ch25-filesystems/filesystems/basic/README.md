@@ -2,7 +2,7 @@
 # Basic File System
 
 The `basic_fs.ko` module implements a file system that does not need a block
-device to be mounted. To register the file system, first mount the moduele:
+device to be mounted. To register the file system, first mount the module:
 
 ```
 $ uname -a
@@ -54,6 +54,8 @@ total 8
     709 -rw-r--r--    1 root     root            18 Feb 19 06:50 regfile2.txt
 # cat /mnt/basic/regfile-link.txt
 Creating a file
+
+# umount /mnt/basic
 ```
 
 The output of `dmesg` is:

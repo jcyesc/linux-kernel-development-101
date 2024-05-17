@@ -119,3 +119,34 @@ It is mounted using:
 $ mount -t debugfs none /sys/kernel/debug
 ```
 
+### cscope
+
+There is a tool that allows to search kernel symbols easily and uses the symbols
+generated for a specific architecture:
+
+To install and use `cscope`, follow the steps below:
+
+```shell
+$ sudo apt install cscope
+
+# Go where the kernel source code is:
+$ cd kernel_src/
+$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- COMPILED_SOURCE=1 cscope
+
+# Start searching using cscope. To exit type Ctrl + d
+# To try another Find option Ctrl + f
+# Use TAB to move between the result list and search options.
+$ cscope
+
+
+Find this C symbol:
+Find this global definition: task_struct
+Find functions called by this function:
+Find functions calling this function:
+Find this text string:
+Change this text string:
+Find this egrep pattern:
+Find this file:
+Find files #including this file:
+Find assignments to this symbol:
+```

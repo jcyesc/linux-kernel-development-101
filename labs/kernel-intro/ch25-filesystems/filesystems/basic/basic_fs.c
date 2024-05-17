@@ -51,6 +51,7 @@ static int basic_fs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
 		struct dentry *dentry, umode_t mode);
 static int basic_fs_symlink(struct mnt_idmap *idmap, struct inode *dir,
 		struct dentry *dentry, const char *symname);
+
 #elif KERNEL_VERSION_5_15_139
 
 static int basic_fs_create(struct user_namespace *user_ns, struct inode *dir,
@@ -63,6 +64,7 @@ static int basic_fs_symlink(struct user_namespace *user_ns, struct inode *dir,
 		struct dentry *dentry, const char *symname);
 #endif
 
+// inode operations for a directory.
 static const struct inode_operations basic_fs_dir_inode_operations = {
 	.create = basic_fs_create,
 	.mknod = basic_fs_mknod,
@@ -75,20 +77,23 @@ static const struct inode_operations basic_fs_dir_inode_operations = {
 	.symlink = basic_fs_symlink,
 };
 
+// file operations for a directory.
 static const struct file_operations *basic_fs_dir_file_operations =
 		&simple_dir_operations;
 
+// inode operations for a file.
 static const struct inode_operations basic_fs_file_inode_operations = {
 	.setattr = simple_setattr,
 	.getattr = simple_getattr,
 };
 
+// inode operations for a link.
 static const struct inode_operations *basic_fs_link_inode_operations =
 	&page_symlink_inode_operations;
 
-
 #if KERNEL_VERSION_6_6_2
 
+// file operations for a file.
 static const struct file_operations basic_fs_file_operations = {
 	.read_iter = generic_file_read_iter,
 	.write_iter	= generic_file_write_iter,
@@ -100,6 +105,7 @@ static const struct file_operations basic_fs_file_operations = {
 
 #elif KERNEL_VERSION_5_15_139
 
+// file operations for a file.
 static const struct file_operations basic_fs_file_operations = {
 	.read_iter = generic_file_read_iter,
 	.write_iter	= generic_file_write_iter,
@@ -167,19 +173,15 @@ struct inode *basic_fs_create_inode(struct super_block *sb,
 static int basic_fs_create(struct mnt_idmap *idmap, struct inode *dir_inode,
 		struct dentry *dentry, umode_t mode, bool excl)
 {
+	// Creates an inode for a regular file.
 	return basic_fs_mknod(idmap, dir_inode, dentry, mode | S_IFREG, 0);
 }
 
 static int basic_fs_mkdir(struct mnt_idmap *idmap, struct inode *dir_inode,
 		struct dentry *dentry, umode_t mode)
 {
-	int ret;
-
-	ret = basic_fs_mknod(idmap, dir_inode, dentry, mode | S_IFDIR, 0);
-	if (ret != 0)
-		return ret;
-
-	return 0;
+	// Creates an inode for a directory.
+	return basic_fs_mknod(idmap, dir_inode, dentry, mode | S_IFDIR, 0);
 }
 
 static int basic_fs_mknod(struct mnt_idmap *idmap, struct inode *dir_inode,
@@ -236,15 +238,7 @@ static int basic_fs_create(struct user_namespace *user_ns, struct inode *dir_ino
 static int basic_fs_mkdir(struct user_namespace *user_ns, struct inode *dir_inode,
 		struct dentry *dentry, umode_t mode)
 {
-	int ret;
-
-	ret = basic_fs_mknod(user_ns, dir_inode, dentry, mode | S_IFDIR, 0);
-	if (ret != 0)
-		return ret;
-
-	inc_nlink(dir_inode);
-
-	return 0;
+	return basic_fs_mknod(user_ns, dir_inode, dentry, mode | S_IFDIR, 0);
 }
 
 static int basic_fs_mknod(struct user_namespace *user_ns, struct inode *dir_inode,
@@ -340,6 +334,8 @@ struct dentry* basic_fs_mount(struct file_system_type *fs_type,
 	 *                   instance.
 	 * - mount_nodev(): mounts a file system that is not stored in a block device.
 	 * - mount_pseudo(): mounts a pseudo-file systems.
+	 *
+	 * See fs/super.c
 	 */
 	return mount_nodev(fs_type, flags, data, basic_fs_fill_super);
 }

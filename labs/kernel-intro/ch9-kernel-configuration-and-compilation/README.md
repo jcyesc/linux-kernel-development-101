@@ -102,5 +102,4 @@ Find this egrep pattern:
 Find this file:
 Find files #including this file:
 Find assignments to this symbol:
-
 ```
