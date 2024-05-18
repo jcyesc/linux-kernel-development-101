@@ -26,7 +26,7 @@
  *
  * - ch25-filesystems/ram-block-driver/ram_block_driver.c
  */
-#define BLKDEV_NAME	"/dev/ramdiskblockdev"
+#define BLKDEV_NAME	"/dev/rdbd1"
 #define BLK_SECTOR_SIZE	512
 
 #define MSG_SEG_1 "This is the first message :)"
@@ -176,8 +176,6 @@ static int __init bio_block_init(void)
 		return -EINVAL;
 	}
 
-	// If the write request comes before the read request, the previous
-	// content of the whole sector will be overridden.
 	ret = submit_write_request(ram_blk_dev);
 	if (ret)
 		return ret;
