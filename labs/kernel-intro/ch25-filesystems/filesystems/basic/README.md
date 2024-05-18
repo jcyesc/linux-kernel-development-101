@@ -10,6 +10,7 @@ Linux buildroot 6.6.14 #30 SMP PREEMPT Sat Jan 27 22:59:17 PST 2024 aarch64 GNU/
 
 # Register filesystem
 $ insmod basic_fs.ko
+
 $ cat /proc/filesystems | grep basicfs
 nodev	basicfs
 ```
@@ -42,38 +43,38 @@ $ echo "Creating a file 2" > /mnt/basic/regfile2.txt
 $ mkdir /mnt/basic/private
 
 $ ls -i /mnt/
-    703 basic
+    668 basic
 $ ls -i /mnt/basic/
-    706 private           704 regfile.txt       705 regfile2.txt
-# ln -s /mnt/basic/regfile.txt /mnt/basic/regfile-link.txt
-# ls -li /mnt/basic/
+    673 private           671 regfile.txt       672 regfile2.txt
+$ ln -s /mnt/basic/regfile.txt /mnt/basic/regfile-link.txt
+$ ls -li /mnt/basic/
 total 8
-    710 drwxr-xr-x    2 root     root             0 Feb 19 06:51 private
-    715 lrwxrwxrwx    1 root     root            22 Feb 19 06:52 regfile-link.txt -> /mnt/basic/regfile.txt
-    708 -rw-r--r--    1 root     root            16 Feb 19 06:50 regfile.txt
-    709 -rw-r--r--    1 root     root            18 Feb 19 06:50 regfile2.txt
-# cat /mnt/basic/regfile-link.txt
+    673 drwxr-xr-x    2 root     root             0 May 17 22:18 private
+    674 lrwxrwxrwx    1 root     root            22 May 17 22:19 regfile-link.txt -> /mnt/basic/regfile.txt
+    671 -rw-r--r--    1 root     root            16 May 17 22:17 regfile.txt
+    672 -rw-r--r--    1 root     root            18 May 17 22:17 regfile2.txt
+$ cat /mnt/basic/regfile-link.txt
 Creating a file
-
-# umount /mnt/basic
+$ umount /mnt/basic
 ```
 
 The output of `dmesg` is:
 
 ```
-[ 2611.055337] basic_fs: loading out-of-tree module taints kernel.
-[ 2611.061991] basic_fs: basic_fs_init: Init the basic filesystem module
-[ 2659.448264] basic_fs: basic_fs_mount: mounting file system
-[ 2659.449103] basic_fs: basic_fs_fill_super: Filling super block
-[ 2659.449480] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
-[ 2659.449727] basic_fs: basic_fs_create_inode: inode->i_ino = 641, inode->i_nlink = 2
-[ 2659.449911] basic_fs: basic_fs_fill_super: root_inode->i_nlink = 2
-[ 2675.288911] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
-[ 2675.289199] basic_fs: basic_fs_create_inode: inode->i_ino = 642, inode->i_nlink = 1
-[ 2682.611551] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
-[ 2682.611962] basic_fs: basic_fs_create_inode: inode->i_ino = 643, inode->i_nlink = 1
-[ 2696.553278] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
-[ 2696.553773] basic_fs: basic_fs_create_inode: inode->i_ino = 644, inode->i_nlink = 2
-[ 2726.974286] basic_fs: basic_fs_symlink: Creating symlink /mnt/basic/regfile.txt
-[ 2726.974812] basic_fs: basic_fs_create_inode: set inode and file operations for link file
+[10249.885430] basic_fs: basic_fs_init: Init the basic filesystem module
+[10321.747394] basic_fs: basic_fs_mount: mounting file system
+[10321.749275] basic_fs: basic_fs_fill_super: Filling super block
+[10321.749861] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
+[10321.750271] basic_fs: basic_fs_create_inode: inode->i_ino = 668, inode->i_nlink = 2
+[10321.750750] basic_fs: basic_fs_fill_super: root_inode->i_nlink = 2
+[10386.758702] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
+[10386.759089] basic_fs: basic_fs_create_inode: inode->i_ino = 671, inode->i_nlink = 1
+[10394.864869] basic_fs: basic_fs_create_inode: set inode and file operations for regular file
+[10394.865175] basic_fs: basic_fs_create_inode: inode->i_ino = 672, inode->i_nlink = 1
+[10420.298609] basic_fs: basic_fs_create_inode: set inode and file operations for a dir
+[10420.299471] basic_fs: basic_fs_create_inode: inode->i_ino = 673, inode->i_nlink = 2
+[10520.438750] basic_fs: basic_fs_symlink: Creating symlink /mnt/basic/regfile.txt
+[10520.439836] basic_fs: basic_fs_create_inode: set inode and file operations for link file
+[10520.440538] basic_fs: basic_fs_create_inode: inode->i_ino = 674, inode->i_nlink = 1
+[12055.640405] basic_fs: basic_fs_exit: Exiting the module
 ```
