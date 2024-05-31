@@ -39,6 +39,47 @@ CONFIG_IKCONFIG_PROC=y
 pi@raspberrypi:~ $ sudo modprobe configs
 pi@raspberrypi:~ $ zcat /proc/config.gz
 ```
+## include/generated/autoconf.h
+
+Once the kernel is configured and built, several files are generated, among them
+is `include/generated/autoconf.h`, which it is included in `<linux/kconfig.h>`.
+The `include/generated/autoconf.h` file contains macros that refers to
+the selected kernel configurations. For example:
+
+```
+/*
+ * Automatically generated file; DO NOT EDIT.
+ * Linux/arm64 6.6.14 Kernel Configuration
+ */
+#define CONFIG_COMMON_CLK_SCMI 1
+#define CONFIG_HAVE_ARCH_SECCOMP_FILTER 1
+#define CONFIG_SND_PROC_FS 1
+#define CONFIG_VFIO_PCI_MMAP 1
+#define CONFIG_SCSI_DMA 1
+#define CONFIG_NETFILTER_FAMILY_BRIDGE 1
+#define CONFIG_SENSORS_ARM_SCMI 1
+#define CONFIG_SPI_QCOM_QSPI_MODULE 1
+#define CONFIG_CC_HAS_SANCOV_TRACE_PC 1
+#define CONFIG_DEFAULT_INIT ""
+#define CONFIG_ARM64_PAGE_SHIFT 12
+#define CONFIG_ARM_MEDIATEK_CPUFREQ_HW_MODULE 1
+#define CONFIG_SOUNDWIRE_MODULE 1
+```
+
+This macros can be used in the source code to verify whether a feature is enabled
+or not:
+
+```
+#if IS_ENABLED(CONFIG_SOUNDWIRE_MODULE)
+
+do_something();
+
+#endif
+```
+
+See:
+
+- https://elixir.bootlin.com/linux/v5.17.4/source/include/linux/kconfig.h#L73
 
 ## IS_ENABLED(option) macro
 
@@ -51,15 +92,12 @@ if (IS_ENABLED(CONFIG_OF_FLATTREE)) {
 }
 ```
 
-The functionality is similar to:
+The kernel configurations that were set are in:
 
 ```shell
 $ cat .config | grep CONFIG_OF_FLATTREE
 CONFIG_OF_FLATTREE=y
 ```
-
-- https://elixir.bootlin.com/linux/v5.17.4/source/include/linux/kconfig.h#L73
-
 
 ## dump_stack()
 
