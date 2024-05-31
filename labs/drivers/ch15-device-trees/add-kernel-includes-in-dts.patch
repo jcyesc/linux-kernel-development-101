@@ -1,0 +1,32 @@
+From 389b7b183a028292cfcf6f56ab1816b83ee15840 Mon Sep 17 00:00:00 2001
+From: Yifan Hong <elsk@google.com>
+Date: Wed, 29 May 2024 18:12:28 -0700
+Subject: [PATCH] ANDROID: Add linux/kconfig.h to #if on CONFIGs for DTC.
+
+Bug: 343327363
+Bug: 340358415
+Change-Id: I34c844119d139c7cdc4830cee66933270c304d96
+Signed-off-by: Yifan Hong <elsk@google.com>
+---
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index c0d1d8f..4b5c2d0 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -222,6 +222,8 @@
+ # ANDROID: Allow DTC_INCLUDE to be set by the BUILD_CONFIG. This allows one to
+ # compile an out-of-tree device tree.
+ DTC_INCLUDE    += $(srctree)/scripts/dtc/include-prefixes
++# For autoconf.h
++DTC_INCLUDE    += $(objtree)/include
+
+ dtc_cpp_flags  = -Wp,-MMD,$(depfile).pre.tmp -nostdinc                    \
+ 		 $(addprefix -I,$(DTC_INCLUDE))                          \
+diff --git a/scripts/dtc/include-prefixes/linux/kconfig.h b/scripts/dtc/include-prefixes/linux/kconfig.h
+new file mode 120000
+index 0000000..81fcaf9
+--- /dev/null
++++ b/scripts/dtc/include-prefixes/linux/kconfig.h
+@@ -0,0 +1 @@
++../../../../include/linux/kconfig.h
+
