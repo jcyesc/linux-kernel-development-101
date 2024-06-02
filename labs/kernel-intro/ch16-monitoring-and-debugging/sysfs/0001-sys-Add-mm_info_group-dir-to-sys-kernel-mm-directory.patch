@@ -1,0 +1,138 @@
+From 75863e679db401f036bfcd8b1ef9f0a1b6d9e985 Mon Sep 17 00:00:00 2001
+From: Juan Yescas <jcyesc@gmail.com>
+Date: Sat, 1 Jun 2024 22:38:31 -0700
+Subject: [PATCH] sys: Add mm_info_group dir to /sys/kernel/mm directory
+
+This change shows how to:
+
+ - add a directory in the sysfs filesystem
+ - add an attribute and update it.
+
+For example:
+
+  $ echo 1 > /sys/kernel/mm/mm/mm_info_group/mm_status  # MM_HALF_FULL
+  $ echo 2 > /sys/kernel/mm/mm/mm_info_group/mm_status  # MM_FULL
+---
+ mm/Makefile |  2 +-
+ mm/mm_sys.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+), 1 deletion(-)
+ create mode 100644 mm/mm_sys.c
+
+diff --git a/mm/Makefile b/mm/Makefile
+index ec65984e2ade..8ade72bfad1b 100644
+--- a/mm/Makefile
++++ b/mm/Makefile
+@@ -53,7 +53,7 @@ obj-y			:= filemap.o mempool.o oom_kill.o fadvise.o \
+ 			   mm_init.o percpu.o slab_common.o \
+ 			   compaction.o show_mem.o shmem_quota.o\
+ 			   interval_tree.o list_lru.o workingset.o \
+-			   debug.o gup.o mmap_lock.o $(mmu-y)
++			   debug.o gup.o mmap_lock.o mm_sys.o $(mmu-y)
+ 
+ # Give 'page_alloc' its own module-parameter namespace
+ page-alloc-y := page_alloc.o
+diff --git a/mm/mm_sys.c b/mm/mm_sys.c
+new file mode 100644
+index 000000000000..fd80262fc1f9
+--- /dev/null
++++ b/mm/mm_sys.c
+@@ -0,0 +1,96 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * MM sys filesystem
++ *
++ * This file contains an example to
++ *
++ * - add a directory in the sysfs filesystem
++ * - add an attribute and update it.
++ *
++ * For example:
++ *
++ *  $ echo 1 > /sys/kernel/mm/mm/mm_info_group/mm_status  # MM_HALF_FULL
++ *  $ echo 2 > /sys/kernel/mm/mm/mm_info_group/mm_status  # MM_FULL
++ */
++
++#include <linux/init.h>
++#include <linux/kobject.h>
++#include <linux/kstrtox.h>
++#include <linux/mm.h>
++#include <linux/sysfs.h>
++
++enum mm_status
++{
++	MM_EMPTY = 0,
++	MM_HALF_FULL,
++	MM_FULL,
++
++	MM_NR,
++};
++
++unsigned long status = 0;
++
++static ssize_t show_mm_info(struct kobject *kobj,
++			struct kobj_attribute *attr,
++			char *buf)
++{
++	switch (status) {
++	case MM_HALF_FULL:
++		return sprintf(buf, "%s\n", "half full");
++	case MM_FULL:
++		return sprintf(buf, "%s\n", "full");
++	case MM_EMPTY:
++	default:
++			return sprintf(buf, "%s\n", "empty");
++	}
++}
++
++static ssize_t store_mm_info(struct kobject *kobj,
++			struct kobj_attribute *attr,
++			const char *buf, size_t n)
++{
++	unsigned long val;
++
++	if (kstrtoul(buf, 10, &val))
++		return -EINVAL;
++
++	if (val >= MM_NR)
++		return -EINVAL;
++
++	status = val;
++
++	return n;
++}
++
++static struct kobj_attribute mm_info_attr = __ATTR(
++	mm_status,
++	0644,
++	show_mm_info,
++	store_mm_info
++);
++
++static struct attribute *mm_info_attrs[] = {
++	&mm_info_attr.attr,
++	NULL
++};
++
++static struct attribute_group mm_info_attr_group = {
++	.name = "mm_info_group",
++	.attrs = mm_info_attrs
++};
++
++/*
++ * What:			/sys/kernel/mm/mm_info_group/mm_status
++ * KernelVersion:		v5.15
++ * Description:		/sys/kernel/mm/mm_info_group/mm_status shows the dummy
++ * 				status of the memory.
++ */
++static int __init init_mm_info(void)
++{
++	if (sysfs_create_group(mm_kobj, &mm_info_attr_group))
++		pr_err("mm_sys: failed to create sysfs group\n");
++
++	return 0;
++}
++late_initcall(init_mm_info);
++
+-- 
+2.25.1
+
