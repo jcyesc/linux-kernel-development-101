@@ -21,6 +21,7 @@ To build the driver in the host and deploy it in the target, run:
 Once the driver is in the target, install the driver:
 
 ```
+# Create a block node.
 qemu $ mknod /dev/rdbd b 240 0
 qemu $ insmod ram_block_driver.ko
 [ 1537.891323] ram_block_driver: loading out-of-tree module taints kernel.
@@ -59,7 +60,7 @@ To verify that the block device and gendisk were created, run:
  # Verify that block device and gendisk exists.
  $ ls -la /dev/rdbd*
 brw-r--r--    1 root     root      240,   0 May 13 09:46 /dev/rdbd
-brw-------    1 root     root      240,   0 May 13 09:47 /dev/rdbd1
+brw-------    1 root     root      240,   1 May 13 09:47 /dev/rdbd1
 ```
 
 To see the configurations of the disk:
@@ -238,29 +239,24 @@ Allocating group tables: done
 Writing inode tables: done
 Writing superblocks and filesystem accounting information: done
 
-
- $ file -s /dev/rdbd
-/dev/rdbd: Linux rev 1.0 ext2 filesystem data, UUID=c9f9fe75-73cc-4d3a-b044-1779ba689b3e (large files)
-
  $ file -s /dev/rdbd1
 /dev/rdbd1: Linux rev 1.0 ext2 filesystem data, UUID=c9f9fe75-73cc-4d3a-b044-1779ba689b3e (large files)
 ```
 
-> IMPORTANT: In this example /dev/rdbd and /dev/rdbd1 refers
-> to the same partition. However, if we would have more partitions, the structure
-> would be:
->
->    /dev/rdbd
->    /dev/rdbd1
->    /dev/rdbd2
->    /dev/rdbd3
->
-> Similar to:
->
->    /dev/sda
->    /dev/sda1
->    /dev/sda2
->    /dev/sda3
+Because the device node `/dev/rdbd` was created with different minor version (`0`)
+than `/dev/rdbd1`, we are unable to read/write on `/dev/rdbd`.
+
+```
+ $ echo "hello" > /dev/rdbd
+-sh: can't create /dev/rdbd: No such device or address
+
+ $ mke2fs /dev/rdbd
+mke2fs 1.47.0 (5-Feb-2023)
+mke2fs: No such device or address while trying to determine filesystem size
+
+ $ file -s /dev/rdbd
+/dev/rdbd: writable, no read permission
+```
 
 2. Mount the block device
 

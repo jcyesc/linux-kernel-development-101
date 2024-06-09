@@ -299,7 +299,7 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	dev->queue->disk = dev->gd;
 	snprintf(dev->gd->disk_name, DISK_NAME_LEN, GENDISK_NAME_1);
 	dev->gd->major = RAM_BLKDEV_MAJOR;
-	dev->gd->first_minor = 0;
+	dev->gd->first_minor = 1;
 	dev->gd->minors = 1;
 	dev->gd->flags |= GENHD_FL_NO_PART;
 	dev->gd->fops = &ram_block_ops;
