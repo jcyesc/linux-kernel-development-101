@@ -43,6 +43,7 @@
 #include <linux/types.h>
 #include <linux/vmalloc.h>
 
+// /sys/block/rdbd1/size
 #define NR_SECTORS				131072
 #define RAMDISK_SECTOR_SIZE		512
 
@@ -59,9 +60,9 @@ static struct ram_block_dev {
 	// Fields that are part of the ramdisk.
 	uint8_t *ramdisk;
 	size_t size;
-	spinlock_t lock;
 
 	// Fields to protect access to ramdisk
+	spinlock_t lock;
 	struct kref refcount;
 } ram_blk_dev;
 
@@ -183,8 +184,10 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 	struct request *rq = bd->rq;
 	int status;
 	struct gendisk *gd = hctx->queue->disk;
+	struct ram_block_dev *dev = gd->private_data;
 
-	pr_info("Queuing request for disk '%s'\n", gd->disk_name);
+	pr_info("Queuing request for disk '%s' with size %ld bytes\n",
+			gd->disk_name, dev->size);
 
 	// Incrementing the kref counter.
 	kref_get(&ram_blk_dev.refcount);
@@ -218,7 +221,6 @@ out:
 static const struct blk_mq_ops ram_mq_queue_ops = {
 	.queue_rq = blk_mq_ops_ram_queue_rq,
 };
-
 
 #if KERNEL_VERSION_6_6_2
 /**
@@ -279,11 +281,14 @@ inline int init_request_queue(struct ram_block_dev *dev)
 	if (IS_ERR(dev->queue))
 		return PTR_ERR(dev->queue);
 
-	pr_info("Before blk_queue_physical_block_size()");
+	// pr_info("Before blk_queue_physical_block_size()");
+	// /sys/block/rdbd1/queue/physical_block_size
 	blk_queue_physical_block_size(dev->queue, RAMDISK_SECTOR_SIZE);
+	// /sys/block/rdbd1/queue/logical_block_size
 	blk_queue_logical_block_size(dev->queue, RAMDISK_SECTOR_SIZE);
 
 	// https://elixir.bootlin.com/linux/v6.6.2/source/block/blk-settings.c#L284
+	// /sys/block/rdbd1/queue/max_segment_size
 	blk_queue_max_segment_size(dev->queue, 512);
 
 	return 0;
@@ -298,9 +303,15 @@ inline int init_gendisk(struct ram_block_dev *dev)
 
 	dev->queue->disk = dev->gd;
 	snprintf(dev->gd->disk_name, DISK_NAME_LEN, GENDISK_NAME_1);
+
+	// major/first_minor/minors should not be set by any new driver, the
+	// block core will take care of allocating them automatically.
+	//
+	// https://elixir.bootlin.com/linux/v6.9.5/source/include/linux/blkdev.h#L134
 	dev->gd->major = RAM_BLKDEV_MAJOR;
 	dev->gd->first_minor = 1;
 	dev->gd->minors = 1;
+
 	dev->gd->flags |= GENHD_FL_NO_PART;
 	dev->gd->fops = &ram_block_ops;
 	dev->gd->queue = dev->queue;
