@@ -69,7 +69,7 @@ To see the configurations of the disk:
  $ for f in `find /sys/block/rdbd1/ -type f`; do echo $f; cat $f; done;
 /sys/block/rdbd1/uevent
 MAJOR=240
-MINOR=0
+MINOR=1
 DEVNAME=rdbd1
 DEVTYPE=disk
 DISKSEQ=11
@@ -92,7 +92,7 @@ cat: read error: Input/output error
 /sys/block/rdbd1/power/control
 auto
 /sys/block/rdbd1/dev
-240:0
+240:1
 /sys/block/rdbd1/ro
 0
 /sys/block/rdbd1/mq/0/cpu_list
