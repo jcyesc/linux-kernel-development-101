@@ -104,22 +104,22 @@ static int exec_request(struct request *rq)
 
 	rq_for_each_segment(bvec, rq, iter) {
 		sector_t sector = iter.iter.bi_sector;
-		unsigned long bv_offset = bvec.bv_offset;
-		unsigned long offset = (sector * RAMDISK_SECTOR_SIZE);
+		unsigned long buf_offset = bvec.bv_offset;
+		unsigned long disk_offset = (sector * RAMDISK_SECTOR_SIZE);
 		size_t len = bvec.bv_len;
 		char *buffer;
 		int dir = bio_data_dir(iter.bio);
 		unsigned long flags;
 
 		pr_info("%s Segment %d", (dir == READ ? "READ" : "WRITE"), i++);
-		pr_info("   sector:    %lld", sector);
-		pr_info("   bv_offset: %ld", bv_offset);
-		pr_info("   offset:    %ld", offset);
-		pr_info("   len:       %ld", len);
+		pr_info("   sector:       %lld", sector);
+		pr_info("   buf_offset:   %ld", buf_offset);
+		pr_info("   disk_offset:  %ld", disk_offset);
+		pr_info("   len:          %ld", len);
 
-		if ((offset + len) > ram_blk_dev.size) {
-			pr_err("Ramdisk = %ld, offset = %ld, len = %ld",
-				ram_blk_dev.size, offset, len);
+		if ((disk_offset + len) > ram_blk_dev.size) {
+			pr_err("Ramdisk = %ld, disk_offset = %ld, len = %ld",
+				ram_blk_dev.size, disk_offset, len);
 			return BLK_STS_IOERR;
 		}
 
@@ -129,10 +129,10 @@ static int exec_request(struct request *rq)
 
 		switch (dir) {
 		case READ:
-			memcpy(buffer + bv_offset, ram_blk_dev.ramdisk + offset, len);
+			memcpy(buffer + buf_offset, ram_blk_dev.ramdisk + disk_offset, len);
 			break;
 		case WRITE:
-			memcpy(ram_blk_dev.ramdisk + offset, buffer + bv_offset, len);
+			memcpy(ram_blk_dev.ramdisk + disk_offset, buffer + buf_offset, len);
 			break;
 		};
 
