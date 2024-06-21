@@ -273,6 +273,25 @@ tmpfs on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
 sysfs on /sys type sysfs (rw,relatime)
 /dev/rdbd1 on /mnt type ext4 (rw,relatime)
 
+ $ ls /sys/fs/ext4/
+features  rdbd1     vda
+
+ $ ls /sys/fs/ext4/rdbd1/
+delayed_allocation_blocks      inode_goal                     max_writeback_mb_bump          msg_count
+err_ratelimit_burst            inode_readahead_blks           mb_best_avail_max_trim_order   msg_ratelimit_burst
+err_ratelimit_interval_ms      journal_task                   mb_group_prealloc              msg_ratelimit_interval_ms
+errors_count                   last_error_block               mb_max_linear_groups           reserved_clusters
+extent_max_zeroout_kb          last_error_errcode             mb_max_to_scan                 session_write_kbytes
+first_error_block              last_error_func                mb_min_to_scan                 sra_exceeded_retry_limit
+first_error_errcode            last_error_ino                 mb_order2_req                  trigger_fs_error
+first_error_func               last_error_line                mb_prefetch                    warning_count
+first_error_ino                last_error_time                mb_prefetch_limit              warning_ratelimit_burst
+first_error_line               last_trim_minblks              mb_stats                       warning_ratelimit_interval_ms
+first_error_time               lifetime_write_kbytes          mb_stream_req
+
+ $ cat /sys/fs/ext4/rdbd1/first_error_errcode
+0
+
  $ cd /mnt/
  $ echo "hello file system" > data.txt
  $ ls
@@ -298,6 +317,9 @@ the device node.
 > Note that before the `write` request is executed, a `read` request
 > is performed first. This is because we might write in the middle of
 > the sector without modifying the data before the offset.
+
+Whe we write directly to the disk `/dev/rdbd1`, we might corrupt the filesystem
+in there, if there is one.
 
 ```
  $ echo "abcd" > /dev/rdbd1
