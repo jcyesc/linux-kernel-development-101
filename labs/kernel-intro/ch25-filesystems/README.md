@@ -214,3 +214,58 @@ struct req_iterator {
 
 It is used to translate file offsets to block offsets.
 
+## Declaring structs in a for loop
+
+In the kernel, there are C constructions that declare structs inside a for loop.
+For example, the macro [__bio_for_each_segment](https://elixir.bootlin.com/linux/v6.9.5/source/include/linux/bio.h#L145)
+declares the structure:
+
+```
+#define bvec_iter_bvec(bvec, iter)				\
+((struct bio_vec) {						\
+	.bv_page	= bvec_iter_page((bvec), (iter)),	\
+	.bv_len		= bvec_iter_len((bvec), (iter)),	\
+	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
+})
+```
+
+inside the for loop below:
+
+```
+#define __bio_for_each_segment(bvl, bio, iter, start)			\
+	for (iter = (start);						\
+	     (iter).bi_size &&						\
+		((bvl = bio_iter_iovec((bio), (iter))), 1);		\
+	     bio_advance_iter_single((bio), &(iter), (bvl).bv_len))
+
+#define bio_for_each_segment(bvl, bio, iter)				\
+	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+```
+
+The C programming language allows to declare structs in the condition of the for
+loops if it is followed by the comma operator. The comma operator evaluates the
+expressions from left to right and the result of the total expression is the
+right most expression.
+
+The next example declares a fraction in the condition part of the for loop and
+takes as a result the "1" that is at the end of the struct declaration.
+
+```
+#include <stdio.h>
+
+struct fraction {
+   int num;
+   int den;
+};
+
+int main() {
+	struct fraction f;
+	for (int i = 0; i < 5 && (f = ((struct fraction) {
+				.num = i,
+				.den = i + 1,
+				}), 1); i++) {
+
+		printf("%d / %d \n", f.num, f.den);
+	}
+}
+```
