@@ -118,7 +118,10 @@ Every physical page in the system is associated to a `struct page`.
 struct page {
 	unsigned long flags;		/* Atomic flags, some possibly
 					 * updated asynchronously */
-
+	union {
+		pgoff_t index;		/* Our offset within mapping. */
+		unsigned long share;	/* share count for fsdax */
+	};
 	union {		/* This union is 4 bytes in size. */
 		/*
 		 * If the page can be mapped to userspace, encodes the number
@@ -154,6 +157,50 @@ struct page {
 #endif /* WANT_PAGE_VIRTUAL */
 
 } _struct_page_alignment;
+```
+
+## Structure of a block I/O request
+
+```
+   struct request                       struct req_iterator
+   ______________                   __________________________
+   |            |                   | struct bvec_iter iter; |
+   |    *bio    |                   | struct bio *bio;       |
+   |____________|                   |________________________|
+          |
+          |
+          |
+      struct bio          struct bio         struct bio          struct bio
+    ______________      ______________      ______________      ______________
+    |            |      |            |      |            |      |            |
+    |  *bi_next  |______|  *bi_next  |______|  *bi_next  |______|  *bi_next  |______ NULL
+    |   bi_iter  |      |   bi_iter  |      |   bi_iter  |      |   bi_iter  |
+    | *bi_io_vec |      | *bi_io_vec |      | *bi_io_vec |      | *bi_io_vec |
+    |____________|      |____________|      |____________|      |____________|
+           |                   |                   |                   |
+           |                   |                   |                   |
+           |                .....                .....                 |
+   struct bio_vec[]                                            struct bio_vec[]
+    ______________     ---------                               ______________     ---------
+    |            |_____| index | struct page                   |            |_____| index | struct page
+    |  *bv_page  |     ---------                               |  *bv_page  |     ---------
+    |____________|     ---------                               |____________|     ---------    
+    |            |_____| index | struct page                   |            |_____| index | struct page
+    |  *bv_page  |     ---------                               |  *bv_page  |     ---------
+    |____________|     ---------                               |____________|     ---------
+    |            |_____| index | struct page                   |            |_____| index | struct page
+    |  *bv_page  |     ---------                               |  *bv_page  |     ---------
+    |____________|                                             |____________|     ---------
+                                                               |            |_____| index | struct page
+                                                               |  *bv_page  |     ---------
+                                                               |____________|     ---------
+                                                               |            |_____| index | struct page
+                                                               |  *bv_page  |     ---------
+                                                               |____________|     ---------
+                                                               |            |_____| index | struct page
+                                                               |  *bv_page  |     ---------
+                                                               |____________|
+
 ```
 
 ## How to iterate segments
