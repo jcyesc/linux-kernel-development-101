@@ -18,6 +18,7 @@ The Virtual File System is a framework that provides common functionality such:
 - queue mechanism to send the request to the block layer.
 
 
+```
     _____________________________________________________________
     |                                                           |
     |                       User space                          |
@@ -49,7 +50,7 @@ The Virtual File System is a framework that provides common functionality such:
     |    emmc    |   |     sd     |  |    ram     |
     | blk driver |   | blk driver |  | blk driver |
     |____________|   |____________|  |____________|
-
+```
  
 
 The main data structures defined for the VFS are:
