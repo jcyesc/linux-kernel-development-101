@@ -35,13 +35,13 @@ int process_blk_request(struct request *rq) {
 		for (iter.bio = rq->bio; iter.bio; iter.bio = iter.bio->bi_next)
 			for (iter.iter = ((iter.bio)->bi_iter);
 	     			(iter.iter).bi_size &&
-							((bvl = ((struct bio_vec) {						
-								.bv_page = bvec_iter_page(((iter.bio)->bi_io_vec), (iter.iter)),
-								.bv_len	= bvec_iter_len(((iter.bio)->bi_io_vec), (iter.iter)),
-								.bv_offset	= bvec_iter_offset(((iter.bio)->bi_io_vec), (iter.iter)),
-							}), 1);
-							// Advaces iter->bi_idx++ if bv_len equals to copy bytes;
-							bio_advance_iter_single((iter.bio), &(iter.iter), (bvl).bv_len)) {
+					((bvl = ((struct bio_vec) {						
+						.bv_page = bvec_iter_page(((iter.bio)->bi_io_vec), (iter.iter)),
+						.bv_len	= bvec_iter_len(((iter.bio)->bi_io_vec), (iter.iter)),
+						.bv_offset	= bvec_iter_offset(((iter.bio)->bi_io_vec), (iter.iter)),
+					}), 1);
+					// Advaces iter->bi_idx++ if bv_len equals to copy bytes;
+					bio_advance_iter_single((iter.bio), &(iter.iter), (bvl).bv_len)) {
 
 				sector_t sector = iter.iter.bi_sector;
 				unsigned long disk_offset = (sector * SECTOR_SIZE);
