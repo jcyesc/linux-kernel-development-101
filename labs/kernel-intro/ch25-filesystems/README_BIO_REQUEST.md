@@ -3,11 +3,78 @@
 
 Linux Kernel version `6.6.14`
 
+## VFS and the block layer
+
+```
+    _____________________________________________________________
+    |                                                           |
+    |                       User space                          |
+    |  mkdir(), rmdir() open(), lseek(), read(), write(), etc.  |
+    |                                                           |
+    |___________________________________________________________|
+                                   |
+                                   |
+    _____________________________________________________________
+    |                                                           |    ______________
+    |                 Virtual File System (VFS)                 |____|            |
+    |                                                           |    | Page Cache |
+    |    building blocks: super_block, dentry, inode, file      |    |____________|
+    |___________________________________________________________|
+                                    |
+                                    |
+  __________________________________________________________________
+  |                                                                |
+  |                         Mapping Layer                          |
+  |                                                                |
+  |  ____________  ____________  ____________  ________________    |
+  |  |          |  |          |  |          |  |              |    |
+  |  |   EXT4   |  |   F2FS   |  | squashFS |  | Block Device |    |
+  |  |  module  |  |  module  |  |  module  |  |     File     |    |
+  |  |__________|  |__________|  |__________|  |______________|    |
+  |                                                                |
+  __________________________________________________________________
+                                   |
+                                   |
+     _____________________________________________________________
+     |                                                           |
+     |                    Generic Block Layer                    |
+     | (create bio request, merge segments, queue request, etc)  |
+     |___________________________________________________________|
+                                   |
+                                   |
+     _____________________________________________________________
+     |                                                           |
+     |                    I/O Schedule Layer                     |
+     | (create bio request, merge segments, queue request, etc)  |
+     |___________________________________________________________|
+                |                  |                   |
+                |                  |                   |
+          ______________    ______________      ______________
+          |            |    |            |      |            |
+          |    emmc    |    |     sd     |      |    ram     |
+          | blk driver |    | blk driver |      | blk driver |
+          |____________|    |____________|      |____________|
+                 |                 |
+                 |                 |
+           _____________      ___________
+           |           |      |         |
+           | emmc disk |      | sd card |
+           |___________|      |_________|
+```
+
 ## Structure of the `bio` requests
 
-- sector
-- block
-- segments
+- sector: The block devices transfer data in chunks of fixed size called sectors.
+          Sector is the basic unit of block devices. The value is usually 512.
+- block: The filesystem unit is a block. The VFS, the mapping layer and the
+         filesystems group the data in blocks. The block size of the filesystem
+         has to be less or equal to the page size (block_size <= page_size) in
+         Linux. The file systems that supports block sizes less than the page
+         size are called `subpage-block` file system. Some examples of `subpage-block`
+         file system are `ext4` and `erofs`. `f2fs` file system does not support
+         subpage-blocks. `f2fs` has this constraint `block_size == page size`.
+- segments: It is a memory page that contains some sectors that are adjacent
+         in the disk.
 
 The main data structures for block I/O requests are:
 
@@ -84,6 +151,9 @@ struct bio_vec {
 
 The `struct bvec_iter` is a helper class to iterate through the vector
 of segments.
+
+Important: The segments that are in the list of `struct bio_vec` represent
+contiguous sectors in the disk.
 
 ```
 struct bvec_iter {
