@@ -33,7 +33,9 @@
 #include <linux/init.h>
 #include <linux/kref.h>
 #include <linux/module.h>
+#include <linux/mutex.h>
 #include <linux/numa.h>
+#include <linux/part_stat.h>
 #include <linux/spinlock.h>
 
 #if KERNEL_VERSION_6_6_2
@@ -61,9 +63,9 @@ static struct ram_block_dev {
 	uint8_t *ramdisk;
 	size_t size;
 
-	// Fields to protect access to ramdisk
+	// Fields to protect access to ramdisk.
+	// There could be only one reader and writer at a time.
 	spinlock_t lock;
-	struct kref refcount;
 } ram_blk_dev;
 
 inline void pr_request(struct request *rq)
@@ -144,31 +146,6 @@ static int exec_request(struct request *rq)
 	return BLK_STS_OK;
 }
 
-static void release_block_device(struct kref *ref)
-{
-	// Note: There could be race condition when the block device is released.
-	struct ram_block_dev *dev = container_of(ref, struct ram_block_dev, refcount);
-
-	pr_info("Unregistering block I/O device");
-	unregister_blkdev(RAM_BLKDEV_MAJOR, RAM_BLKDEV_NAME);
-
-	pr_info("Deleting gendisk");
-	del_gendisk(dev->gd);
-
-	pr_info("Destroying queue");
-#if KERNEL_VERSION_6_6_2
-	blk_mq_destroy_queue(dev->queue);
-#elif KERNEL_VERSION_5_15_139
-	blk_cleanup_queue(dev->queue);
-#endif
-
-	pr_info("Freeing tag_set");
-	blk_mq_free_tag_set(&dev->tag_set);
-
-	pr_info("Freeing ramdisk");
-	vfree(dev->ramdisk);
-}
-
 /**
  * Queue a new request from block IO.
  * To process the request, use these methods:
@@ -189,9 +166,6 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 	pr_info("Queuing request for disk '%s' with size %ld bytes\n",
 			gd->disk_name, dev->size);
 
-	// Incrementing the kref counter.
-	kref_get(&ram_blk_dev.refcount);
-
 	if (bd->last)
 		pr_info("This is the 'last' request in the queue");
 
@@ -210,8 +184,6 @@ static blk_status_t blk_mq_ops_ram_queue_rq(struct blk_mq_hw_ctx *hctx,
 	blk_mq_end_request(rq, status);
 
 out:
-	// Decrementing the kref counter.
-	kref_put(&ram_blk_dev.refcount, release_block_device);
 	return BLK_STS_OK;
 }
 
@@ -230,6 +202,13 @@ static int ram_block_open(struct gendisk *disk, blk_mode_t mode)
 {
 	pr_info("Open disk %s\n", disk->disk_name);
 
+	if (mutex_is_locked(&disk->open_mutex)) {
+		pr_info("Disk locked\n");
+	} else {
+		pr_info("Disk no locked\n");
+	}
+
+
 	return 0;
 }
 
@@ -239,6 +218,11 @@ static int ram_block_open(struct gendisk *disk, blk_mode_t mode)
 static void ram_block_release(struct gendisk *disk)
 {
 	pr_info("Release disk %s\n", disk->disk_name);
+	if (mutex_is_locked(&disk->open_mutex)) {
+		pr_info("Disk locked\n");
+	} else {
+		pr_info("Disk no locked\n");
+	}
 }
 
 #elif KERNEL_VERSION_5_15_139
@@ -324,6 +308,7 @@ inline int init_gendisk(struct ram_block_dev *dev)
 	// This block device is not rotational and it is synchronous.
 	blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->gd->queue);
 	blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, dev->gd->queue);
+	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, dev->gd->queue);
 
 	return 0;
 }
@@ -343,8 +328,6 @@ static int setup_block_dev(struct ram_block_dev *dev)
 	int status;
 
 	spin_lock_init(&dev->lock);
-	// Initializes the kref and set the counter to 1.
-	kref_init(&dev->refcount);
 
 	status = init_ramdisk(dev);
 	if (status < 0)
@@ -401,16 +384,49 @@ static int __init ram_block_init(void)
 	return 0;
 }
 
+static int release_block_device(struct ram_block_dev *dev)
+{
+	unsigned int clients;
+
+	mutex_lock(&dev->gd->open_mutex);
+
+	clients = disk_openers(dev->gd);
+	pr_info("gendisk has [%d] clients(s)!", clients);
+	if (clients) {
+		mutex_unlock(&dev->gd->open_mutex);
+		return -EBUSY;
+	}
+
+	mutex_unlock(&dev->gd->open_mutex);
+
+	sync_blockdev(dev->gd->part0);
+
+	pr_info("Deleting gendisk");
+	del_gendisk(dev->gd);
+
+	pr_info("Destroying queue");
+#if KERNEL_VERSION_6_6_2
+	blk_mq_destroy_queue(dev->queue);
+#elif KERNEL_VERSION_5_15_139
+	blk_cleanup_queue(dev->queue);
+#endif
+
+	pr_info("Freeing tag_set");
+	blk_mq_free_tag_set(&dev->tag_set);
+
+	pr_info("Freeing ramdisk");
+	vfree(dev->ramdisk);
+
+	pr_info("Unregistering block I/O device");
+	unregister_blkdev(RAM_BLKDEV_MAJOR, RAM_BLKDEV_NAME);
+
+	return 0;
+}
+
 static void __exit ram_block_exit(void)
 {
-	unsigned int countrefs;
-
 	pr_info("Exiting ram block driver");
-
-	countrefs = kref_read(&ram_blk_dev.refcount);
-		pr_info("ram_blk_dev has [%d] references(s)!", countrefs);
-
-	kref_put(&ram_blk_dev.refcount, release_block_device);
+	WARN_ON_ONCE(release_block_device(&ram_blk_dev));
 }
 
 module_init(ram_block_init);
