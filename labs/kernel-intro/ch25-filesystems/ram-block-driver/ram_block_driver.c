@@ -237,6 +237,12 @@ static void ram_block_release(struct gendisk *disk, fmode_t mode)
 {
 	pr_info("Release disk %s\n", disk->disk_name);
 }
+
+static int disk_openers(struct gendisk *disk)
+{
+	return disk->part0->bd_openers;
+}
+
 #endif
 
 static const struct block_device_operations ram_block_ops = {
@@ -307,7 +313,11 @@ inline int init_gendisk(struct ram_block_dev *dev)
 
 	// This block device is not rotational and it is synchronous.
 	blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->gd->queue);
+
+#if KERNEL_VERSION_6_6_2
 	blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, dev->gd->queue);
+#endif
+
 	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, dev->gd->queue);
 
 	return 0;
