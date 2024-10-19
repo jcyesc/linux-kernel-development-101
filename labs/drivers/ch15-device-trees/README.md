@@ -35,7 +35,7 @@ To generate the dtb with the memory and cpu configuration passed to
 
 ```
 $ sudo qemu-system-aarch64 \
-	-m 2048 \
+	-m 8192 \
     -cpu cortex-a72 \
     -machine virt,dumpdtb=qemu_virt.dtb \
     -nographic \
@@ -53,7 +53,7 @@ $ dtb=/home/parallels/Development/tools/linux-stable/qemu_virt.dtb
 
 # Pass the dtb qemu_virt.dtb to qemu-system-aarch64.
 $ sudo qemu-system-aarch64 \
-	-m 2048 \
+	-m 8192 \
     -cpu cortex-a72 \
     -machine virt \
     -nographic \
@@ -72,9 +72,89 @@ WARNING: Image format was not specified for '/home/parallels/Development/tools/b
          Specify the 'raw' format explicitly to remove the restrictions.
 ```
 
-`WARNING:` After adding the DTB, `qemu-system-aarch64` halts. Due to this,
-another alternative is to build the kernel for a different board that is also
-supported by qemu and buildroot.
+
+`WARNING:` After adding the DTB, `qemu-system-aarch64` halts.
+
+If we check the size of the dtb, we realize that is 1.0MB, which it is pretty
+big for the DTB standards.
+
+```
+ $ ls -lh qemu_virt.dtb
+-rw-r--r-- 1 root root 1.0M Oct 19 11:43 qemu_virt.dtb
+```
+
+To fix this, we simply decompile and compile the dts
+
+```
+ # Decompile DTB
+ $ dtc -I dtb -O dts -o qemu_virt.dts qemu_virt.dtb
+
+ # Compile DTS
+ $ dtc -I dts -O dtb -o qemu_virt.dtb  qemu_virt.dts
+
+ # Check the size
+ $ ls -lh qemu_virt.dtb
+ -rw-rw-r-- 1 parallels parallels 7.3K Oct 19 11:50 qemu_virt.dtb
+```
+
+After this, qemu boots the kernel using the given dtb:
+
+```
+$ sudo qemu-system-aarch64 \
+    -m 8192 \
+    -cpu cortex-a72 \
+    -machine virt \
+    -nographic \
+    -smp 1 \
+    -dtb $dtb \
+    -hda $hda \
+    -kernel $kernel \
+    -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
+    -object rng-random,filename=/dev/urandom,id=rng0 \
+    -device virtio-rng-pci,rng=rng0 \
+    -device virtio-net-pci,netdev=eth0 \
+    -netdev user,id=eth0,hostfwd=tcp::8022-:22
+
+
+buildroot login: root
+# cat /proc/meminfo
+MemTotal:        8129784 kB
+
+# hexdump -C /sys/firmware/devicetree/base/memory@40000000/reg
+00000000  00 00 00 00 40 00 00 00  00 00 00 02 00 00 00 00  |....@...........|
+00000010
+```
+
+Note that the 8192 MiB of memory is indicated in the device tree:
+
+```
+	#size-cells = <0x02>;
+	#address-cells = <0x02>;
+
+	memory@40000000 {
+		reg = <0x00 0x40000000 0x02 0x00>;
+		device_type = "memory";
+	};
+```
+
+The first 2 32-bits cells (address cells) in `reg = <0x00 0x40000000 0x02 0x00>;`
+indicate:
+
+- 0x00       -> last 32-bits of the starting address.
+- 0x40000000 -> first 32-bits of the starting address.
+
+The starting address is 0x40000000.
+
+The last 2 32-bit cells (size-cells) in `reg = <0x00 0x40000000 0x02 0x00>;`
+indicate:
+
+- 0x02 -> last 32-bits of the size.
+- 0x00 -> first 32-bits of the size.
+
+The memory size is 0x200000000 = 8192 MiB = 8 GiB
+
+Another alternative to use a custom DTB is to build the kernel for a different
+board that is also supported by qemu and buildroot.
 
 ## Check which boards are supported by kernel and buildroot
 
