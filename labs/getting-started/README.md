@@ -216,6 +216,12 @@ in `buildroot/output/target/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM`
  newrootfs.ext2: Linux rev 0.0 ext2 filesystem data, UUID=00000000-0000-0000-0000-000000000000
 ```
 
+Note: If the disk is corrupted, we might fix it with:
+
+```
+ $ e2fsck -p ~/images/rootfs.ext2
+```
+
 ## How to start `qemu`
 
 ```shell
