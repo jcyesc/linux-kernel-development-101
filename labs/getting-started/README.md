@@ -227,7 +227,7 @@ Note: If the disk is corrupted, we might fix it with:
 ```shell
  $ sudo qemu-system-aarch64 \
      -m 2048 \
-     -cpu cortex-a72 \
+     -cpu cortex-a76 \
      -machine virt \
      -nographic -smp 1 \
      -hda <path to rootfs>/output/images/rootfs.ext2 \
@@ -465,7 +465,7 @@ Start qemu with the new rootfs:
 ```shell
  $ hda=<path to rootfs/newrootfs.ext4>
  $ kernel=<path kernel/linux-stable/arch/arm64/boot/Image>
- $ sudo qemu-system-aarch64 -m 2048 -cpu cortex-a72 -machine virt \
+ $ sudo qemu-system-aarch64 -m 2048 -cpu cortex-a76 -machine virt \
        -nographic -smp 1  -hda $hda \
        -kernel $kernel  \
        -append "console=ttyAMA0 root=/dev/vda oops=panic panic_on_warn=1 panic=-1 debug earlyprintk=serial" \
