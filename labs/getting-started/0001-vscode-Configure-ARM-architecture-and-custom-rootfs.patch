@@ -1,0 +1,108 @@
+From 5be1bbba9772aab6de31ced12dfa4f4d142a93cb Mon Sep 17 00:00:00 2001
+Date: Sat, 14 Feb 2026 06:55:19 -0800
+Subject: [PATCH] vscode: Configure ARM architecture and custom rootfs
+
+This configuration is for:
+
+- ARM architecture
+- Provide a custom rootfs
+- Uses a cortex-a76 processor
+---
+ local.sh | 17 +++++++++++++++--
+ tasks.sh | 30 ++++++++++++++++++++++--------
+ 2 files changed, 37 insertions(+), 10 deletions(-)
+
+diff --git a/local.sh b/local.sh
+index dda21bd..0c1e721 100644
+--- a/local.sh
++++ b/local.sh
+@@ -4,7 +4,20 @@
+ # your local needs and should not be part of the upstream tasks.sh. For example:
+ 
+ ## Cross-compile/debug/emulate for arm64
+-# TARGET_ARCH=arm64
++TARGET_ARCH=arm64
++
++## Path to the rootfs
++IMAGE_PATH=/home/santo/Development/kernel/buildroot/output/images/rootfs.ext2
++
++## DTB Path
++# DTB_PATH=
++
++## qemu-system-aarch64 parameters
++# The rootfs has to be compiled for the cortex-a76 processor. Otherwise,
++# Update the value.
++VM_START_ARGS=" -cpu cortex-a76"
++VM_START_ARGS+=" -smp 1"
++VM_START_ARGS+=" -m 2048"
+ 
+ ## Change PATH to use a different QEMU binary
+ # export PATH=$HOME/qemu/bin/:$PATH
+@@ -23,7 +36,7 @@
+ # fi
+ 
+ ## Make the build verbose
+-# SILENT_BUILD_FLAG=""
++SILENT_BUILD_FLAG=""
+ 
+ ## Disable the build spinner
+ # SPINNER=0
+diff --git a/tasks.sh b/tasks.sh
+index 0bd8afe..2cb203e 100755
+--- a/tasks.sh
++++ b/tasks.sh
+@@ -55,8 +55,8 @@ done
+ 
+ # Default context variables, can be overridden by local.sh or in environment.
+ : ${WORKSPACE_DIR:=`realpath -s "${SCRIPT_DIR}/.."`}
+-: ${MAKE:="make -j`nproc` LLVM=1 LLVM_IAS=1 CC='ccache clang'"}
+ : ${TARGET_ARCH:="x86_64"}
++: ${MAKE:="make -j`nproc` LLVM=1 LLVM_IAS=1 CC='ccache clang'"}
+ : ${TARGET_GDB:="gdb-multiarch"}
+ : ${SILENT_BUILD_FLAG="-s"}
+ : ${SUCCESSFUL_EXIT_COMMAND:=""}
+@@ -93,7 +93,7 @@ elif [ "${TARGET_ARCH}" = "arm64" ]; then
+   : ${MKOSI_TARGET_ARCH:="arm64"}
+   : ${TOOLS_SRCARCH:="arm64"}
+   : ${QEMU_BIN:="qemu-system-aarch64"}
+-  : ${QEMU_CMD:="${QEMU_BIN} -cpu max -machine virt"}
++  : ${QEMU_CMD:="${QEMU_BIN} -machine virt"}
+   : ${SERIAL_TTY:="ttyAMA0"}
+   : ${PROOT_ARGS:="-q qemu-aarch64-static"}
+   : ${SYZKALLER_TARGETARCH:="arm64"}
+@@ -122,12 +122,26 @@ if [ ! -f ${SSH_KEY} ]; then
+   ssh-keygen -t rsa -f ${SSH_KEY} -N "" -q
+ fi
+ 
+-# QEMU start command
+-: ${VM_START:="${QEMU_CMD} -s -nographic -smp 4 -m 4G -qmp tcp:localhost:4444,server,nowait -serial mon:stdio \
+-    -net nic,model=virtio-net-pci -net user,hostfwd=tcp::5555-:22 \
+-    -virtfs local,path=/,mount_tag=hostfs,security_model=none,multidevs=remap \
+-    -append \"console=${SERIAL_TTY},115200 root=${ROOT_MNT} rw nokaslr init=/lib/systemd/systemd debug systemd.log_level=info ${KERNEL_CMDLINE_EXTRA}\" \
+-    -drive file=${IMAGE_PATH},format=raw -kernel ${KERNEL_PATH} ${VM_START_ARGS}"}
++if [ "${TARGET_ARCH}" = "x86_64" ]; then
++  # QEMU start command for x86-64
++  : ${VM_START:="${QEMU_CMD} -s -nographic -smp 4 -m 4G -qmp tcp:localhost:4444,server,nowait -serial mon:stdio \
++      -net nic,model=virtio-net-pci -net user,hostfwd=tcp::5555-:22 \
++      -virtfs local,path=/,mount_tag=hostfs,security_model=none,multidevs=remap \
++      -append \"console=${SERIAL_TTY},115200 root=${ROOT_MNT} rw nokaslr init=/lib/systemd/systemd debug systemd.log_level=info ${KERNEL_CMDLINE_EXTRA}\" \
++      -drive file=${IMAGE_PATH},format=raw -kernel ${KERNEL_PATH} ${VM_START_ARGS}"}
++elif [ "${TARGET_ARCH}" = "arm64" ]; then
++  # QEMU start command for arm64
++  : ${VM_START:="${QEMU_CMD} -s -nographic \
++      -qmp tcp:localhost:4444,server,nowait -serial mon:stdio \
++      -net nic,model=virtio-net-pci -net user,hostfwd=tcp::5555-:22 \
++      -virtfs local,path=/,mount_tag=hostfs,security_model=none,multidevs=remap \
++      -append \"console=${SERIAL_TTY},115200 root=${ROOT_MNT} rw nokaslr debug ${KERNEL_CMDLINE_EXTRA}\" \
++      -hda ${IMAGE_PATH} -kernel ${KERNEL_PATH} ${VM_START_ARGS} \
++      -object rng-random,filename=/dev/urandom,id=rng0 \
++      -device virtio-rng-pci,rng=rng0 \
++      -device virtio-net-pci,netdev=eth0 \
++      -netdev user,id=eth0,hostfwd=tcp::8022-:22"}
++fi
+ 
+ case "${COMMAND}" in
+ # Virtual machine life-cycle
+-- 
+2.43.0
+
